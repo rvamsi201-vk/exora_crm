@@ -1,5 +1,9 @@
 # Environment variables - NEVER push this!
 .env
+.env.local
+
+# OS junk
+.DS_Store
 
 # Node modules
 node_modules/

@@ -11,24 +11,39 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
     :root {
-      --bg: #07050f;
-      --surface: #0d0a1a;
-      color-scheme: dark;
-      --card: rgba(14, 10, 28, 0.45);
-      --border: rgba(160, 80, 255, 0.18);
-      --purple: #a050ff;
-      --purple-soft: rgba(160, 80, 255, 0.15);
-      --text: #f0eaff;
-      --muted: rgba(240, 234, 255, 0.45);
-      --acc: #a050ff;
-      --s1: #0d0a1a;
-      --s2: #131126;
-      --s3: #1a1733;
-      --bd: rgba(160, 80, 255, 0.15);
-      --tx: #f0eaff;
-      --tx2: rgba(240, 234, 255, 0.6);
-      --tx3: rgba(240, 234, 255, 0.3);
+      /* Light admin dashboard palette. Variable names are kept stable
+         (--acc, --s1/s2/s3, --tx/tx2/tx3, --bd, ...) since the whole app
+         is built on them — only the values changed, from dark-purple to
+         light/blue, so this cascades everywhere safely. */
+      --bg: #f4f6fb;
+      --surface: #ffffff;
+      color-scheme: light;
+      --card: #ffffff;
+      --border: #e2e8f0;
+      --purple: #7c3aed;
+      --purple-soft: rgba(37, 99, 235, 0.08);
+      --text: #0f172a;
+      --muted: rgba(15, 23, 42, 0.5);
+      --acc: #2563eb;
+      --s1: #ffffff;
+      --s2: #f8fafc;
+      --s3: #eef2f9;
+      --bd: #e5e9f2;
+      --tx: #0f172a;
+      --tx2: rgba(15, 23, 42, 0.62);
+      --tx3: rgba(15, 23, 42, 0.4);
       --r: 12px;
+      /* Status/accent colors — used throughout for KPI cards, pipeline
+         stages, and badges (new=acc, contacted=a5, interested=a4,
+         proposal=purple, won/qualified=a3, lost=a2). These five were
+         referenced via var(--a2)..var(--a5) but never defined anywhere
+         in the stylesheet, so every gradient/color using them was
+         silently invalid; defining them here both fixes that and
+         supplies the "colorful KPI cards" this redesign asks for. */
+      --a2: #ef4444;
+      --a3: #16a34a;
+      --a4: #f59e0b;
+      --a5: #0ea5e9;
     }
 
     * {
@@ -87,7 +102,7 @@
       left: 0;
       top: 0;
       bottom: 0;
-      width: 260px;
+      width: 236px;
       background: var(--s1);
       border-right: 1px solid var(--bd);
       display: flex;
@@ -149,7 +164,7 @@
       color: #a050ff;
       letter-spacing: 0px;
       word-spacing: -3px;
-      text-shadow: 0 0 10px rgba(160, 80, 255, 0.4);
+      text-shadow: 0 0 10px rgba(37, 99, 235, 0.4);
       white-space: nowrap;
       overflow: visible !important;
       display: block;
@@ -241,7 +256,7 @@
       padding: 8px;
       width: 100%;
       min-width: 240px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.14);
       z-index: 1000;
       display: none;
       transform-origin: top;
@@ -337,7 +352,7 @@
       font-size: 13px;
       cursor: pointer;
       font-weight: 500;
-      box-shadow: 0 0 20px rgba(160, 80, 255, 0.3);
+      box-shadow: 0 0 20px rgba(37, 99, 235, 0.3);
     }
 
     #mega-menu {
@@ -560,7 +575,7 @@
       position: relative;
       overflow: hidden;
       flex-shrink: 0;
-      box-shadow: 0 0 15px rgba(160, 80, 255, 0.4);
+      box-shadow: 0 0 15px rgba(37, 99, 235, 0.4);
     }
 
     .logo-img {
@@ -738,7 +753,7 @@
 
     /* MAIN */
     .main {
-      margin-left: 260px;
+      margin-left: 236px;
       padding: 28px 32px;
       position: relative;
       z-index: 1;
@@ -823,7 +838,7 @@
     }
 
     .bp:hover {
-      background: #6e7df8;
+      background: #1d4ed8;
       transform: translateY(-1px);
     }
 
@@ -1112,7 +1127,7 @@
     .sb-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.4);
+      background: rgba(15, 23, 42, 0.12);
       backdrop-filter: blur(2px);
       z-index: 4999;
       opacity: 0;
@@ -1129,9 +1144,9 @@
       position: absolute;
       top: 15px;
       right: 15px;
-      background: #1a1733;
-      border: 1px solid rgba(160, 80, 255, 0.3);
-      color: white;
+      background: var(--s3);
+      border: 1px solid var(--bd);
+      color: var(--tx);
       width: 36px;
       height: 36px;
       border-radius: 10px;
@@ -1562,7 +1577,7 @@
       width: 500px;
       max-height: 88vh;
       overflow-y: auto;
-      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 30px 80px rgba(15, 23, 42, 0.16);
       animation: mup 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
@@ -1764,7 +1779,7 @@
       opacity: 0;
       transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
       max-width: 300px;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 20px 50px rgba(15, 23, 42, 0.12);
     }
 
     .toast.show {
@@ -1839,7 +1854,7 @@
       border-radius: 20px;
       padding: 36px 32px;
       width: 390px;
-      box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 40px 100px rgba(15, 23, 42, 0.16);
     }
 
     .login-logo {
@@ -2000,7 +2015,7 @@
     /* FULL-PAGE SECTIONS */
     .page-section {
       display: none;
-      margin-left: 260px;
+      margin-left: 236px;
       padding: 48px 32px;
       position: relative;
       z-index: 1;
@@ -2184,7 +2199,7 @@
       display: flex;
       flex-direction: column;
       transition: right 0.35s cubic-bezier(0.34, 1.10, 0.64, 1);
-      box-shadow: -20px 0 60px rgba(0, 0, 0, 0.5);
+      box-shadow: -20px 0 60px rgba(15, 23, 42, 0.14);
     }
 
     .lead-panel.open {
@@ -2658,20 +2673,20 @@
       padding: 16px;
       cursor: grab;
       transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
     }
 
     .kc:active {
       cursor: grabbing;
       transform: rotate(2deg) scale(1.05);
       z-index: 1000;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.12);
     }
 
     .kc:hover {
       border-color: rgba(91, 106, 247, 0.3);
       transform: translateY(-3px);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.10);
     }
 
     .move-to-wrap { position: relative; margin-top: 12px; display: none; }
@@ -2696,7 +2711,7 @@
       background: #1a1e2e;
       border: 1px solid #2e3250;
       border-radius: 10px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.14);
       display: none;
       flex-direction: column;
       padding: 6px;
@@ -2746,7 +2761,7 @@
       margin-right: 12px;
       font-size: 18px;
       transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.05);
     }
     .back-btn:hover { background: var(--acc); color: white; transform: translateX(-2px); }
     .page-section.show-back .back-btn { display: flex; }
@@ -3026,8 +3041,8 @@
         max-width: 85% !important;
         z-index: 10000 !important;
         display: flex !important;
-        box-shadow: 15px 0 50px rgba(0, 0, 0, 0.6);
-        background: #0d0a1a !important;
+        box-shadow: 15px 0 50px rgba(15, 23, 42, 0.16);
+        background: #ffffff !important;
         transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
         margin-left: 0 !important;
         padding: 20px 15px !important;
@@ -3537,7 +3552,7 @@
   <div class="topbar">
     <div style="display:flex; align-items:center; gap:12px;">
       <button class="hb-btn" onclick="toggleMSB()"
-        style="background:var(--s3); border:1px solid var(--acc); color:var(--acc); box-shadow:0 0 10px rgba(160,80,255,0.2);">
+        style="background:var(--s3); border:1px solid var(--acc); color:var(--acc); box-shadow:0 0 10px rgba(37,99,235,0.2);">
         <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2.5" fill="none"
           stroke-linecap="round" stroke-linejoin="round">
           <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -3601,6 +3616,10 @@
     <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
       <input class="fi" id="domain-search-input" placeholder="e.g. Hospitals, Gyms, IT Companies..."
         style="flex:1;min-width:220px;" onkeydown="if(event.key==='Enter')generateDomainLeads()">
+      <input class="fi" id="domain-area-input" placeholder="Area (optional, e.g. Koramangala)"
+        style="width:180px;" onkeydown="if(event.key==='Enter')generateDomainLeads()">
+      <input class="fi" id="domain-city-input" placeholder="City (optional, e.g. Bengaluru)"
+        style="width:180px;" onkeydown="if(event.key==='Enter')generateDomainLeads()">
       <button class="btn bp" onclick="generateDomainLeads()" id="domain-gen-btn">⚡ Generate Leads</button>
     </div>
 
@@ -3642,7 +3661,7 @@
     <div style="display:flex; align-items:center; gap:12px;">
       <button class="back-btn" onclick="showAdminPage('dashboard',document.getElementById('nav-dash'))">←</button>
       <button class="hb-btn" onclick="toggleMSB()"
-        style="background:var(--s3); border:1px solid var(--acc); color:var(--acc); box-shadow:0 0 10px rgba(160,80,255,0.2);">
+        style="background:var(--s3); border:1px solid var(--acc); color:var(--acc); box-shadow:0 0 10px rgba(37,99,235,0.2);">
         <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2.5" fill="none"
           stroke-linecap="round" stroke-linejoin="round">
           <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -3663,6 +3682,12 @@
         <div class="bell-btn" onclick="toggleRemindersPanel()"><i data-lucide="bell"></i><span class="bell-dot" id="bell-dot-leads"></span></div>
         <button class="btn bp" id="tb-add-lead" onclick="openAddLead()">+ Add Lead</button>
       </div>
+  </div>
+  <div style="background:var(--s1);border:1.5px solid var(--bd);border-radius:var(--r);padding:14px 18px;margin-bottom:20px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+    <div style="font-family:'Clash Display',sans-serif;font-size:13px;font-weight:700;white-space:nowrap;">⚡ Find More</div>
+    <input class="fi" id="leads-area-input" placeholder="Area (optional, e.g. Koramangala)" style="width:180px;" onkeydown="if(event.key==='Enter')triggerLeadsPageGen()">
+    <input class="fi" id="leads-city-input" placeholder="City (optional, e.g. Bengaluru)" style="width:180px;" onkeydown="if(event.key==='Enter')triggerLeadsPageGen()">
+    <button class="btn bp" onclick="triggerLeadsPageGen()" id="leads-gen-btn">⚡ Generate More Leads</button>
   </div>
   <div class="card" style="margin-bottom:20px;">
     <div class="ch" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
@@ -3700,7 +3725,7 @@
     <div style="display:flex; align-items:center;">
       <button class="back-btn" onclick="showAdminPage('dashboard',document.getElementById('nav-dash'))">←</button>
       <button class="hb-btn" onclick="toggleMSB()"
-        style="background:var(--s3); border:1px solid var(--acc); color:var(--acc); box-shadow:0 0 10px rgba(160,80,255,0.2);">
+        style="background:var(--s3); border:1px solid var(--acc); color:var(--acc); box-shadow:0 0 10px rgba(37,99,235,0.2);">
         <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2.5" fill="none"
           stroke-linecap="round" stroke-linejoin="round">
           <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -3952,7 +3977,7 @@
     <div style="display:flex; align-items:center;">
       <button class="back-btn" onclick="showAdminPage('dashboard',document.getElementById('nav-dash'))">←</button>
       <button class="hb-btn" onclick="toggleMSB()"
-        style="background:var(--s3); border:1px solid var(--acc); color:var(--acc); box-shadow:0 0 10px rgba(160,80,255,0.2);">
+        style="background:var(--s3); border:1px solid var(--acc); color:var(--acc); box-shadow:0 0 10px rgba(37,99,235,0.2);">
         <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2.5" fill="none"
           stroke-linecap="round" stroke-linejoin="round">
           <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -4005,7 +4030,7 @@
     <div style="display:flex; align-items:center;">
       <button class="back-btn" onclick="showAdminPage('dashboard',document.getElementById('nav-dash'))">←</button>
       <button class="hb-btn" onclick="toggleMSB()"
-        style="background:var(--s3); border:1px solid var(--acc); color:var(--acc); box-shadow:0 0 10px rgba(160,80,255,0.2);">
+        style="background:var(--s3); border:1px solid var(--acc); color:var(--acc); box-shadow:0 0 10px rgba(37,99,235,0.2);">
         <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2.5" fill="none"
           stroke-linecap="round" stroke-linejoin="round">
           <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -4020,7 +4045,7 @@
     </div>
     <div class="tb-right">
       <button class="btn bg" onclick="showAdminPage('team',document.getElementById('nav-team'))">Skip</button>
-      <button class="btn bp" id="assign-all-btn" onclick="assignAllLeads()" style="margin-left: 10px; background: rgba(160,80,255,0.08); border: 1.5px solid rgba(160,80,255,0.3); color: var(--acc); box-shadow: 0 4px 15px rgba(160,80,255,0.1);">⚡ Assign All</button>
+      <button class="btn bp" id="assign-all-btn" onclick="assignAllLeads()" style="margin-left: 10px; background: rgba(37,99,235,0.08); border: 1.5px solid rgba(37,99,235,0.3); color: var(--acc); box-shadow: 0 4px 15px rgba(37,99,235,0.1);">⚡ Assign All</button>
       <button class="btn bp" id="assign-submit-btn" onclick="submitAssignLeads()" style="margin-left: 10px;">✓ Submit Assignment</button>
     </div>
   </div>
@@ -4055,7 +4080,7 @@
     <div style="display:flex; align-items:center;">
       <button class="back-btn" onclick="showAdminPage('dashboard',document.getElementById('nav-dash'))">←</button>
       <button class="hb-btn" onclick="toggleMSB()"
-        style="background:var(--s3); border:1px solid var(--acc); color:var(--acc); box-shadow:0 0 10px rgba(160,80,255,0.2);">
+        style="background:var(--s3); border:1px solid var(--acc); color:var(--acc); box-shadow:0 0 10px rgba(37,99,235,0.2);">
         <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2.5" fill="none"
           stroke-linecap="round" stroke-linejoin="round">
           <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -4123,7 +4148,7 @@
     <div style="display:flex; align-items:center;">
       <button class="back-btn" onclick="showAdminPage('dashboard',document.getElementById('nav-dash'))" title="Back to Dashboard">←</button>
       <button class="hb-btn" onclick="toggleMSB()"
-        style="background:var(--s3); border:1px solid var(--acc); color:var(--acc); box-shadow:0 0 10px rgba(160,80,255,0.2);">
+        style="background:var(--s3); border:1px solid var(--acc); color:var(--acc); box-shadow:0 0 10px rgba(37,99,235,0.2);">
         <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2.5" fill="none"
           stroke-linecap="round" stroke-linejoin="round">
           <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -4160,7 +4185,7 @@
     <div style="display:flex; align-items:center;">
       <button class="back-btn" onclick="showAdminPage('dashboard',document.getElementById('nav-dash'))" title="Back to Dashboard">←</button>
       <button class="hb-btn" onclick="toggleMSB()"
-        style="background:var(--s3); border:1px solid var(--acc); color:var(--acc); box-shadow:0 0 10px rgba(160,80,255,0.2);">
+        style="background:var(--s3); border:1px solid var(--acc); color:var(--acc); box-shadow:0 0 10px rgba(37,99,235,0.2);">
         <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2.5" fill="none"
           stroke-linecap="round" stroke-linejoin="round">
           <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -4187,7 +4212,7 @@
   <div class="topbar">
     <div style="display:flex; align-items:center;">
       <button class="hb-btn" onclick="toggleMSB()"
-        style="background:var(--s3); border:1px solid var(--acc); color:var(--acc); box-shadow:0 0-10px rgba(160,80,255,0.2);">
+        style="background:var(--s3); border:1px solid var(--acc); color:var(--acc); box-shadow:0 0-10px rgba(37,99,235,0.2);">
         <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2.5" fill="none"
           stroke-linecap="round" stroke-linejoin="round">
           <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -4264,6 +4289,10 @@
       <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
         <input class="fi" id="sp-domain-search-input" placeholder="e.g. Auditing Companies, Fitness Gyms..."
           style="flex:1;min-width:220px;" onkeydown="if(event.key==='Enter')generateDomainLeads('sp')">
+        <input class="fi" id="sp-domain-area-input" placeholder="Area (optional, e.g. Koramangala)"
+          style="width:180px;" onkeydown="if(event.key==='Enter')generateDomainLeads('sp')">
+        <input class="fi" id="sp-domain-city-input" placeholder="City (optional, e.g. Bengaluru)"
+          style="width:180px;" onkeydown="if(event.key==='Enter')generateDomainLeads('sp')">
         <button class="btn bp" onclick="generateDomainLeads('sp')" id="sp-domain-gen-btn">⚡ Generate Leads</button>
       </div>
 
@@ -4279,7 +4308,7 @@
     <div style="display:flex; align-items:center;">
       <button class="back-btn" onclick="showSPPage('spdash', document.getElementById('nav-spdash'))">←</button>
       <button class="hb-btn" onclick="toggleMSB()"
-        style="background:var(--s3); border:1px solid var(--acc); color:var(--acc); box-shadow:0 0 10px rgba(160,80,255,0.2);">
+        style="background:var(--s3); border:1px solid var(--acc); color:var(--acc); box-shadow:0 0 10px rgba(37,99,235,0.2);">
         <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2.5" fill="none"
           stroke-linecap="round" stroke-linejoin="round">
           <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -4496,6 +4525,10 @@
   }
 
   // ── Website column helper ─────────────────────────────────
+  function locationLine(l) {
+    const loc = [l.area, l.city].filter(v => v && v.trim()).join(', ');
+    return loc ? `<div class="sa" style="color:var(--tx3);">📍 ${loc}</div>` : '';
+  }
   function websiteCell(l) {
     const w = (l.website && l.website.trim() && l.website !== 'undefined' && l.website !== 'null') ? l.website : '';
     if (!w) {
@@ -4647,11 +4680,16 @@
     }
   }
 
+  let domainGenInFlight = false; // guards against double-submit (double-click, double-Enter) firing two campaigns
   async function generateDomainLeads(role = 'admin') {
+    if (domainGenInFlight) return;
+
     const inputId = role === 'admin' ? 'domain-search-input' : 'sp-domain-search-input';
     const btnId = role === 'admin' ? 'domain-gen-btn' : 'sp-domain-gen-btn';
     const targetId = role === 'admin' ? 'target-term' : 'sp-target-term';
     const typeId = role === 'admin' ? 'type-term' : 'sp-type-term';
+    const areaId = role === 'admin' ? 'domain-area-input' : 'sp-domain-area-input';
+    const cityId = role === 'admin' ? 'domain-city-input' : 'sp-domain-city-input';
 
     const input = document.getElementById(inputId);
     const val = input.value.trim();
@@ -4661,6 +4699,14 @@
     const typeEl = document.getElementById(typeId);
     const targetTerm = (targetEl && targetEl.value.trim()) || 'customers';
     const typeTerm = (typeEl && typeEl.value.trim()) || 'business';
+
+    const areaEl = document.getElementById(areaId);
+    const cityEl = document.getElementById(cityId);
+    const area = (areaEl && areaEl.value.trim()) || '';
+    const city = (cityEl && cityEl.value.trim()) || '';
+    const locationLabel = [area, city].filter(Boolean).join(', ');
+
+    domainGenInFlight = true;
 
     // Scroll to top
     window.scrollTo(0, 0);
@@ -4704,30 +4750,40 @@
         renderSidebarDomains();
       }
 
-      // 2. Trigger n8n
-      await post('/trigger-n8n', {
+      // 2. Trigger n8n best-effort (location is passed separately — the
+      // free-text query and provenance stay intact; only the search sent
+      // out is location-aware). Not awaited for completion — /trigger-all
+      // below is the authoritative, synchronous source of truth.
+      post('/trigger-n8n', {
         generated_by_name: currentUser.name,
         custom_query: val,
-        domain: domainId
-      }, true);
+        domain: domainId,
+        area, city
+      }, true).catch(err => console.log('n8n trigger err:', err));
 
-      // 3. Trigger immediate Serper backup
-      post('/trigger-all', { query: val, domain: domainId }, true).catch(err => console.log('Serper backup err:', err));
-
-      toast(`🚀 Generating leads for ${label}s... This may take ~45s.`, 'success');
+      toast(`🚀 Searching for ${label}s${locationLabel ? ' in ' + locationLabel : ''}...`, 'info');
       input.value = '';
+      if (areaEl) areaEl.value = '';
+      if (cityEl) cityEl.value = '';
 
-      // 4. Wait and refresh
-      setTimeout(async () => {
-        if (currentUser.role === 'admin') await loadAdminData();
-        else await loadSPData();
-        await loadBrandStats();
-        toast(`✅ ${label}s leads are now available!`, 'success');
-      }, 45000);
+      // 3. Await the real Serper-backed search, then refresh with real counts.
+      const result = await post('/trigger-all', { query: val, domain: domainId, area, city }, true);
+      if (currentUser.role === 'admin') await loadAdminData();
+      else await loadSPData();
+      await loadBrandStats();
+
+      const p = result.pipeline || {};
+      const parts = [`${p.scraped || 0} saved`];
+      if (p.skipped) parts.push(`${p.skipped} duplicate`);
+      if (p.rejected) parts.push(`${p.rejected} rejected (location mismatch)`);
+      if (p.errors) parts.push(`${p.errors} errors`);
+      const tone = (p.scraped || 0) > 0 ? 'success' : ((p.rejected || 0) || (p.errors || 0) ? 'error' : 'info');
+      toast(`✅ ${label}s search complete — ${parts.join(', ')}`, tone);
 
     } catch (e) {
-      toast('Error: ' + e.message, 'error');
+      toast('Search failed: ' + e.message, 'error');
     } finally {
+      domainGenInFlight = false;
       btn.disabled = false;
       btn.innerHTML = '⚡ Generate Leads';
     }
@@ -4737,6 +4793,12 @@
     const d = domains.find(d => d.id === currentDomain);
     if (!d) return toast('Current domain not found', 'error');
 
+    const areaEl = document.getElementById('leads-area-input');
+    const cityEl = document.getElementById('leads-city-input');
+    const area = (areaEl && areaEl.value.trim()) || '';
+    const city = (cityEl && cityEl.value.trim()) || '';
+    const locationLabel = [area, city].filter(Boolean).join(', ');
+
     const btn = document.getElementById('leads-gen-btn');
     const oldTxt = btn.innerHTML;
     btn.disabled = true;
@@ -4745,26 +4807,29 @@
     try {
       // Run dedup first
       await post('/leads/dedup', {}, true).catch(err => console.log('Dedup pre-run err:', err));
-      await post('/trigger-n8n', {
+      post('/trigger-n8n', {
         generated_by_name: currentUser.name,
         custom_query: d.query,
-        domain: d.id
-      }, true);
+        domain: d.id,
+        area, city
+      }, true).catch(err => console.log('n8n trigger err:', err));
 
-      // Immediate Serper backup
-      post('/trigger-all', { query: d.query, domain: d.id }, true).catch(e => console.log(e));
+      toast(`🚀 Searching for more ${d.label}${locationLabel ? ' in ' + locationLabel : ''}...`, 'info');
 
-      toast(`🚀 Generating more ${d.label}... This may take ~45s.`, 'success');
+      const result = await post('/trigger-all', { query: d.query, domain: d.id, area, city }, true);
+      if (currentUser.role === 'admin') await loadAdminData();
+      else await loadSPData();
 
-      // Refresh in 45s
-      setTimeout(async () => {
-        if (currentUser.role === 'admin') await loadAdminData();
-        else await loadSPData();
-        toast(`✅ New ${d.label} are now available!`, 'success');
-      }, 45000);
+      const p = result.pipeline || {};
+      const parts = [`${p.scraped || 0} saved`];
+      if (p.skipped) parts.push(`${p.skipped} duplicate`);
+      if (p.rejected) parts.push(`${p.rejected} rejected (location mismatch)`);
+      if (p.errors) parts.push(`${p.errors} errors`);
+      const tone = (p.scraped || 0) > 0 ? 'success' : ((p.rejected || 0) || (p.errors || 0) ? 'error' : 'info');
+      toast(`✅ ${d.label} search complete — ${parts.join(', ')}`, tone);
 
     } catch (e) {
-      toast('Error: ' + e.message, 'error');
+      toast('Search failed: ' + e.message, 'error');
     } finally {
       btn.disabled = false;
       btn.innerHTML = oldTxt;
@@ -4828,7 +4893,7 @@
   function authHeaders() { return { Authorization: 'Bearer ' + authToken, 'Content-Type': 'application/json' }; }
 
   // ── API CALLS ──
-  async function get(path, auth = false) {
+  async function get(path, auth = true) {
     const h = { 'ngrok-skip-browser-warning': 'true' };
     if (auth) h.Authorization = 'Bearer ' + authToken;
     const r = await fetch(API + path, { headers: h });
@@ -5196,9 +5261,11 @@
 
     // 3. SEARCH filter
     const q = spSq.toLowerCase();
-    const searchMatch = !q 
-      || (l.school_name || '').toLowerCase().includes(q) 
-      || (l.address || '').toLowerCase().includes(q);
+    const searchMatch = !q
+      || (l.school_name || '').toLowerCase().includes(q)
+      || (l.address || '').toLowerCase().includes(q)
+      || (l.city || '').toLowerCase().includes(q)
+      || (l.area || '').toLowerCase().includes(q);
 
     // 4. SIZE filter
     const sizeMatch = (() => {
@@ -5262,7 +5329,7 @@
     if (!leadsArray.length) { tb.innerHTML = '<tr class="empty"><td colspan="7">No leads found.</td></tr>'; return; }
     const bc = { new: 'bn', contacted: 'bc', interested: 'bi', proposal: 'bp', won: 'bw', lost: 'bl' };
     tb.innerHTML = leadsArray.map(l => `<tr>
-    <td><div class="sn">${l.school_name || '—'}</div><div class="sa">${l.address || ''}</div><div style="margin-top:6px;">${l.pitch ? `<a class="wb-link" style="cursor:pointer;white-space:nowrap;" onclick="showPitch(${l.id})">🤖 View Pitch</a>` : `<a class="wb-link" style="cursor:pointer;white-space:nowrap;color:var(--tx3);" onclick="spGeneratePitch(${l.id}, this)">⚡ Generate Pitch</a>`}</div></td>
+    <td><div class="sn">${l.school_name || '—'}</div><div class="sa">${l.address || ''}</div>${locationLine(l)}<div style="margin-top:6px;">${l.pitch ? `<a class="wb-link" style="cursor:pointer;white-space:nowrap;" onclick="showPitch(${l.id})">🤖 View Pitch</a>` : `<a class="wb-link" style="cursor:pointer;white-space:nowrap;color:var(--tx3);" onclick="spGeneratePitch(${l.id}, this)">⚡ Generate Pitch</a>`}</div></td>
     <td><div style="font-size:12px;color:var(--tx2);white-space:nowrap;">${(l.phone && l.phone.trim() && l.phone !== 'undefined' && l.phone !== 'null') ? l.phone : '—'}</div></td>
     <td style="white-space:nowrap;">${websiteCell(l)}</td>
     <td><div style="color:var(--a4);font-size:12.5px;">${l.rating || '—'} ⭐</div></td>
@@ -5753,10 +5820,12 @@
 
     // 3. SEARCH filter
     const q = sq.toLowerCase();
-    const searchMatch = !q 
-      || (l.school_name || '').toLowerCase().includes(q) 
-      || (l.address || '').toLowerCase().includes(q) 
-      || (l.phone || '').toLowerCase().includes(q);
+    const searchMatch = !q
+      || (l.school_name || '').toLowerCase().includes(q)
+      || (l.address || '').toLowerCase().includes(q)
+      || (l.phone || '').toLowerCase().includes(q)
+      || (l.city || '').toLowerCase().includes(q)
+      || (l.area || '').toLowerCase().includes(q);
 
     // 4. SIZE filter
     const sizeMatch = (() => {
@@ -5841,7 +5910,7 @@
       const init = m ? m.name.split(' ').map(n => n[0]).join('').slice(0, 2) : '?';
       const pStr = (l.phone && l.phone.trim() && l.phone !== 'undefined' && l.phone !== 'null') ? l.phone : '—';
       const assCell = (currentAssignment === 'assigned') ? `<td style="white-space:nowrap;"><div style="background:${m?.color}15; color:${m?.color}; border:1px solid ${m?.color}30; padding:4px 10px; border-radius:6px; font-size:11px; font-weight:700;">${m?.name || '—'}</div></td><td style="font-size:11px; color:var(--tx3);">${fd(l.assigned_at)}</td>` : '';
-      return `<tr><td><div class="sn">${l.school_name || '—'}</div><div class="sa">${l.address || ''}</div><div style="margin-top:6px;">${l.pitch ? `<a class="wb-link" style="cursor:pointer;white-space:nowrap;" onclick="showPitch(${l.id})">💬 View Pitch</a>` : `<a class="wb-link" style="cursor:pointer;white-space:nowrap;color:var(--tx3);" onclick="spGeneratePitch(${l.id}, this)">⚡ Generate Pitch</a>`}</div></td><td><div style="font-size:12px;color:var(--tx2);white-space:nowrap;">${pStr}</div></td><td style="white-space:nowrap;">${websiteCell(l)}</td><td><div style="color:var(--a4);font-size:12.5px;">${l.rating || '—'} ⭐</div></td><td><div style="display:flex;align-items:center;gap:12px;"><div class="score-pill"><strong>${l.score || 0}</strong> /100</div><div style="font-size:14px;">${l.priority == '🔥 high' ? '🔥' : l.priority == '⚡ medium' ? '⚡' : '📋'}</div></div></td><td><select class="badge ${bc[curStatus] || 'bn'}" onchange="updStatus(${l.id},this.value,this)" style="background:none;border:none;cursor:pointer;color:inherit;font-weight:700;">
+      return `<tr><td><div class="sn">${l.school_name || '—'}</div><div class="sa">${l.address || ''}</div>${locationLine(l)}<div style="margin-top:6px;">${l.pitch ? `<a class="wb-link" style="cursor:pointer;white-space:nowrap;" onclick="showPitch(${l.id})">💬 View Pitch</a>` : `<a class="wb-link" style="cursor:pointer;white-space:nowrap;color:var(--tx3);" onclick="spGeneratePitch(${l.id}, this)">⚡ Generate Pitch</a>`}</div></td><td><div style="font-size:12px;color:var(--tx2);white-space:nowrap;">${pStr}</div></td><td style="white-space:nowrap;">${websiteCell(l)}</td><td><div style="color:var(--a4);font-size:12.5px;">${l.rating || '—'} ⭐</div></td><td><div style="display:flex;align-items:center;gap:12px;"><div class="score-pill"><strong>${l.score || 0}</strong> /100</div><div style="font-size:14px;">${l.priority == '🔥 high' ? '🔥' : l.priority == '⚡ medium' ? '⚡' : '📋'}</div></div></td><td><select class="badge ${bc[curStatus] || 'bn'}" onchange="updStatus(${l.id},this.value,this)" style="background:none;border:none;cursor:pointer;color:inherit;font-weight:700;">
 
           <option value="new" ${curStatus === 'new' ? 'selected' : ''}>🔵 New</option>
           <option value="contacted" ${curStatus === 'contacted' ? 'selected' : ''}>🟠 Contacted</option>
@@ -5958,7 +6027,7 @@
         const dt = new Date(l.created_at);
         const dtStr = dt.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
         const delActivity = `<button onclick="deleteActivity('${l.type}', ${l.id}, ${l.lead_id})" style="margin-left:auto; background:none; border:none; cursor:pointer; opacity:0.3;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.3" title="Delete Activity"><i data-lucide="trash-2" class="icon-sm"></i></button>`;
-        const statusColors = { new: 'rgba(91,106,247,0.15)', contacted: 'rgba(62,207,255,0.15)', interested: 'rgba(245,166,35,0.15)', proposal: 'rgba(160,80,255,0.15)', won: 'rgba(29,233,160,0.15)', lost: 'rgba(242,91,126,0.15)', qualified: 'rgba(29,233,160,0.15)', closed: 'rgba(29,233,160,0.15)' };
+        const statusColors = { new: 'rgba(91,106,247,0.15)', contacted: 'rgba(62,207,255,0.15)', interested: 'rgba(245,166,35,0.15)', proposal: 'rgba(37,99,235,0.15)', won: 'rgba(29,233,160,0.15)', lost: 'rgba(242,91,126,0.15)', qualified: 'rgba(29,233,160,0.15)', closed: 'rgba(29,233,160,0.15)' };
         const statusTextColors = { new: 'var(--acc)', contacted: 'var(--a5)', interested: 'var(--a4)', proposal: 'var(--purple)', won: 'var(--a3)', lost: 'var(--a2)', qualified: 'var(--a3)', closed: 'var(--a3)' };
         const statusEmoji = {
           new: '<i data-lucide="circle" class="icon-sm" style="fill:var(--acc)"></i>',
@@ -6340,7 +6409,8 @@
   // ══════════════════════════════════════════════════════════
   async function loadScoreSettings() {
     try {
-      const rows = await fetch(API + '/score-config').then(r => r.json());
+      const rows = await get('/score-config');
+      if (!Array.isArray(rows)) throw new Error('Unexpected response from server (expected a list of score rules).');
       renderConfigList('base-config-list', rows.filter(r => r.category === 'base'));
       renderConfigList('gap-config-list', rows.filter(r => r.category === 'gap'));
     } catch (e) { toast('Failed to load score config: ' + e.message, 'error'); }
@@ -6377,11 +6447,7 @@
     const enEl = document.getElementById('cfg-en-' + id);
     if (!ptsEl || !enEl) return;
     try {
-      await fetch(API + '/score-config/' + id, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ points: parseInt(ptsEl.value), enabled: enEl.checked })
-      });
+      await patch('/score-config/' + id, { points: parseInt(ptsEl.value), enabled: enEl.checked });
       toast('✅ Rule saved!', 'success');
     } catch (e) { toast('Error saving rule: ' + e.message, 'error'); }
   }
@@ -6830,7 +6896,7 @@
         
         ctx.beginPath();
         ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(160, 80, 255, ${s.opacity * 0.5})`;
+        ctx.fillStyle = `rgba(37, 99, 235, ${s.opacity * 0.5})`;
         ctx.fill();
         // subtle twinkle
         s.opacity += (Math.random() - 0.5) * 0.05;

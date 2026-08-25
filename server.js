@@ -1,5 +1,5 @@
-require('dotenv').config();
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+const { loadEnv, assertNotRemoteDatabase } = require('./lib/env-guard');
+loadEnv();
 const express = require('express');
 const { Pool } = require('pg');
 const cors = require('cors');
@@ -9,24 +9,66 @@ const path = require('path');
 
 const { scrapeAndSave } = require('./lead-scraper');
 const { scoreAllPendingLeads, scoreLead } = require('./lead-scorer');
+const { getCollector } = require('./lib/collectors');
+const { enqueueJob } = require('./lib/jobs/queue');
+const { startWorker } = require('./lib/jobs/worker');
+const { findOrCreateCompany, addLocationIfMissing, findOrCreateContact } = require('./lib/companies');
+const { mergeCompanies, mergeContacts, AlreadyMergedError } = require('./lib/dedup/merge');
+const { pickAssignee, assignOpportunity } = require('./lib/crm/assignment');
+const { createTask, createSlaFollowUpTask, completeTask } = require('./lib/crm/tasks');
+const { recordActivity } = require('./lib/crm/activity');
+const { addSuppression, removeSuppression } = require('./lib/outreach/suppression');
+const { recordScoreFeedback } = require('./lib/crm/scoreFeedback');
+const analytics = require('./lib/analytics/reports');
+const { normalizeLocation, combineQueryWithLocation } = require('./lib/normalize');
+const crypto = require('crypto');
+
+const DEFAULT_ORG_ID = '00000000-0000-0000-0000-000000000001';
 
 const app = express();
-app.use(cors());
+const isProduction = process.env.NODE_ENV === 'production';
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || '')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+app.use(cors({
+  origin(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin) || (!isProduction && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin))) {
+      return callback(null, true);
+    }
+    return callback(new Error('Origin not allowed by CORS'));
+  }
+}));
 app.use(express.json());
 
 // ── Globals for n8n tracking ──
 global.lastN8nTrigger = 'System';
 global.lastN8nDomain = 'school';
+global.lastN8nLocation = {};
 
 // ── Serve frontend ──
-app.use(express.static(path.join(__dirname)));
+// Only the files the UI actually references are served statically; the
+// directory previously served as-is, which exposed server.js, package.json,
+// nginx/PM2 config, and node_modules over HTTP.
+app.get('/logo.png', (req, res) => res.sendFile(path.join(__dirname, 'logo.png')));
 
-const JWT_SECRET = process.env.JWT_SECRET || 'leadflow_super_secret_2024';
+if (isProduction && (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32)) {
+  throw new Error('JWT_SECRET must be set to at least 32 characters in production');
+}
+const JWT_SECRET = process.env.JWT_SECRET || 'development-only-change-before-production';
+
+function databaseSslConfig() {
+  const mode = (process.env.DATABASE_SSL_MODE || 'require').toLowerCase();
+  if (mode === 'disable') return false;
+  return { rejectUnauthorized: mode === 'verify-full' };
+}
 
 // ── PostgreSQL Connection ──
+assertNotRemoteDatabase(process.env.DATABASE_URL);
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
+  ssl: databaseSslConfig()
 });
 
 // ── Auto-create tables on startup ──
@@ -224,15 +266,22 @@ async function initDB() {
       END $$;
     `);
 
-    // Seed default admin if not exists
-    const adminCheck = await pool.query("SELECT id FROM users WHERE email=$1", ['admin@leadflow.com']);
-    if (adminCheck.rows.length === 0) {
-      const hash = await bcrypt.hash('admin123', 10);
-      await pool.query(
-        `INSERT INTO users (name, email, password_hash, role) VALUES ($1,$2,$3,$4)`,
-        ['Admin User', 'admin@leadflow.com', hash, 'admin']
-      );
-      console.log('✅ Default admin created: admin@leadflow.com / admin123');
+    // Optional bootstrap admin. Never create known credentials automatically.
+    if (process.env.SEED_DEFAULT_ADMIN === 'true') {
+      const adminEmail = process.env.DEFAULT_ADMIN_EMAIL;
+      const adminPassword = process.env.DEFAULT_ADMIN_PASSWORD;
+      if (!adminEmail || !adminPassword || adminPassword.length < 12) {
+        throw new Error('DEFAULT_ADMIN_EMAIL and a 12+ character DEFAULT_ADMIN_PASSWORD are required when SEED_DEFAULT_ADMIN=true');
+      }
+      const adminCheck = await pool.query('SELECT id FROM users WHERE email=$1', [adminEmail.toLowerCase().trim()]);
+      if (adminCheck.rows.length === 0) {
+        const hash = await bcrypt.hash(adminPassword, 10);
+        await pool.query(
+          `INSERT INTO users (name, email, password_hash, role) VALUES ($1,$2,$3,$4)`,
+          [process.env.DEFAULT_ADMIN_NAME || 'Admin User', adminEmail.toLowerCase().trim(), hash, 'admin']
+        );
+        console.log('✅ Bootstrap admin created');
+      }
     }
 
     console.log('✅ Connected to PostgreSQL —', process.env.DATABASE_URL.split('/').pop());
@@ -242,7 +291,11 @@ async function initDB() {
   }
 }
 
-initDB();
+if (process.env.AUTO_INIT_DB !== 'false' && !isProduction) {
+  initDB();
+} else {
+  console.log('ℹ️ Automatic database initialization is disabled');
+}
 
 // ── AUTH MIDDLEWARE ──
 function requireAuth(roles = []) {
@@ -263,13 +316,19 @@ function requireAuth(roles = []) {
   };
 }
 
+// Resolves the caller's organization from organization_memberships,
+// falling back to the seeded default org (every pre-existing user was
+// backfilled into it by migration 001, so this only matters for brand new
+// accounts created before a membership exists).
+async function getOrgId(userId) {
+  const { rows } = await pool.query(
+    `SELECT org_id FROM organization_memberships WHERE user_id=$1 AND deleted_at IS NULL ORDER BY created_at ASC LIMIT 1`,
+    [userId]
+  );
+  return rows[0]?.org_id || DEFAULT_ORG_ID;
+}
+
 // ── ROOT & HEALTH ──
-app.get('/', (req, res) => {
-  res.json({
-    status: 'ok',
-    message: 'LeadForge server running'
-  });
-});
 app.get('/api/', (req, res) => {
   res.json({ status: 'ok', message: 'LeadForge server running' });
 });
@@ -361,6 +420,9 @@ app.post('/api/auth/register', requireAuth(['admin']), async (req, res) => {
   }
 });
 
+// Every remaining API route requires a valid signed-in user.
+app.use('/api', requireAuth());
+
 // ── Helpers ────────────────────────────────────────────
 function cleanPhone(raw) {
   if (!raw) return '';
@@ -418,7 +480,7 @@ app.get('/api/score-config', async (req, res) => {
     res.json(rows);
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
-app.patch('/api/score-config/:id', async (req, res) => {
+app.patch('/api/score-config/:id', requireAuth(['admin']), async (req, res) => {
   const { points, enabled } = req.body;
   const updates = []; const vals = []; let i = 1;
   if (points !== undefined) { updates.push(`points=$${i++}`); vals.push(parseInt(points)); }
@@ -433,7 +495,7 @@ app.patch('/api/score-config/:id', async (req, res) => {
 
 // ── LEADS ──
 app.get('/api/leads', async (req, res) => {
-  const { domain, size } = req.query;
+  const { domain, size, city, area, normalized_location, campaign_id } = req.query;
   try {
     let q = 'SELECT * FROM leads WHERE 1=1';
     let params = [];
@@ -444,6 +506,22 @@ app.get('/api/leads', async (req, res) => {
     if (size && size !== 'all') {
       params.push(size);
       q += ` AND size = $${params.length}`;
+    }
+    if (city && city !== 'all') {
+      params.push(`%${city.toLowerCase()}%`);
+      q += ` AND (LOWER(city) LIKE $${params.length} OR LOWER(area) LIKE $${params.length} OR LOWER(normalized_location) LIKE $${params.length})`;
+    }
+    if (area && area !== 'all') {
+      params.push(`%${area.toLowerCase()}%`);
+      q += ` AND LOWER(area) LIKE $${params.length}`;
+    }
+    if (normalized_location) {
+      params.push(`%${normalized_location.toLowerCase()}%`);
+      q += ` AND LOWER(normalized_location) LIKE $${params.length}`;
+    }
+    if (campaign_id) {
+      params.push(campaign_id);
+      q += ` AND EXISTS (SELECT 1 FROM source_records sr WHERE sr.legacy_lead_id = leads.id AND sr.campaign_id = $${params.length})`;
     }
     q += ' ORDER BY school_name ASC';
     const result = await pool.query(q, params);
@@ -564,15 +642,16 @@ app.get('/api/leads/mine', requireAuth(['salesperson']), async (req, res) => {
 });
 
 app.post('/api/leads', async (req, res) => {
-  const { school_name, address, phone, website, rating, reviews, source, status, assigned_id, notes, deal_value, domain } = req.body;
+  const { school_name, address, phone, website, rating, reviews, source, status, assigned_id, notes, deal_value, domain, city, area, state, country } = req.body;
   try {
     const cleanedPhone = cleanPhone(phone);
     const finalDomain = detectDomain(school_name, domain);
     const base = calcBaseScore({ rating, reviews, phone: cleanedPhone, website, address });
+    const normalizedLocation = normalizeLocation({ area, city, state, country });
     const result = await pool.query(
-      `INSERT INTO leads (school_name, address, phone, website, rating, reviews, base_score, score, source, status, assigned_id, notes, deal_value, domain)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14) RETURNING *`,
-      [school_name, address, cleanedPhone, website, rating || null, reviews || null, base, base, source || 'manual', status || 'new', assigned_id || null, notes || '', deal_value || 0, finalDomain]
+      `INSERT INTO leads (school_name, address, phone, website, rating, reviews, base_score, score, source, status, assigned_id, notes, deal_value, domain, city, area, state, country, normalized_location)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19) RETURNING *`,
+      [school_name, address, cleanedPhone, website, rating || null, reviews || null, base, base, source || 'manual', status || 'new', assigned_id || null, notes || '', deal_value || 0, finalDomain, city || null, area || null, state || null, country || null, normalizedLocation]
     );
     res.json(result.rows[0]);
   } catch (err) { res.status(500).json({ error: err.message }); }
@@ -584,6 +663,9 @@ app.patch('/api/leads/:id', async (req, res) => {
   try {
     const keys = Object.keys(fields);
     if (!keys.length) return res.status(400).json({ error: 'No fields to update' });
+    const allowedFields = new Set(['school_name', 'address', 'phone', 'website', 'rating', 'reviews', 'status', 'assigned_id', 'notes', 'deal_value', 'domain', 'size', 'city', 'area', 'state', 'country']);
+    const invalidFields = keys.filter((key) => !allowedFields.has(key));
+    if (invalidFields.length) return res.status(400).json({ error: `Unsupported fields: ${invalidFields.join(', ')}` });
     const setClause = keys.map((k, i) => `${k}=$${i + 1}`).join(', ');
     const values = keys.map(k => fields[k]);
     values.push(id);
@@ -609,7 +691,7 @@ app.patch('/api/leads/:id/status', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.delete('/api/leads/:id', async (req, res) => {
+app.delete('/api/leads/:id', requireAuth(['admin']), async (req, res) => {
   try {
     await pool.query('DELETE FROM leads WHERE id=$1', [req.params.id]);
     res.json({ success: true });
@@ -654,7 +736,7 @@ app.get('/api/team', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.post('/api/team', async (req, res) => {
+app.post('/api/team', requireAuth(['admin']), async (req, res) => {
   const { name, role, email, phone, color, status, territory } = req.body;
   try {
     const result = await pool.query(
@@ -665,7 +747,7 @@ app.post('/api/team', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.delete('/api/team/:id', async (req, res) => {
+app.delete('/api/team/:id', requireAuth(['admin']), async (req, res) => {
   const { id } = req.params;
   try {
     await pool.query('UPDATE leads SET assigned_id = NULL WHERE assigned_id = $1', [id]);
@@ -676,8 +758,17 @@ app.delete('/api/team/:id', async (req, res) => {
 });
 
 // ── n8n WEBHOOK ──────────────────────────────────────────────
-app.post('/webhook/leads', async (req, res) => {
-  const { school_name, address, phone, website, rating, reviews, domain } = req.body;
+app.post('/webhook/leads', (req, res, next) => {
+  const expected = process.env.N8N_WEBHOOK_SECRET;
+  const supplied = req.headers['x-webhook-secret'];
+  if (!expected) {
+    if (isProduction) return res.status(503).json({ error: 'Webhook is not configured' });
+    return next();
+  }
+  if (supplied !== expected) return res.status(401).json({ error: 'Invalid webhook secret' });
+  next();
+}, async (req, res) => {
+  const { school_name, address, phone, website, rating, reviews, domain, city, area, state, country } = req.body;
   try {
     const cleanedPhone = cleanPhone(phone);
     const base = calcBaseScore({ rating, reviews, phone: cleanedPhone, website, address });
@@ -690,19 +781,72 @@ app.post('/webhook/leads', async (req, res) => {
     if (bigNames.some(bn => lowerName.includes(bn))) size = 'big';
 
     const finalDomain = detectDomain(school_name, domain || global.lastN8nDomain || 'school');
+    // n8n workflows don't always echo location fields back on the inbound
+    // webhook, so fall back to whatever the outbound /api/trigger-n8n call
+    // most recently sent — same pattern as global.lastN8nDomain above.
+    const loc = {
+      city: city || global.lastN8nLocation.city || null,
+      area: area || global.lastN8nLocation.area || null,
+      state: state || global.lastN8nLocation.state || null,
+      country: country || global.lastN8nLocation.country || null,
+    };
+    const normalizedLocation = normalizeLocation(loc);
 
     const result = await pool.query(
-      `INSERT INTO leads (school_name, address, phone, website, rating, reviews, base_score, score, source, status, domain, size)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,'n8n','new',$9,$10)
+      `INSERT INTO leads (school_name, address, phone, website, rating, reviews, base_score, score, source, status, domain, size, city, area, state, country, normalized_location)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,'n8n','new',$9,$10,$11,$12,$13,$14,$15)
        ON CONFLICT DO NOTHING
        RETURNING *`,
-      [school_name || 'Unknown', address || '', cleanedPhone, website || '', rating || null, reviews || null, base, base, finalDomain, size]
+      [school_name || 'Unknown', address || '', cleanedPhone, website || '', rating || null, reviews || null, base, base, finalDomain, size, loc.city, loc.area, loc.state, loc.country, normalizedLocation]
     );
     if (!result.rows.length) {
       return res.json({ success: true, skipped: true, message: 'Duplicate lead, skipped.' });
     }
     console.log('⚡ New lead from n8n:', school_name, '| size:', size, '| base_score:', base);
     res.json({ success: true, lead: result.rows[0] });
+
+    // Best-effort provenance record for the new collection framework.
+    // Fire-and-forget: never blocks or affects the webhook response above,
+    // and is silently skipped pre-migration (source_records not present yet).
+    pool.query(
+      `INSERT INTO source_records (id, org_id, source_type, external_ref, raw_payload, legacy_lead_id, status)
+       VALUES ($1,$2,'n8n',$3,$4,$5,'collected')`,
+      [crypto.randomUUID(), DEFAULT_ORG_ID, String(result.rows[0].id), JSON.stringify(req.body), result.rows[0].id]
+    ).catch(() => { /* pre-migration or table missing — non-fatal */ });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ── OUTREACH DELIVERY/REPLY WEBHOOK (Phase 5) ─────────────────
+// Generic inbound event receiver for whichever email/WhatsApp provider is
+// configured — matches an outreach_messages row by provider_message_id.
+// Same shared-secret gating pattern as /webhook/leads: required in
+// production, optionally open in dev if no secret is set.
+app.post('/webhook/outreach', (req, res, next) => {
+  const expected = process.env.OUTREACH_WEBHOOK_SECRET;
+  const supplied = req.headers['x-webhook-secret'];
+  if (!expected) {
+    if (isProduction) return res.status(503).json({ error: 'Webhook is not configured' });
+    return next();
+  }
+  if (supplied !== expected) return res.status(401).json({ error: 'Invalid webhook secret' });
+  next();
+}, async (req, res) => {
+  const { provider_message_id, event, error } = req.body;
+  if (!provider_message_id || !['delivered', 'replied', 'failed'].includes(event)) {
+    return res.status(400).json({ error: 'provider_message_id and a valid event are required' });
+  }
+  try {
+    const columnByEvent = { delivered: 'delivered_at', replied: 'replied_at', failed: null };
+    const setClause = columnByEvent[event] ? `${columnByEvent[event]}=NOW(), status=$1` : `status=$1, error=$2`;
+    const values = columnByEvent[event] ? [event, provider_message_id] : [event, error || null, provider_message_id];
+    const { rows } = await pool.query(
+      `UPDATE outreach_messages SET ${setClause} WHERE provider_message_id=$${values.length} RETURNING *`,
+      values
+    );
+    if (!rows.length) return res.status(404).json({ error: 'No message found for this provider_message_id' });
+    const message = rows[0];
+    await recordActivity(pool, { org_id: message.org_id, type: `outreach_${message.channel}_${event}`, company_id: message.company_id, contact_id: message.contact_id, opportunity_id: message.opportunity_id, payload: { message_id: message.id } });
+    res.json({ success: true });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
@@ -956,7 +1100,7 @@ app.get('/api/leads/:id/reminders', async (req, res) => {
 });
 
 // ── Fix corrupted data ──────────────────────────────
-app.get('/api/fix-data', async (req, res) => {
+app.post('/api/fix-data', requireAuth(['admin']), async (req, res) => {
   try {
     const corrupted = ['undefined', 'null', 'none', 'NaN', '#ERROR!', '#N/A'];
     let totalFixed = 0;
@@ -1004,7 +1148,7 @@ app.get('/api/fix-data', async (req, res) => {
 });
 
 // ── Fix corrupted phone data ─────────────────────────────
-app.get('/api/fix-phones', async (req, res) => {
+app.post('/api/fix-phones', requireAuth(['admin']), async (req, res) => {
   try {
     const result = await pool.query(`UPDATE leads SET phone='' WHERE phone ~* '^#(ERROR|N\/A|VALUE|REF|NAME|DIV/0|NULL)' RETURNING id, school_name`);
     res.json({ success: true, fixed: result.rowCount, leads: result.rows });
@@ -1016,9 +1160,15 @@ app.post('/api/trigger-scrape', async (req, res) => {
   const query = req.body?.query || process.env.N8N_QUERY || 'preschools in Bengaluru';
   try {
     const domain = req.body?.domain || 'school';
-    console.log(`\n⚡ Scrape triggered for: "${query}" (domain: ${domain})`);
-    const results = await scrapeAndSave(query, domain);
-    res.json({ success: true, query, domain, saved: results.saved.length, skipped: results.skipped.length, errors: results.errors.length, leads: results.saved });
+    const { city, area, state, country } = req.body || {};
+    const orgId = await getOrgId(req.user.id);
+    console.log(`\n⚡ Scrape triggered for: "${query}" (domain: ${domain}${city || area ? `, location: ${area || ''}${area && city ? ', ' : ''}${city || ''}` : ''})`);
+    const results = await scrapeAndSave(query, domain, { city, area, state, country }, orgId);
+    res.json({
+      success: true, query, domain,
+      saved: results.saved.length, skipped: results.skipped.length, rejected: results.rejected.length, errors: results.errors.length,
+      leads: results.saved, campaign_id: results.campaign_id, run_id: results.run_id,
+    });
   } catch (err) {
     console.error('Scrape trigger error:', err.message);
     res.status(500).json({ error: err.message });
@@ -1042,14 +1192,23 @@ app.post('/api/trigger-all', async (req, res) => {
   const query = req.body?.query || process.env.N8N_QUERY || 'preschools in Bengaluru';
   try {
     const domain = req.body?.domain || 'school';
+    const { city, area, state, country } = req.body || {};
+    const orgId = await getOrgId(req.user.id);
     console.log(`\n🚀 FULL PIPELINE triggered for: "${query}" (domain: ${domain})`);
-    const scrapeResults = await scrapeAndSave(query, domain);
+    const scrapeResults = await scrapeAndSave(query, domain, { city, area, state, country }, orgId);
     const scored = await scoreAllPendingLeads();
     const { rows: allLeads } = await pool.query(
       `SELECT id, school_name, score, priority, website_status, gaps_found FROM leads WHERE search_query=$1 ORDER BY score DESC`,
       [query]
     );
-    res.json({ success: true, query, pipeline: { scraped: scrapeResults.saved.length, skipped: scrapeResults.skipped.length, scored: scored.length }, leads: allLeads });
+    res.json({
+      success: true, query,
+      pipeline: {
+        scraped: scrapeResults.saved.length, skipped: scrapeResults.skipped.length,
+        rejected: scrapeResults.rejected.length, errors: scrapeResults.errors.length, scored: scored.length,
+      },
+      leads: allLeads, campaign_id: scrapeResults.campaign_id, run_id: scrapeResults.run_id,
+    });
   } catch (err) {
     console.error('Pipeline error:', err.message);
     res.status(500).json({ error: err.message });
@@ -1085,9 +1244,10 @@ app.get('/api/stats', async (req, res) => {
 
 // ── Trigger n8n (proxy) ──────────────────────────────────────
 app.post('/api/trigger-n8n', requireAuth(['admin', 'salesperson']), async (req, res) => {
-  const { generated_by_name, custom_query, domain } = req.body;
+  const { generated_by_name, custom_query, domain, city, area, state, country } = req.body;
   if (generated_by_name) global.lastN8nTrigger = generated_by_name;
   if (domain) global.lastN8nDomain = domain;
+  if (city || area || state || country) global.lastN8nLocation = { city: city || null, area: area || null, state: state || null, country: country || null };
 
   try {
     let target_term = 'customers';
@@ -1101,12 +1261,20 @@ app.post('/api/trigger-n8n', requireAuth(['admin', 'salesperson']), async (req, 
       }
     }
 
+    const rawQuery = custom_query || process.env.N8N_QUERY;
+    const locationAwareQuery = combineQueryWithLocation(rawQuery, { city, area, state, country });
+
     const response = await fetch(process.env.N8N_WEBHOOK_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        query: custom_query || process.env.N8N_QUERY,
+        query: locationAwareQuery,
+        original_query: rawQuery,
         domain: domain,
+        city: city || null,
+        area: area || null,
+        state: state || null,
+        country: country || null,
         target_term: target_term,
         type_term: type_term,
         generated_by: generated_by_name || 'Admin'
@@ -1123,12 +1291,597 @@ app.post('/api/trigger-n8n', requireAuth(['admin', 'salesperson']), async (req, 
 });
 
 // ── Fix status endpoint ───────────────────────────────────────
-app.get('/api/fix-status', async (req, res) => {
+app.post('/api/fix-status', requireAuth(['admin']), async (req, res) => {
   try {
     await pool.query(`UPDATE leads SET status = 'new' WHERE status IS NULL OR (TRIM(LOWER(status)) != 'contacted' AND TRIM(LOWER(status)) != 'qualified' AND TRIM(LOWER(status)) != 'closed' AND TRIM(LOWER(status)) != 'scored');`);
     const result = await pool.query('SELECT status, COUNT(*) FROM leads GROUP BY status');
     res.json({ success: true, message: 'All status fixed!', breakdown: result.rows });
   } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ── DISCOVERY CAMPAIGNS & COLLECTION FRAMEWORK ─────────────────
+// Serper/website runs and CSV imports are enqueued as background jobs
+// (lib/jobs) and executed by the in-process worker started below —
+// requests return immediately instead of blocking on scraping. Manual
+// entry is a single fast write, so it runs synchronously through the
+// same collector/company pipeline for consistent provenance.
+const RUNNABLE_SOURCE_TYPES = new Set(['serper', 'website']);
+
+app.post('/api/campaigns', async (req, res) => {
+  const { name, description, query, source_type, sector, city, area, state, country } = req.body;
+  if (!name) return res.status(400).json({ error: 'name is required' });
+  try {
+    const orgId = await getOrgId(req.user.id);
+
+    // Idempotency guard against duplicate submissions (double-click, retry,
+    // two tabs): reuse a just-created campaign with the same name/query/
+    // location instead of creating a second one.
+    const { rows: recent } = await pool.query(
+      `SELECT * FROM discovery_campaigns
+       WHERE org_id=$1 AND LOWER(name)=LOWER($2) AND COALESCE(query,'')=COALESCE($3,'')
+         AND COALESCE(city,'')=COALESCE($4,'') AND COALESCE(area,'')=COALESCE($5,'')
+         AND created_at > NOW() - INTERVAL '60 seconds'
+       ORDER BY created_at DESC LIMIT 1`,
+      [orgId, name, query || null, city || null, area || null]
+    );
+    if (recent.length) return res.json({ ...recent[0], deduped: true });
+
+    const normalizedLocation = normalizeLocation({ city, area, state, country });
+    const { rows } = await pool.query(
+      `INSERT INTO discovery_campaigns (id, org_id, name, description, query, source_type, sector, created_by, city, area, state, country, normalized_location)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING *`,
+      [crypto.randomUUID(), orgId, name, description || null, query || null, source_type || 'manual', sector || null, req.user.id, city || null, area || null, state || null, country || null, normalizedLocation]
+    );
+    res.json(rows[0]);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/campaigns', async (req, res) => {
+  try {
+    const orgId = await getOrgId(req.user.id);
+    const { rows } = await pool.query(
+      `SELECT * FROM discovery_campaigns WHERE org_id=$1 ORDER BY created_at DESC`,
+      [orgId]
+    );
+    res.json(rows);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/campaigns/:id', async (req, res) => {
+  try {
+    const orgId = await getOrgId(req.user.id);
+    const { rows } = await pool.query(
+      `SELECT * FROM discovery_campaigns WHERE id=$1 AND org_id=$2`,
+      [req.params.id, orgId]
+    );
+    if (!rows.length) return res.status(404).json({ error: 'Campaign not found' });
+    const { rows: runs } = await pool.query(
+      `SELECT * FROM campaign_runs WHERE campaign_id=$1 ORDER BY created_at DESC LIMIT 20`,
+      [req.params.id]
+    );
+    res.json({ ...rows[0], runs });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/campaigns/:id/runs', async (req, res) => {
+  try {
+    const orgId = await getOrgId(req.user.id);
+    const { rows } = await pool.query(
+      `SELECT r.* FROM campaign_runs r
+       JOIN discovery_campaigns c ON c.id = r.campaign_id
+       WHERE r.campaign_id=$1 AND c.org_id=$2 ORDER BY r.created_at DESC`,
+      [req.params.id, orgId]
+    );
+    res.json(rows);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/campaigns/:id/run', async (req, res) => {
+  const { source_type, params } = req.body;
+  if (!RUNNABLE_SOURCE_TYPES.has(source_type)) {
+    return res.status(400).json({ error: `source_type must be one of: ${[...RUNNABLE_SOURCE_TYPES].join(', ')}` });
+  }
+  try {
+    const orgId = await getOrgId(req.user.id);
+    const { rows: campaignRows } = await pool.query(
+      `SELECT * FROM discovery_campaigns WHERE id=$1 AND org_id=$2`,
+      [req.params.id, orgId]
+    );
+    if (!campaignRows.length) return res.status(404).json({ error: 'Campaign not found' });
+    const campaign = campaignRows[0];
+
+    const runId = crypto.randomUUID();
+    await pool.query(
+      `INSERT INTO campaign_runs (id, org_id, campaign_id, status) VALUES ($1,$2,$3,'pending')`,
+      [runId, orgId, campaign.id]
+    );
+    const job = await enqueueJob(pool, {
+      org_id: orgId, campaign_id: campaign.id, run_id: runId, type: source_type,
+      payload: {
+        query: campaign.query,
+        location: { city: campaign.city, area: campaign.area, state: campaign.state, country: campaign.country },
+        ...(params || {}),
+      },
+    });
+    await pool.query(`UPDATE campaign_runs SET job_id=$1 WHERE id=$2`, [job.id, runId]);
+
+    res.status(202).json({ success: true, run_id: runId, job_id: job.id, status: 'queued' });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/campaigns/:id/import-csv', async (req, res) => {
+  const { csv_text } = req.body;
+  if (!csv_text) return res.status(400).json({ error: 'csv_text is required' });
+  try {
+    const orgId = await getOrgId(req.user.id);
+    const { rows: campaignRows } = await pool.query(
+      `SELECT * FROM discovery_campaigns WHERE id=$1 AND org_id=$2`,
+      [req.params.id, orgId]
+    );
+    if (!campaignRows.length) return res.status(404).json({ error: 'Campaign not found' });
+
+    const runId = crypto.randomUUID();
+    await pool.query(
+      `INSERT INTO campaign_runs (id, org_id, campaign_id, status) VALUES ($1,$2,$3,'pending')`,
+      [runId, orgId, req.params.id]
+    );
+    const job = await enqueueJob(pool, {
+      org_id: orgId, campaign_id: req.params.id, run_id: runId, type: 'csv', payload: { csv_text },
+    });
+    await pool.query(`UPDATE campaign_runs SET job_id=$1 WHERE id=$2`, [job.id, runId]);
+
+    res.status(202).json({ success: true, run_id: runId, job_id: job.id, status: 'queued' });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/campaigns/:id/manual-entry', async (req, res) => {
+  try {
+    const orgId = await getOrgId(req.user.id);
+    const { rows: campaignRows } = await pool.query(
+      `SELECT * FROM discovery_campaigns WHERE id=$1 AND org_id=$2`,
+      [req.params.id, orgId]
+    );
+    if (!campaignRows.length) return res.status(404).json({ error: 'Campaign not found' });
+
+    const { collect } = getCollector('manual');
+    const { items, errors } = await collect(req.body);
+    if (errors.length) return res.status(400).json({ error: errors[0].message });
+
+    const item = items[0];
+    const { company } = await findOrCreateCompany(pool, { org_id: orgId, name: item.company.name, domain: item.company.domain });
+    if (item.location?.address_line) {
+      await addLocationIfMissing(pool, { org_id: orgId, company_id: company.id, address_line: item.location.address_line });
+    }
+    let contact = null;
+    if (item.contact?.email || item.contact?.phone) {
+      contact = await findOrCreateContact(pool, { org_id: orgId, company_id: company.id, ...item.contact });
+    }
+    await pool.query(
+      `INSERT INTO source_records (id, org_id, campaign_id, source_type, external_ref, raw_payload, company_id, contact_id, status)
+       VALUES ($1,$2,$3,'manual',$4,$5,$6,$7,'collected')`,
+      [crypto.randomUUID(), orgId, req.params.id, item.external_ref, JSON.stringify(item.raw), company.id, contact?.id || null]
+    );
+
+    res.json({ success: true, company, contact });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/jobs/:id', async (req, res) => {
+  try {
+    const orgId = await getOrgId(req.user.id);
+    const { rows } = await pool.query(`SELECT * FROM jobs WHERE id=$1 AND org_id=$2`, [req.params.id, orgId]);
+    if (!rows.length) return res.status(404).json({ error: 'Job not found' });
+    res.json(rows[0]);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/jobs', async (req, res) => {
+  try {
+    const orgId = await getOrgId(req.user.id);
+    const params = [orgId];
+    let q = `SELECT * FROM jobs WHERE org_id=$1`;
+    if (req.query.campaign_id) { params.push(req.query.campaign_id); q += ` AND campaign_id=$${params.length}`; }
+    q += ` ORDER BY created_at DESC LIMIT 100`;
+    const { rows } = await pool.query(q, params);
+    res.json(rows);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ── COMPANIES (read) ────────────────────────────────────────────
+app.get('/api/companies', async (req, res) => {
+  try {
+    const orgId = await getOrgId(req.user.id);
+    const params = [orgId];
+    let q = `SELECT * FROM companies WHERE org_id=$1 AND deleted_at IS NULL`;
+    if (req.query.q) { params.push(`%${req.query.q.toLowerCase()}%`); q += ` AND normalized_name LIKE $${params.length}`; }
+    q += ` ORDER BY created_at DESC LIMIT 100`;
+    const { rows } = await pool.query(q, params);
+    res.json(rows);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/companies/:id', async (req, res) => {
+  try {
+    const orgId = await getOrgId(req.user.id);
+    const { rows } = await pool.query(`SELECT * FROM companies WHERE id=$1 AND org_id=$2`, [req.params.id, orgId]);
+    if (!rows.length) return res.status(404).json({ error: 'Company not found' });
+    const [locations, contacts, opportunities] = await Promise.all([
+      pool.query(`SELECT * FROM company_locations WHERE company_id=$1 AND deleted_at IS NULL`, [req.params.id]),
+      pool.query(`SELECT * FROM contacts WHERE company_id=$1 AND deleted_at IS NULL`, [req.params.id]),
+      pool.query(`SELECT * FROM opportunities WHERE company_id=$1 AND deleted_at IS NULL`, [req.params.id]),
+    ]);
+    res.json({ ...rows[0], locations: locations.rows, contacts: contacts.rows, opportunities: opportunities.rows });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ── ENRICHMENT (Phase 3) ────────────────────────────────────────
+// Website enrichment runs as a background job (see lib/enrichment) —
+// crawling happens off the request thread and is retried on failure like
+// any other job.
+app.post('/api/companies/:id/enrich', async (req, res) => {
+  try {
+    const orgId = await getOrgId(req.user.id);
+    const { rows } = await pool.query(`SELECT id FROM companies WHERE id=$1 AND org_id=$2 AND deleted_at IS NULL`, [req.params.id, orgId]);
+    if (!rows.length) return res.status(404).json({ error: 'Company not found' });
+    const job = await enqueueJob(pool, { org_id: orgId, type: 'enrich_company', payload: { company_id: req.params.id } });
+    res.status(202).json({ success: true, job_id: job.id, status: 'queued' });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ── DEDUPLICATION (Phase 3) ──────────────────────────────────────
+// A scan flags duplicate candidates; only exact-domain (company) or
+// exact-email (contact) matches auto-merge. Everything else lands in the
+// review queue below for a human decision — merges never delete data,
+// they redirect child records onto the winner and soft-delete the loser.
+app.post('/api/dedup/scan', requireAuth(['admin']), async (req, res) => {
+  try {
+    const orgId = await getOrgId(req.user.id);
+    const job = await enqueueJob(pool, { org_id: orgId, type: 'dedup_scan', payload: {} });
+    res.status(202).json({ success: true, job_id: job.id, status: 'queued' });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/dedup/candidates', requireAuth(['admin']), async (req, res) => {
+  try {
+    const orgId = await getOrgId(req.user.id);
+    const status = req.query.status || 'pending';
+    const { rows } = await pool.query(
+      `SELECT * FROM duplicate_candidates WHERE org_id=$1 AND status=$2 ORDER BY confidence DESC, created_at DESC LIMIT 200`,
+      [orgId, status]
+    );
+    res.json(rows);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/dedup/candidates/:id/confirm', requireAuth(['admin']), async (req, res) => {
+  const { winner_id } = req.body;
+  try {
+    const orgId = await getOrgId(req.user.id);
+    const { rows } = await pool.query(`SELECT * FROM duplicate_candidates WHERE id=$1 AND org_id=$2`, [req.params.id, orgId]);
+    if (!rows.length) return res.status(404).json({ error: 'Candidate not found' });
+    const candidate = rows[0];
+    if (candidate.status !== 'pending') return res.status(409).json({ error: `Candidate already ${candidate.status}` });
+
+    const idA = candidate.entity_id_a, idB = candidate.entity_id_b;
+    const winner = winner_id && [idA, idB].includes(winner_id) ? winner_id : idA;
+    const loser = winner === idA ? idB : idA;
+    const merge = candidate.entity_type === 'company' ? mergeCompanies : mergeContacts;
+
+    await merge(pool, { org_id: orgId, winner_id: winner, loser_id: loser, confidence: candidate.confidence, reasons: candidate.reasons, auto: false, merged_by: req.user.id });
+    await pool.query(`UPDATE duplicate_candidates SET status='confirmed', resolved_at=NOW(), resolved_by=$1 WHERE id=$2`, [req.user.id, req.params.id]);
+    res.json({ success: true, winner_id: winner, loser_id: loser });
+  } catch (err) {
+    if (err instanceof AlreadyMergedError) return res.status(409).json({ error: err.message });
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/dedup/candidates/:id/reject', requireAuth(['admin']), async (req, res) => {
+  try {
+    const orgId = await getOrgId(req.user.id);
+    const { rows } = await pool.query(
+      `UPDATE duplicate_candidates SET status='rejected', resolved_at=NOW(), resolved_by=$1
+       WHERE id=$2 AND org_id=$3 AND status='pending' RETURNING *`,
+      [req.user.id, req.params.id, orgId]
+    );
+    if (!rows.length) return res.status(404).json({ error: 'Pending candidate not found' });
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ── SCORING (Phase 4) ────────────────────────────────────────────
+// Scoring runs as a background job (it crawls the company's website to
+// detect gaps, same responsible-crawl budget as enrichment).
+app.post('/api/companies/:id/score', async (req, res) => {
+  try {
+    const orgId = await getOrgId(req.user.id);
+    const { rows } = await pool.query(`SELECT id FROM companies WHERE id=$1 AND org_id=$2 AND deleted_at IS NULL`, [req.params.id, orgId]);
+    if (!rows.length) return res.status(404).json({ error: 'Company not found' });
+    const job = await enqueueJob(pool, { org_id: orgId, type: 'score_company', payload: { company_id: req.params.id } });
+    res.status(202).json({ success: true, job_id: job.id, status: 'queued' });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/companies/:id/scores', async (req, res) => {
+  try {
+    const orgId = await getOrgId(req.user.id);
+    const { rows } = await pool.query(
+      `SELECT s.* FROM company_scores s JOIN companies c ON c.id = s.company_id
+       WHERE s.company_id=$1 AND c.org_id=$2 ORDER BY s.computed_at DESC LIMIT 20`,
+      [req.params.id, orgId]
+    );
+    res.json(rows);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ── AI RESEARCH (Phase 4) ────────────────────────────────────────
+// Optional and provider-agnostic (see lib/ai/provider.js) — if no
+// AI_PROVIDER/AI_API_KEY is configured, the job still completes but
+// records status='skipped' rather than fabricating research content.
+app.post('/api/companies/:id/research', async (req, res) => {
+  try {
+    const orgId = await getOrgId(req.user.id);
+    const { rows } = await pool.query(`SELECT id FROM companies WHERE id=$1 AND org_id=$2 AND deleted_at IS NULL`, [req.params.id, orgId]);
+    if (!rows.length) return res.status(404).json({ error: 'Company not found' });
+    const job = await enqueueJob(pool, { org_id: orgId, type: 'ai_research', payload: { company_id: req.params.id, requested_by: req.user.id } });
+    res.status(202).json({ success: true, job_id: job.id, status: 'queued' });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/companies/:id/research', async (req, res) => {
+  try {
+    const orgId = await getOrgId(req.user.id);
+    const { rows } = await pool.query(
+      `SELECT r.* FROM company_research r JOIN companies c ON c.id = r.company_id
+       WHERE r.company_id=$1 AND c.org_id=$2 ORDER BY r.created_at DESC LIMIT 10`,
+      [req.params.id, orgId]
+    );
+    res.json(rows);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ── OPPORTUNITIES / CRM PIPELINE (Phase 5) ───────────────────────
+const OPPORTUNITY_STAGES = ['new', 'contacted', 'qualified', 'won', 'lost'];
+
+app.post('/api/opportunities', async (req, res) => {
+  const { company_id, contact_id, name, deal_value, campaign_id, territory, auto_assign } = req.body;
+  if (!company_id || !name) return res.status(400).json({ error: 'company_id and name are required' });
+  try {
+    const orgId = await getOrgId(req.user.id);
+    const { rows: companyRows } = await pool.query(`SELECT id FROM companies WHERE id=$1 AND org_id=$2 AND deleted_at IS NULL`, [company_id, orgId]);
+    if (!companyRows.length) return res.status(404).json({ error: 'Company not found' });
+
+    const oppId = crypto.randomUUID();
+    const { rows } = await pool.query(
+      `INSERT INTO opportunities (id, org_id, company_id, contact_id, name, deal_value, campaign_id) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *`,
+      [oppId, orgId, company_id, contact_id || null, name, deal_value || 0, campaign_id || null]
+    );
+    let opportunity = rows[0];
+    await recordActivity(pool, { org_id: orgId, actor_user_id: req.user.id, type: 'opportunity_created', company_id, contact_id: contact_id || null, opportunity_id: oppId, payload: { name } });
+
+    if (auto_assign !== false) {
+      const teamId = await pickAssignee(pool, { territory });
+      if (teamId) {
+        opportunity = await assignOpportunity(pool, { org_id: orgId, opportunity_id: oppId, team_id: teamId });
+        await recordActivity(pool, { org_id: orgId, actor_user_id: req.user.id, type: 'opportunity_assigned', company_id, opportunity_id: oppId, payload: { team_id: teamId, auto: true } });
+        await createSlaFollowUpTask(pool, { org_id: orgId, opportunity_id: oppId, opportunity_name: name, assigned_to_team_id: teamId, created_by: req.user.id });
+      }
+    }
+    res.json(opportunity);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/opportunities', async (req, res) => {
+  try {
+    const orgId = await getOrgId(req.user.id);
+    const params = [orgId];
+    let q = `SELECT * FROM opportunities WHERE org_id=$1 AND deleted_at IS NULL`;
+    if (req.query.stage) { params.push(req.query.stage); q += ` AND stage=$${params.length}`; }
+    if (req.query.owner_team_id) { params.push(req.query.owner_team_id); q += ` AND owner_team_id=$${params.length}`; }
+    q += ` ORDER BY created_at DESC LIMIT 200`;
+    const { rows } = await pool.query(q, params);
+    res.json(rows);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/opportunities/:id', async (req, res) => {
+  try {
+    const orgId = await getOrgId(req.user.id);
+    const { rows } = await pool.query(`SELECT * FROM opportunities WHERE id=$1 AND org_id=$2`, [req.params.id, orgId]);
+    if (!rows.length) return res.status(404).json({ error: 'Opportunity not found' });
+    const [tasks, timeline] = await Promise.all([
+      pool.query(`SELECT * FROM tasks WHERE opportunity_id=$1 ORDER BY due_at ASC NULLS LAST`, [req.params.id]),
+      pool.query(`SELECT * FROM activities WHERE opportunity_id=$1 ORDER BY occurred_at DESC LIMIT 50`, [req.params.id]),
+    ]);
+    res.json({ ...rows[0], tasks: tasks.rows, timeline: timeline.rows });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.patch('/api/opportunities/:id/stage', async (req, res) => {
+  const { stage, lost_reason } = req.body;
+  if (!OPPORTUNITY_STAGES.includes(stage)) return res.status(400).json({ error: `stage must be one of: ${OPPORTUNITY_STAGES.join(', ')}` });
+  if (stage === 'lost' && !lost_reason) return res.status(400).json({ error: 'lost_reason is required when marking an opportunity lost' });
+  try {
+    const orgId = await getOrgId(req.user.id);
+    const { rows: existing } = await pool.query(`SELECT stage FROM opportunities WHERE id=$1 AND org_id=$2`, [req.params.id, orgId]);
+    if (!existing.length) return res.status(404).json({ error: 'Opportunity not found' });
+    const closedAt = ['won', 'lost'].includes(stage) ? 'NOW()' : 'NULL';
+    const { rows } = await pool.query(
+      `UPDATE opportunities SET stage=$1, lost_reason=$2, closed_at=${closedAt}, updated_at=NOW() WHERE id=$3 RETURNING *`,
+      [stage, stage === 'lost' ? lost_reason : null, req.params.id]
+    );
+    await recordActivity(pool, { org_id: orgId, actor_user_id: req.user.id, type: 'stage_changed', company_id: rows[0].company_id, opportunity_id: req.params.id, payload: { from: existing[0].stage, to: stage, lost_reason: stage === 'lost' ? lost_reason : undefined } });
+    if (['won', 'lost'].includes(stage)) {
+      await recordScoreFeedback(pool, { org_id: orgId, opportunity_id: req.params.id, company_id: rows[0].company_id, outcome: stage, lost_reason: stage === 'lost' ? lost_reason : null });
+    }
+    res.json(rows[0]);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/opportunities/:id/assign', requireAuth(['admin']), async (req, res) => {
+  const { team_id, territory } = req.body;
+  try {
+    const orgId = await getOrgId(req.user.id);
+    const teamId = team_id || await pickAssignee(pool, { territory });
+    if (!teamId) return res.status(400).json({ error: 'No team member available to assign' });
+    const opportunity = await assignOpportunity(pool, { org_id: orgId, opportunity_id: req.params.id, team_id: teamId });
+    await recordActivity(pool, { org_id: orgId, actor_user_id: req.user.id, type: 'opportunity_assigned', company_id: opportunity.company_id, opportunity_id: req.params.id, payload: { team_id: teamId, auto: !team_id } });
+    await createSlaFollowUpTask(pool, { org_id: orgId, opportunity_id: req.params.id, opportunity_name: opportunity.name, assigned_to_team_id: teamId, created_by: req.user.id });
+    res.json(opportunity);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ── TASKS (Phase 5) ───────────────────────────────────────────────
+app.post('/api/opportunities/:id/tasks', async (req, res) => {
+  const { title, description, due_at, assigned_to_team_id } = req.body;
+  if (!title) return res.status(400).json({ error: 'title is required' });
+  try {
+    const orgId = await getOrgId(req.user.id);
+    const { rows: oppRows } = await pool.query(`SELECT id FROM opportunities WHERE id=$1 AND org_id=$2`, [req.params.id, orgId]);
+    if (!oppRows.length) return res.status(404).json({ error: 'Opportunity not found' });
+    const task = await createTask(pool, { org_id: orgId, opportunity_id: req.params.id, title, description, due_at, assigned_to_team_id, created_by: req.user.id });
+    res.json(task);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/opportunities/:id/tasks', async (req, res) => {
+  try {
+    const orgId = await getOrgId(req.user.id);
+    const { rows } = await pool.query(
+      `SELECT t.* FROM tasks t JOIN opportunities o ON o.id = t.opportunity_id
+       WHERE t.opportunity_id=$1 AND o.org_id=$2 ORDER BY t.due_at ASC NULLS LAST`,
+      [req.params.id, orgId]
+    );
+    res.json(rows);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.patch('/api/tasks/:id', async (req, res) => {
+  const { status } = req.body;
+  try {
+    const orgId = await getOrgId(req.user.id);
+    const task = await completeTask(pool, { org_id: orgId, task_id: req.params.id, status });
+    await recordActivity(pool, { org_id: orgId, actor_user_id: req.user.id, type: `task_${status}`, opportunity_id: task.opportunity_id, payload: { task_id: task.id, title: task.title } });
+    res.json(task);
+  } catch (err) { res.status(400).json({ error: err.message }); }
+});
+
+// ── COMPANY TIMELINE (Phase 5) ────────────────────────────────────
+app.get('/api/companies/:id/timeline', async (req, res) => {
+  try {
+    const orgId = await getOrgId(req.user.id);
+    const { rows: companyRows } = await pool.query(`SELECT id FROM companies WHERE id=$1 AND org_id=$2`, [req.params.id, orgId]);
+    if (!companyRows.length) return res.status(404).json({ error: 'Company not found' });
+    const { rows } = await pool.query(
+      `SELECT * FROM activities WHERE company_id=$1 ORDER BY occurred_at DESC LIMIT 100`,
+      [req.params.id]
+    );
+    res.json(rows);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ── CONTACTS: suppression + outreach (Phase 5) ────────────────────
+app.get('/api/contacts/:id', async (req, res) => {
+  try {
+    const orgId = await getOrgId(req.user.id);
+    const { rows } = await pool.query(`SELECT * FROM contacts WHERE id=$1 AND org_id=$2`, [req.params.id, orgId]);
+    if (!rows.length) return res.status(404).json({ error: 'Contact not found' });
+    res.json(rows[0]);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/contacts/:id/suppress', async (req, res) => {
+  const { channel, reason } = req.body;
+  if (!['email', 'whatsapp', 'call', 'all'].includes(channel)) return res.status(400).json({ error: 'Invalid channel' });
+  try {
+    const orgId = await getOrgId(req.user.id);
+    const { rows: contactRows } = await pool.query(`SELECT id FROM contacts WHERE id=$1 AND org_id=$2`, [req.params.id, orgId]);
+    if (!contactRows.length) return res.status(404).json({ error: 'Contact not found' });
+    const suppression = await addSuppression(pool, { org_id: orgId, contact_id: req.params.id, channel, reason, source: 'user_request', created_by: req.user.id });
+    await recordActivity(pool, { org_id: orgId, actor_user_id: req.user.id, type: 'contact_suppressed', contact_id: req.params.id, payload: { channel, reason } });
+    res.json(suppression);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.delete('/api/contacts/:id/suppress/:channel', requireAuth(['admin']), async (req, res) => {
+  try {
+    const orgId = await getOrgId(req.user.id);
+    const removed = await removeSuppression(pool, { org_id: orgId, contact_id: req.params.id, channel: req.params.channel });
+    if (!removed) return res.status(404).json({ error: 'Suppression not found' });
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/contacts/:id/suppressions', async (req, res) => {
+  try {
+    const orgId = await getOrgId(req.user.id);
+    const { rows } = await pool.query(`SELECT * FROM suppressions WHERE org_id=$1 AND contact_id=$2`, [orgId, req.params.id]);
+    res.json(rows);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/contacts/:id/outreach', async (req, res) => {
+  const { channel, subject, body, opportunity_id } = req.body;
+  if (!['email', 'whatsapp'].includes(channel)) return res.status(400).json({ error: 'channel must be email or whatsapp' });
+  if (!body) return res.status(400).json({ error: 'body is required' });
+  try {
+    const orgId = await getOrgId(req.user.id);
+    const { rows: contactRows } = await pool.query(`SELECT id FROM contacts WHERE id=$1 AND org_id=$2`, [req.params.id, orgId]);
+    if (!contactRows.length) return res.status(404).json({ error: 'Contact not found' });
+    const job = await enqueueJob(pool, {
+      org_id: orgId, type: 'send_outreach',
+      payload: { contact_id: req.params.id, channel, subject, body, opportunity_id: opportunity_id || null, sent_by: req.user.id },
+    });
+    res.status(202).json({ success: true, job_id: job.id, status: 'queued' });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/contacts/:id/outreach', async (req, res) => {
+  try {
+    const orgId = await getOrgId(req.user.id);
+    const { rows } = await pool.query(
+      `SELECT * FROM outreach_messages WHERE org_id=$1 AND contact_id=$2 ORDER BY created_at DESC LIMIT 50`,
+      [orgId, req.params.id]
+    );
+    res.json(rows);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ── ANALYTICS (Phase 6) ────────────────────────────────────────────
+// Read-only aggregation over data collected in Phases 1-5 (lib/analytics/
+// reports.js) — admin-only, same as the other cross-org/cross-rep
+// reporting endpoints.
+app.get('/api/analytics/sources', requireAuth(['admin']), async (req, res) => {
+  try { res.json(await analytics.sourceCampaignPerformance(pool, { org_id: await getOrgId(req.user.id) })); }
+  catch (err) { res.status(500).json({ error: err.message }); }
+});
+app.get('/api/analytics/enrichment', requireAuth(['admin']), async (req, res) => {
+  try { res.json(await analytics.enrichmentDuplicateRates(pool, { org_id: await getOrgId(req.user.id) })); }
+  catch (err) { res.status(500).json({ error: err.message }); }
+});
+app.get('/api/analytics/scoring', requireAuth(['admin']), async (req, res) => {
+  try { res.json(await analytics.scoreConversionAnalysis(pool, { org_id: await getOrgId(req.user.id) })); }
+  catch (err) { res.status(500).json({ error: err.message }); }
+});
+app.get('/api/analytics/pipeline', requireAuth(['admin']), async (req, res) => {
+  try { res.json(await analytics.pipelineVelocity(pool, { org_id: await getOrgId(req.user.id) })); }
+  catch (err) { res.status(500).json({ error: err.message }); }
+});
+app.get('/api/analytics/reps', requireAuth(['admin']), async (req, res) => {
+  try { res.json(await analytics.repPerformance(pool, { org_id: await getOrgId(req.user.id) })); }
+  catch (err) { res.status(500).json({ error: err.message }); }
+});
+app.get('/api/analytics/outreach', requireAuth(['admin']), async (req, res) => {
+  try { res.json(await analytics.outreachResponseRates(pool, { org_id: await getOrgId(req.user.id) })); }
+  catch (err) { res.status(500).json({ error: err.message }); }
+});
+app.get('/api/analytics/revenue', requireAuth(['admin']), async (req, res) => {
+  try { res.json(await analytics.revenueAndRoi(pool, { org_id: await getOrgId(req.user.id) })); }
+  catch (err) { res.status(500).json({ error: err.message }); }
+});
+app.get('/api/analytics/lost-reasons', requireAuth(['admin']), async (req, res) => {
+  try { res.json(await analytics.lostReasonsAndScoringFeedback(pool, { org_id: await getOrgId(req.user.id) })); }
+  catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 // ── Health check ──────────────────────────────────────────────
@@ -1150,6 +1903,24 @@ const server = app.listen(PORT, () => {
   console.log(`📋 Leads API       → GET  http://localhost:${PORT}/api/leads`);
 });
 
+// ── Background job worker (Phase 2 collection framework) ───────
+// Polls the `jobs` table in-process so campaign runs/CSV imports don't
+// block request/response cycles. Only starts once the `jobs` table
+// exists (i.e. migration 002 has been applied) and can be disabled with
+// ENABLE_JOB_WORKER=false.
+if (process.env.ENABLE_JOB_WORKER !== 'false') {
+  pool.query(`SELECT to_regclass('jobs') AS t`)
+    .then(({ rows }) => {
+      if (rows[0]?.t) {
+        startWorker(pool);
+        console.log('✅ Job worker started');
+      } else {
+        console.log('ℹ️ jobs table not found — run `npm run migrate` to enable the job worker');
+      }
+    })
+    .catch((err) => console.error('❌ Job worker startup check failed:', err.message));
+}
+
 // ── Graceful EADDRINUSE handling ─────────────────────────────
 server.on('error', (err) => {
   if (err.code === 'EADDRINUSE') {
@@ -1162,4 +1933,3 @@ server.on('error', (err) => {
     process.exit(1);
   }
 });
-

@@ -10,12 +10,15 @@
  */
 
 require('dotenv').config();
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 const axios = require('axios');
 const cheerio = require('cheerio');
 const { Pool } = require('pg');
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
+const sslMode = (process.env.DATABASE_SSL_MODE || 'require').toLowerCase();
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: sslMode === 'disable' ? false : { rejectUnauthorized: sslMode === 'verify-full' }
+});
 
 // ── Load scoring config from DB ────────────────────────────
 async function loadScoreConfig() {

@@ -79,3 +79,11 @@ ENV PORT: 3333
 ✅ Tables ready!
 🔑 Login attempt: admin@leadflow.com
 ✅ Login success: admin@leadflow.com (admin)
+
+🚀 LeadFlow backend running at http://localhost:3333
+🔗 n8n webhook     → POST http://localhost:3333/webhook/leads
+📊 Trigger score   → POST http://localhost:3333/api/trigger-score
+⚡ Full pipeline   → POST http://localhost:3333/api/trigger-all
+📋 Leads API       → GET  http://localhost:3333/api/leads
+✅ Connected to PostgreSQL — exora_crm?sslmode=disable
+✅ Tables ready!
