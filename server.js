@@ -982,7 +982,7 @@ app.get('/api/reminders/today', async (req, res, next) => {
     return next();
   }
   requireAuth(['admin', 'salesperson'])(req, res, next);
-},  async (req, res) => {
+}, async (req, res) => {
   try {
     const isN8n = req.headers['ngrok-skip-browser-warning'] === 'true';
     let where = `WHERE DATE(reminders.remind_at) <= CURRENT_DATE AND (reminders.status IS NULL OR reminders.status = 'pending')`;
@@ -1249,6 +1249,9 @@ app.get('/api/stats', async (req, res) => {
 // ── Trigger n8n (proxy) ──────────────────────────────────────
 app.post('/api/trigger-n8n', requireAuth(['admin', 'salesperson']), async (req, res) => {
   const { generated_by_name, custom_query, domain, city, area, state, country } = req.body;
+  if (!city || !city.trim()) {
+    return res.status(400).json({ error: 'Please enter the city or pincode' });
+  }
   if (generated_by_name) global.lastN8nTrigger = generated_by_name;
   if (domain) global.lastN8nDomain = domain;
   if (city || area || state || country) global.lastN8nLocation = { city: city || null, area: area || null, state: state || null, country: country || null };

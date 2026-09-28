@@ -1,0 +1,18 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: exora_crm_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: exora_crm_dev
+      POSTGRES_USER: exora_crm
+      POSTGRES_PASSWORD: exora_local_2024
+    ports:
+      - "5433:5432"
+    volumes:
+      - exora_pgdata:/var/lib/postgresql/data
+
+volumes:
+  exora_pgdata:

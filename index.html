@@ -10,9 +10,7 @@
        International Typographic Style is built on. -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
     /* ══════════════════════════════════════════════════════════════
@@ -31,60 +29,81 @@
        ══════════════════════════════════════════════════════════════ */
     :root {
       /* ── Achromatic ramp ───────────────────────────────────────── */
-      --paper:  #ffffff;   /* ground                                  */
-      --ink:    #0a0a0a;   /* primary text, rules at full strength     */
-      --grey-1: #fafafa;   /* faintest fill — zebra rows, inputs       */
-      --grey-2: #f2f2f2;   /* panel tint                               */
-      --grey-3: #e4e4e4;   /* hairline rule                            */
-      --grey-4: #c9c9c9;   /* disabled edge                            */
-      --grey-5: #8c8c8c;   /* secondary text                           */
-      --grey-6: #5c5c5c;   /* tertiary text on white                   */
+      --paper: #ffffff;
+      /* ground                                  */
+      --ink: #0a0a0a;
+      /* primary text, rules at full strength     */
+      --grey-1: #fafafa;
+      /* faintest fill — zebra rows, inputs       */
+      --grey-2: #f2f2f2;
+      /* panel tint                               */
+      --grey-3: #e4e4e4;
+      /* hairline rule                            */
+      --grey-4: #c9c9c9;
+      /* disabled edge                            */
+      --grey-5: #8c8c8c;
+      /* secondary text                           */
+      --grey-6: #5c5c5c;
+      /* tertiary text on white                   */
 
       /* ── The single accent ─────────────────────────────────────── */
-      --red:      #e1000f;
+      --red: #e1000f;
       --red-dark: #b8000c;
 
       /* ── Legacy aliases, remapped ──────────────────────────────── */
-      --bg:      var(--grey-2);
+      --bg: var(--grey-2);
       --surface: var(--paper);
-      --card:    var(--paper);
-      --border:  var(--grey-3);
-      --text:    var(--ink);
-      --muted:   var(--grey-5);
-      --acc:     var(--ink);      /* nav/active ink, not a colour wash */
-      --purple:  var(--red);
+      --card: var(--paper);
+      --border: var(--grey-3);
+      --text: var(--ink);
+      --muted: var(--grey-5);
+      --acc: var(--ink);
+      /* nav/active ink, not a colour wash */
+      --purple: var(--red);
       --purple-soft: transparent;
       --s1: var(--paper);
       --s2: var(--grey-1);
       --s3: var(--grey-2);
       --s4: var(--grey-4);
       --bd: var(--grey-3);
-      --tx:  var(--ink);
+      --tx: var(--ink);
       --tx2: var(--grey-6);
       --tx3: var(--grey-5);
-      --r: 0px;                    /* Swiss geometry: square corners   */
+      --r: 0px;
+      /* Swiss geometry: square corners   */
 
       /* ── Status. Encoding data, so these earn their colour; kept
            desaturated so they read as notation, not decoration. ──── */
-      --a2: #c8102e;   /* negative — lost, overdue, error   */
-      --a3: #1a7f4b;   /* positive — won, qualified, live   */
-      --a4: #b26a00;   /* caution  — pending, warm          */
-      --a5: #14568c;   /* neutral  — new, informational     */
+      --a2: #c8102e;
+      /* negative — lost, overdue, error   */
+      --a3: #1a7f4b;
+      /* positive — won, qualified, live   */
+      --a4: #b26a00;
+      /* caution  — pending, warm          */
+      --a5: #14568c;
+      /* neutral  — new, informational     */
 
       /* ── Type scale (major-third-ish, tuned for dense data) ────── */
-      --t-micro: 10px;   /* uppercase labels, tracked wide    */
-      --t-fine:  11px;
+      --t-micro: 10px;
+      /* uppercase labels, tracked wide    */
+      --t-fine: 11px;
       --t-small: 12px;
-      --t-body:  13px;
-      --t-lede:  15px;
-      --t-h3:    18px;
-      --t-h2:    24px;
-      --t-h1:    32px;
+      --t-body: 13px;
+      --t-lede: 15px;
+      --t-h3: 18px;
+      --t-h2: 24px;
+      --t-h1: 32px;
       --t-display: 48px;
 
       /* ── 8px spacing grid ──────────────────────────────────────── */
-      --u1: 4px;  --u2: 8px;  --u3: 12px; --u4: 16px;
-      --u5: 24px; --u6: 32px; --u7: 48px; --u8: 64px;
+      --u1: 4px;
+      --u2: 8px;
+      --u3: 12px;
+      --u4: 16px;
+      --u5: 24px;
+      --u6: 32px;
+      --u7: 48px;
+      --u8: 64px;
 
       /* ── Structure ─────────────────────────────────────────────── */
       --rule: 1px solid var(--grey-3);
@@ -131,8 +150,15 @@
       margin-right: 5px;
     }
 
-    .score-grid { display: grid; grid-template-columns: 1fr 1fr; }
-    .how-it-works-grid { display: grid; grid-template-columns: repeat(4, 1fr); }
+    .score-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .how-it-works-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+    }
 
     body::before {
       content: '';
@@ -203,6 +229,7 @@
       #navbar {
         padding: 18px 60px;
       }
+
       .nav-logo {
         font-size: 18px !important;
       }
@@ -230,8 +257,15 @@
     }
 
     @keyframes blink-cursor {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0; }
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0;
+      }
     }
 
     @keyframes typing-mask {
@@ -550,7 +584,7 @@
       display: none;
       opacity: 0;
       transition: opacity 0.4s;
-      background: rgba(0,0,0,0.65);
+      background: rgba(0, 0, 0, 0.65);
       backdrop-filter: none;
       -webkit-backdrop-filter: none;
     }
@@ -2313,7 +2347,10 @@
       overflow-x: auto;
       scrollbar-width: none;
     }
-    .lp-tabs::-webkit-scrollbar { display: none; }
+
+    .lp-tabs::-webkit-scrollbar {
+      display: none;
+    }
 
     .lp-tab {
       flex: 1;
@@ -2739,20 +2776,31 @@
       box-shadow: none;
     }
 
-    .move-to-wrap { position: relative; margin-top: 12px; display: none; }
-    @media (max-width: 500px) { .move-to-wrap { display: block; } }
+    .move-to-wrap {
+      position: relative;
+      margin-top: 12px;
+      display: none;
+    }
+
+    @media (max-width: 500px) {
+      .move-to-wrap {
+        display: block;
+      }
+    }
+
     .move-to-btn {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: rgba(91,106,247,0.1);
-      border: 1px solid rgba(91,106,247,0.3);
+      background: rgba(91, 106, 247, 0.1);
+      border: 1px solid rgba(91, 106, 247, 0.3);
       color: var(--acc);
       border-radius: 0;
       font-size: 11px;
       padding: 5px 12px;
       cursor: pointer;
     }
+
     .move-menu {
       position: absolute;
       bottom: 100%;
@@ -2768,7 +2816,11 @@
       margin-bottom: 10px;
       z-index: 2000;
     }
-    .move-menu.open { display: flex; }
+
+    .move-menu.open {
+      display: flex;
+    }
+
     .move-opt {
       display: flex;
       align-items: center;
@@ -2780,8 +2832,18 @@
       cursor: pointer;
       transition: background 0.2s;
     }
-    .move-opt:hover { background: rgba(255,255,255,0.06); color: var(--tx); }
-    .move-dot { width: 8px; height: 8px; border-radius: 0; flex-shrink: 0; }
+
+    .move-opt:hover {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--tx);
+    }
+
+    .move-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 0;
+      flex-shrink: 0;
+    }
 
 
     .topbar {
@@ -2789,7 +2851,8 @@
       justify-content: space-between;
       align-items: center;
       height: 68px;
-      padding: 0 40px 0 24px; /* Move items little left by increasing right padding */
+      padding: 0 40px 0 24px;
+      /* Move items little left by increasing right padding */
       background: var(--s1);
       border-bottom: 1px solid var(--bd);
       position: sticky;
@@ -2813,8 +2876,16 @@
       transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: none;
     }
-    .back-btn:hover { background: var(--acc); color: white; transform: translateX(-2px); }
-    .page-section.show-back .back-btn { display: flex; }
+
+    .back-btn:hover {
+      background: var(--acc);
+      color: white;
+      transform: translateX(-2px);
+    }
+
+    .page-section.show-back .back-btn {
+      display: flex;
+    }
 
     .tb-right {
       display: flex;
@@ -3078,6 +3149,7 @@
       .login-box {
         padding: 40px 24px !important;
       }
+
       #login-wrap {
         overflow-x: hidden;
       }
@@ -3180,26 +3252,35 @@
         margin-bottom: 20px !important;
         gap: 10px !important;
       }
+
       .tb-row-1 {
         display: contents !important;
       }
+
       .tb-row-2 {
         display: none !important;
       }
+
       .topbar .search {
-        display: none !important; /* Keep original header search hidden on mobile to avoid overflow */
+        display: none !important;
+        /* Keep original header search hidden on mobile to avoid overflow */
       }
+
       .topbar .srv-status {
         display: none !important;
       }
 
-      .hb-btn, .bell-btn, #tb-add-lead, #sp-tb-add-lead {
+      .hb-btn,
+      .bell-btn,
+      #tb-add-lead,
+      #sp-tb-add-lead {
         min-width: 44px !important;
         min-height: 44px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
       }
+
       .page-title {
         font-size: 16px !important;
         flex: 1;
@@ -3207,6 +3288,7 @@
         margin: 0 !important;
         padding: 0 10px !important;
       }
+
       .tb-right {
         display: flex !important;
         align-items: center !important;
@@ -3222,7 +3304,7 @@
         margin-top: 5px;
       }
 
-      .page-section .tb-right > * {
+      .page-section .tb-right>* {
         display: flex !important;
       }
 
@@ -3235,11 +3317,12 @@
         width: 100% !important;
       }
 
-      .tb-right > *:not(.bell-btn):not(.btn.bp):not(#tb-add-lead):not(#sp-tb-add-lead):not(.search-wrap):not(.btn.bg) {
+      .tb-right>*:not(.bell-btn):not(.btn.bp):not(#tb-add-lead):not(#sp-tb-add-lead):not(.search-wrap):not(.btn.bg) {
         display: none !important;
       }
-      
-      #tb-add-lead, #sp-tb-add-lead {
+
+      #tb-add-lead,
+      #sp-tb-add-lead {
         background: var(--acc) !important;
         color: transparent !important;
         position: relative !important;
@@ -3249,25 +3332,33 @@
         padding: 0 !important;
         min-width: 44px !important;
       }
-      #tb-add-lead::after, #sp-tb-add-lead::after {
+
+      #tb-add-lead::after,
+      #sp-tb-add-lead::after {
         content: '+';
         position: absolute !important;
         color: white !important;
         font-size: 24px !important;
         font-weight: 400 !important;
       }
-      .mobile-search { 
-        width: 100% !important; 
-        max-width: none !important; 
+
+      .mobile-search {
+        width: 100% !important;
+        max-width: none !important;
         margin: 0 !important;
         background: var(--s3) !important;
       }
+
       .mobile-status {
         display: inline-flex !important;
         width: fit-content !important;
         margin-bottom: 5px !important;
       }
-      .score-grid, .how-it-works-grid { grid-template-columns: 1fr !important; }
+
+      .score-grid,
+      .how-it-works-grid {
+        grid-template-columns: 1fr !important;
+      }
 
       .lead-panel {
         width: 100% !important;
@@ -3275,15 +3366,21 @@
         border-left: none !important;
         z-index: 9999 !important;
       }
+
       .lead-panel.open {
         right: 0 !important;
       }
+
       .lp-tabs {
         overflow-x: auto !important;
         scrollbar-width: none !important;
         -webkit-overflow-scrolling: touch !important;
       }
-      .lp-tabs::-webkit-scrollbar { display: none !important; }
+
+      .lp-tabs::-webkit-scrollbar {
+        display: none !important;
+      }
+
       .lp-tab {
         flex: none !important;
         min-width: 120px !important;
@@ -3319,6 +3416,7 @@
         overflow-x: hidden !important;
         overflow-y: auto !important;
       }
+
       .kanban-col {
         width: 100% !important;
         min-width: 100% !important;
@@ -3332,6 +3430,7 @@
         border-bottom: 1px solid var(--bd) !important;
         border-left: 4px solid var(--s-color, #5b6af7) !important;
       }
+
       .kanban-hdr {
         height: 52px !important;
         padding: 0 16px !important;
@@ -3339,11 +3438,12 @@
         align-items: center !important;
         justify-content: space-between !important;
         cursor: pointer !important;
-        background: rgba(255,255,255,0.03) !important;
+        background: rgba(255, 255, 255, 0.03) !important;
         position: relative !important;
         top: 0 !important;
         border-bottom: none !important;
       }
+
       .kanban-hdr::after {
         content: '▶';
         font-size: 10px;
@@ -3351,9 +3451,11 @@
         transition: transform 0.3s ease;
         margin-left: 10px;
       }
+
       .kanban-col.open .kanban-hdr::after {
         transform: rotate(90deg);
       }
+
       .kanban-list {
         max-height: 0 !important;
         overflow: hidden !important;
@@ -3362,15 +3464,18 @@
         display: block !important;
         min-height: auto !important;
       }
+
       .kanban-col.open .kanban-list {
         max-height: 10000px !important;
         padding: 12px 0 !important;
         border-top: 1px solid var(--bd);
       }
+
       .kc {
         width: calc(100% - 24px) !important;
         margin: 0 12px 12px !important;
       }
+
       .kanban-empty-msg {
         margin: 12px !important;
       }
@@ -3383,6 +3488,7 @@
       table {
         min-width: 600px;
       }
+
       /* Assign Leads Mobile Fixes */
       #assignleads-page .alp-filter-row {
         flex-direction: column !important;
@@ -3391,17 +3497,20 @@
         padding: 16px !important;
         height: auto !important;
       }
+
       #assignleads-page #alp-domain-filter {
         width: 100% !important;
         height: 44px !important;
         min-width: 100% !important;
       }
+
       #assignleads-page .size-tabs {
         width: 100% !important;
         height: 48px !important;
         display: flex !important;
-        background: rgba(0,0,0,0.05) !important;
+        background: rgba(0, 0, 0, 0.05) !important;
       }
+
       #assignleads-page .size-tab {
         flex: 1 !important;
         height: 100% !important;
@@ -3411,27 +3520,32 @@
         font-size: 11px !important;
         padding: 0 !important;
       }
+
       #alp-leads-list {
         max-height: calc(100vh - 320px) !important;
         overflow-y: auto !important;
         -webkit-overflow-scrolling: touch !important;
         padding-bottom: 100px !important;
       }
+
       #assignleads-page .topbar {
         flex-wrap: wrap !important;
         height: auto !important;
         padding: 12px 16px !important;
         gap: 10px !important;
       }
-      #assignleads-page .topbar > div {
+
+      #assignleads-page .topbar>div {
         width: 100% !important;
         justify-content: space-between !important;
       }
+
       #assignleads-page .tb-right {
         width: 100% !important;
         justify-content: flex-end !important;
         padding-bottom: 8px !important;
       }
+
       #assignleads-page .lead-cb-row {
         padding: 14px !important;
         gap: 12px !important;
@@ -3447,7 +3561,9 @@
        ══════════════════════════════════════════════════════════════════ */
 
     /* ── Foundation ──────────────────────────────────────────────────── */
-    html { -webkit-text-size-adjust: 100%; }
+    html {
+      -webkit-text-size-adjust: 100%;
+    }
 
     body {
       font-family: var(--font);
@@ -3462,28 +3578,65 @@
     }
 
     /* The decorative purple nebula behind the old theme. */
-    body::before { display: none !important; content: none !important; }
+    body::before {
+      display: none !important;
+      content: none !important;
+    }
 
     /* Figures are compared column-to-column all over this app, so every
        numeral gets the same advance width. */
-    .sc-val, .kc-val, .tc-num, .ni-count, .kanban-count, .score-pill,
-    table td, table th, .td-sv, .badge, .wbar-lbl, input, .fi, .lp-input {
+    .sc-val,
+    .kc-val,
+    .tc-num,
+    .ni-count,
+    .kanban-count,
+    .score-pill,
+    table td,
+    table th,
+    .td-sv,
+    .badge,
+    .wbar-lbl,
+    input,
+    .fi,
+    .lp-input {
       font-variant-numeric: tabular-nums;
       font-feature-settings: 'tnum' 1;
     }
 
-    ::selection { background: var(--ink); color: var(--paper); }
+    ::selection {
+      background: var(--ink);
+      color: var(--paper);
+    }
 
-    a { color: inherit; text-decoration: none; }
-    a:focus-visible, button:focus-visible, input:focus-visible,
-    select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    a:focus-visible,
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible,
+    [tabindex]:focus-visible {
       outline: 2px solid var(--red);
       outline-offset: 2px;
     }
 
     /* ── The one repeated typographic device: a tracked micro-label ──── */
-    .nl, .sc-lbl, .fl, .lp-label, .shdr, .hero-tag, .tc-lbl, .lp-sec-title,
-    .stitle, table th, .ftabs .ft, .role-tabs .rtab, .size-tabs .size-tab {
+    .nl,
+    .sc-lbl,
+    .fl,
+    .lp-label,
+    .shdr,
+    .hero-tag,
+    .tc-lbl,
+    .lp-sec-title,
+    .stitle,
+    table th,
+    .ftabs .ft,
+    .role-tabs .rtab,
+    .size-tabs .size-tab {
       font-size: var(--t-micro);
       font-weight: 600;
       letter-spacing: 0.14em;
@@ -3517,19 +3670,37 @@
       width: auto;
       white-space: nowrap;
     }
-    .logo span { color: var(--red); opacity: 1; }
-    .typing-cursor { display: none !important; }
+
+    .logo span {
+      color: var(--red);
+      opacity: 1;
+    }
+
+    .typing-cursor {
+      display: none !important;
+    }
 
     .logo-mark {
-      width: 28px; height: 28px;
+      width: 28px;
+      height: 28px;
       background: var(--ink);
       border: none;
       box-shadow: none;
     }
-    .logo-img { filter: invert(1) grayscale(1); image-rendering: auto; }
 
-    .nl { padding: var(--u5) var(--u5) var(--u2); margin: 0; }
-    .sidebar .nl:first-of-type { padding-top: 0; }
+    .logo-img {
+      filter: invert(1) grayscale(1);
+      image-rendering: auto;
+    }
+
+    .nl {
+      padding: var(--u5) var(--u5) var(--u2);
+      margin: 0;
+    }
+
+    .sidebar .nl:first-of-type {
+      padding-top: 0;
+    }
 
     .ni {
       padding: var(--u2) var(--u5);
@@ -3541,17 +3712,31 @@
       border-left: 2px solid transparent;
       transition: background 0.12s linear, color 0.12s linear;
     }
-    .ni:hover { background: var(--grey-1); color: var(--ink); }
+
+    .ni:hover {
+      background: var(--grey-1);
+      color: var(--ink);
+    }
+
     .ni.active {
       background: transparent;
       border-left-color: var(--red);
       color: var(--ink);
       font-weight: 600;
     }
-    .ni.active .ni-ic svg { color: var(--red); }
-    .ni-ic svg { width: 16px; height: 16px; margin-right: 0; }
 
-    .ni-count, .ni-badge {
+    .ni.active .ni-ic svg {
+      color: var(--red);
+    }
+
+    .ni-ic svg {
+      width: 16px;
+      height: 16px;
+      margin-right: 0;
+    }
+
+    .ni-count,
+    .ni-badge {
       background: var(--grey-2);
       color: var(--grey-6);
       border: none;
@@ -3560,20 +3745,44 @@
       padding: 1px var(--u2);
       letter-spacing: 0.04em;
     }
-    .ni.active .ni-count { background: var(--ink); color: var(--paper); }
 
-    .user-foot, .sb-foot { border-top: var(--rule); padding: var(--u4) var(--u5) 0; margin-top: var(--u4); }
-    .u-av, .av, .td-av, .avo, .avf {
+    .ni.active .ni-count {
+      background: var(--ink);
+      color: var(--paper);
+    }
+
+    .user-foot,
+    .sb-foot {
+      border-top: var(--rule);
+      padding: var(--u4) var(--u5) 0;
+      margin-top: var(--u4);
+    }
+
+    .u-av,
+    .av,
+    .td-av,
+    .avo,
+    .avf {
       background: var(--ink) !important;
       color: var(--paper) !important;
       font-size: var(--t-fine);
       font-weight: 600;
       letter-spacing: 0.02em;
     }
-    .u-name { font-size: var(--t-body); font-weight: 600; letter-spacing: -0.01em; }
-    .u-role { font-size: var(--t-fine); color: var(--grey-5); }
 
-    .srv-status, .live-pill {
+    .u-name {
+      font-size: var(--t-body);
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .u-role {
+      font-size: var(--t-fine);
+      color: var(--grey-5);
+    }
+
+    .srv-status,
+    .live-pill {
       font-size: var(--t-micro);
       font-weight: 600;
       letter-spacing: 0.12em;
@@ -3583,8 +3792,16 @@
       color: var(--grey-6);
       padding: var(--u1) var(--u2);
     }
-    .srv-ok { border-color: var(--a3); color: var(--a3); }
-    .srv-err { border-color: var(--a2); color: var(--a2); }
+
+    .srv-ok {
+      border-color: var(--a3);
+      color: var(--a3);
+    }
+
+    .srv-err {
+      border-color: var(--a2);
+      color: var(--a2);
+    }
 
     .signout-btn {
       background: transparent;
@@ -3595,10 +3812,17 @@
       padding: var(--u2) var(--u3);
       transition: border-color 0.12s linear, color 0.12s linear;
     }
-    .signout-btn:hover { border-color: var(--ink); color: var(--ink); }
+
+    .signout-btn:hover {
+      border-color: var(--ink);
+      color: var(--ink);
+    }
 
     /* ── Work surface ────────────────────────────────────────────────── */
-    .main { margin-left: var(--sidebar-w); background: var(--grey-2); }
+    .main {
+      margin-left: var(--sidebar-w);
+      background: var(--grey-2);
+    }
 
     .topbar {
       background: var(--paper);
@@ -3616,9 +3840,18 @@
       line-height: 1.1;
       color: var(--ink);
     }
-    .ps, .tsec { font-size: var(--t-small); color: var(--grey-5); letter-spacing: 0; }
 
-    .page-section { padding: 0; }
+    .ps,
+    .tsec {
+      font-size: var(--t-small);
+      color: var(--grey-5);
+      letter-spacing: 0;
+    }
+
+    .page-section {
+      padding: 0;
+    }
+
     .card {
       background: var(--paper);
       border: var(--rule);
@@ -3626,7 +3859,9 @@
       padding: var(--u5);
       box-shadow: none;
     }
-    .stitle, .ct {
+
+    .stitle,
+    .ct {
       font-size: var(--t-micro);
       font-weight: 600;
       letter-spacing: 0.14em;
@@ -3639,7 +3874,11 @@
 
     /* ── Key figures. A rule above, the number large, the label small:
           the whole hierarchy carried by size and space alone. ───────── */
-    .stats { gap: 0; border-left: var(--rule); }
+    .stats {
+      gap: 0;
+      border-left: var(--rule);
+    }
+
     .sc {
       background: var(--paper);
       border: var(--rule);
@@ -3650,11 +3889,26 @@
       position: relative;
       transition: background 0.12s linear;
     }
-    .sc:hover { background: var(--grey-1); transform: none; }
+
+    .sc:hover {
+      background: var(--grey-1);
+      transform: none;
+    }
+
     /* The five coloured top-bars are ornament: one shared rule replaces them. */
-    .sc::after { display: none !important; }
-    .sc-ic { display: none !important; }
-    .sc-lbl { margin-bottom: var(--u4); display: block; }
+    .sc::after {
+      display: none !important;
+    }
+
+    .sc-ic {
+      display: none !important;
+    }
+
+    .sc-lbl {
+      margin-bottom: var(--u4);
+      display: block;
+    }
+
     .sc-val {
       font-size: var(--t-display);
       font-weight: 600;
@@ -3663,12 +3917,31 @@
       color: var(--ink);
       margin: 0 0 var(--u2);
     }
-    .sc-sub { font-size: var(--t-fine); color: var(--grey-5); letter-spacing: 0; }
-    .sc-sub.up { color: var(--a3); }
+
+    .sc-sub {
+      font-size: var(--t-fine);
+      color: var(--grey-5);
+      letter-spacing: 0;
+    }
+
+    .sc-sub.up {
+      color: var(--a3);
+    }
 
     /* ── Controls ────────────────────────────────────────────────────── */
-    .btn, .btn-hero, .bp, .btn-primary, .btn-outline, .btn-ghost,
-    .btn-success, .btn-xs, .bsm, .kc-btn, .lp-btn, .cpbtn, .tc-add {
+    .btn,
+    .btn-hero,
+    .bp,
+    .btn-primary,
+    .btn-outline,
+    .btn-ghost,
+    .btn-success,
+    .btn-xs,
+    .bsm,
+    .kc-btn,
+    .lp-btn,
+    .cpbtn,
+    .tc-add {
       font-family: var(--font);
       border-radius: 0;
       box-shadow: none;
@@ -3677,49 +3950,103 @@
       transition: background 0.12s linear, color 0.12s linear, border-color 0.12s linear;
     }
 
-    .btn, .bsm, .btn-xs {
+    .btn,
+    .bsm,
+    .btn-xs {
       background: var(--paper);
       border: 1px solid var(--grey-4);
       color: var(--ink);
       font-size: var(--t-small);
       padding: var(--u2) var(--u4);
     }
-    .btn:hover, .bsm:hover, .btn-xs:hover { border-color: var(--ink); background: var(--grey-1); }
+
+    .btn:hover,
+    .bsm:hover,
+    .btn-xs:hover {
+      border-color: var(--ink);
+      background: var(--grey-1);
+    }
 
     /* Primary action — the single place the accent is spent. */
-    .bp, .btn-primary, .btn-hero-primary, .btn.bp {
+    .bp,
+    .btn-primary,
+    .btn-hero-primary,
+    .btn.bp {
       background: var(--red) !important;
       border: 1px solid var(--red) !important;
       color: var(--paper) !important;
       font-weight: 600;
       opacity: 1;
     }
-    .bp:hover, .btn-primary:hover, .btn-hero-primary:hover, .btn.bp:hover {
+
+    .bp:hover,
+    .btn-primary:hover,
+    .btn-hero-primary:hover,
+    .btn.bp:hover {
       background: var(--red-dark) !important;
       border-color: var(--red-dark) !important;
       box-shadow: none;
     }
-    .bp:disabled, .btn:disabled { background: var(--grey-3) !important; border-color: var(--grey-3) !important; color: var(--grey-5) !important; cursor: not-allowed; }
 
-    .btn-ghost, .btn-outline {
+    .bp:disabled,
+    .btn:disabled {
+      background: var(--grey-3) !important;
+      border-color: var(--grey-3) !important;
+      color: var(--grey-5) !important;
+      cursor: not-allowed;
+    }
+
+    .btn-ghost,
+    .btn-outline {
       background: transparent;
       border: 1px solid var(--grey-4);
       color: var(--ink);
     }
-    .btn-ghost:hover, .btn-outline:hover { border-color: var(--ink); background: var(--grey-1); }
-    .btn-success { background: var(--a3); border: 1px solid var(--a3); color: var(--paper); }
 
-    .back-btn, .bell-btn, .mc, .lp-close, .signup-close, .menu-close, .search-clear {
+    .btn-ghost:hover,
+    .btn-outline:hover {
+      border-color: var(--ink);
+      background: var(--grey-1);
+    }
+
+    .btn-success {
+      background: var(--a3);
+      border: 1px solid var(--a3);
+      color: var(--paper);
+    }
+
+    .back-btn,
+    .bell-btn,
+    .mc,
+    .lp-close,
+    .signup-close,
+    .menu-close,
+    .search-clear {
       background: transparent;
       border: var(--rule);
       border-radius: 0;
       color: var(--ink);
       box-shadow: none;
     }
-    .back-btn:hover, .bell-btn:hover, .mc:hover, .lp-close:hover { border-color: var(--ink); background: var(--grey-1); }
+
+    .back-btn:hover,
+    .bell-btn:hover,
+    .mc:hover,
+    .lp-close:hover {
+      border-color: var(--ink);
+      background: var(--grey-1);
+    }
 
     /* ── Fields ──────────────────────────────────────────────────────── */
-    .fi, .ssel, .search, .lp-input, .lp-select, .lp-textarea, input, select, textarea {
+    .fi,
+    .ssel,
+    .search,
+    .lp-input,
+    .lp-select,
+    .lp-textarea,
+    input,
+    select,
+    textarea {
       font-family: var(--font);
       font-size: var(--t-body);
       background: var(--paper);
@@ -3730,23 +4057,51 @@
       box-shadow: none;
       transition: border-color 0.12s linear;
     }
-    .fi:focus, .ssel:focus, .search:focus, .lp-input:focus,
-    .lp-select:focus, .lp-textarea:focus, input:focus, select:focus, textarea:focus {
+
+    .fi:focus,
+    .ssel:focus,
+    .search:focus,
+    .lp-input:focus,
+    .lp-select:focus,
+    .lp-textarea:focus,
+    input:focus,
+    select:focus,
+    textarea:focus {
       border-color: var(--ink);
       outline: none;
     }
-    ::placeholder { color: var(--grey-5); opacity: 1; }
-    .fl, .lp-label { display: block; margin-bottom: var(--u2); }
-    .fg, .lp-fg { margin-bottom: var(--u4); }
+
+    ::placeholder {
+      color: var(--grey-5);
+      opacity: 1;
+    }
+
+    .fl,
+    .lp-label {
+      display: block;
+      margin-bottom: var(--u2);
+    }
+
+    .fg,
+    .lp-fg {
+      margin-bottom: var(--u4);
+    }
 
     /* ── Tabs: a baseline rule, the active tab marked in red ─────────── */
-    .ftabs, .role-tabs, .size-tabs, .lp-tabs {
+    .ftabs,
+    .role-tabs,
+    .size-tabs,
+    .lp-tabs {
       gap: 0;
       border-bottom: var(--rule);
       background: transparent;
       padding: 0;
     }
-    .ft, .rtab, .size-tab, .lp-tab {
+
+    .ft,
+    .rtab,
+    .size-tab,
+    .lp-tab {
       background: transparent !important;
       border: none !important;
       border-bottom: 2px solid transparent !important;
@@ -3755,16 +4110,35 @@
       padding: var(--u3) var(--u4) !important;
       margin-bottom: -1px;
     }
-    .ft:hover, .rtab:hover, .size-tab:hover, .lp-tab:hover { color: var(--ink) !important; }
-    .ft.active, .rtab.active, .size-tab.active, .lp-tab.active {
+
+    .ft:hover,
+    .rtab:hover,
+    .size-tab:hover,
+    .lp-tab:hover {
+      color: var(--ink) !important;
+    }
+
+    .ft.active,
+    .rtab.active,
+    .size-tab.active,
+    .lp-tab.active {
       color: var(--ink) !important;
       border-bottom-color: var(--red) !important;
       font-weight: 600;
     }
 
     /* ── Tables: rules only. No cell borders, no fills, no rounding. ─── */
-    .table-wrapper { border: var(--rule); background: var(--paper); overflow-x: auto; }
-    table { border-collapse: collapse; width: 100%; }
+    .table-wrapper {
+      border: var(--rule);
+      background: var(--paper);
+      overflow-x: auto;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
     table th {
       text-align: left;
       background: var(--paper);
@@ -3772,6 +4146,7 @@
       padding: var(--u3) var(--u4);
       white-space: nowrap;
     }
+
     table td {
       border-bottom: var(--rule);
       padding: var(--u4);
@@ -3779,12 +4154,32 @@
       color: var(--ink);
       vertical-align: middle;
     }
-    table tbody tr:last-child td { border-bottom: none; }
-    table tbody tr { transition: background 0.1s linear; }
-    table tbody tr:hover { background: var(--grey-1); }
+
+    table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    table tbody tr {
+      transition: background 0.1s linear;
+    }
+
+    table tbody tr:hover {
+      background: var(--grey-1);
+    }
 
     /* ── Tags and status. Square, ruled, lowercase-free. ─────────────── */
-    .badge, .kc-tag, .sp-badge, .score-pill, .call-outcome-badge, .bg, .bl, .bw, .bq, .bn, .bx, .bi {
+    .badge,
+    .kc-tag,
+    .sp-badge,
+    .score-pill,
+    .call-outcome-badge,
+    .bg,
+    .bl,
+    .bw,
+    .bq,
+    .bn,
+    .bx,
+    .bi {
       border-radius: 0 !important;
       font-size: var(--t-micro);
       font-weight: 600;
@@ -3795,16 +4190,40 @@
       border: 1px solid currentColor;
       box-shadow: none;
     }
-    .badge.gray, .bg { color: var(--grey-5); }
-    .badge.yellow, .bq { color: var(--a4); }
-    .bn, .bi { color: var(--a5); }
-    .bw { color: var(--a3); }
-    .bl, .bx { color: var(--a2); }
 
-    .dot, .ps-dot, .move-dot, .kanban-dot, .bell-dot {
+    .badge.gray,
+    .bg {
+      color: var(--grey-5);
+    }
+
+    .badge.yellow,
+    .bq {
+      color: var(--a4);
+    }
+
+    .bn,
+    .bi {
+      color: var(--a5);
+    }
+
+    .bw {
+      color: var(--a3);
+    }
+
+    .bl,
+    .bx {
+      color: var(--a2);
+    }
+
+    .dot,
+    .ps-dot,
+    .move-dot,
+    .kanban-dot,
+    .bell-dot {
       border-radius: 0 !important;
       box-shadow: none !important;
-      width: 8px; height: 8px;
+      width: 8px;
+      height: 8px;
     }
 
     /* ── Kanban ──────────────────────────────────────────────────────
@@ -3812,22 +4231,35 @@
        palette (#13132a on rgba(13,13,31,.6)), which rendered near-black
        text on a near-black card — the pipeline was unreadable. Rebuilt
        on paper with the stage colour carried by a single top rule. */
-    .kanban-board { gap: 0; border-left: var(--rule); margin-top: var(--u5); }
+    .kanban-board {
+      gap: 0;
+      border-left: var(--rule);
+      margin-top: var(--u5);
+    }
+
     .kanban-col {
       background: var(--grey-1) !important;
       border: var(--rule);
       border-left: none;
       border-radius: 0;
       backdrop-filter: none;
-      min-width: 300px; max-width: 300px;
+      min-width: 300px;
+      max-width: 300px;
     }
-    .kanban-col.drag-over { background: var(--paper) !important; border-color: var(--ink); transform: none; }
+
+    .kanban-col.drag-over {
+      background: var(--paper) !important;
+      border-color: var(--ink);
+      transform: none;
+    }
+
     .kanban-hdr {
       background: var(--paper);
       border-bottom: var(--rule);
       border-top: 2px solid var(--ink);
       padding: var(--u4);
     }
+
     .kanban-title {
       font-family: var(--font);
       font-size: var(--t-micro);
@@ -3836,6 +4268,7 @@
       text-transform: uppercase;
       color: var(--ink);
     }
+
     .kanban-count {
       background: transparent;
       border: var(--rule);
@@ -3843,8 +4276,19 @@
       font-size: var(--t-micro);
       padding: 1px var(--u2);
     }
-    .kanban-list { padding: var(--u3); gap: var(--u3); }
-    .kanban-empty-msg { font-style: normal; font-size: var(--t-fine); color: var(--grey-5); text-transform: uppercase; letter-spacing: 0.12em; }
+
+    .kanban-list {
+      padding: var(--u3);
+      gap: var(--u3);
+    }
+
+    .kanban-empty-msg {
+      font-style: normal;
+      font-size: var(--t-fine);
+      color: var(--grey-5);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
 
     .kc {
       background: var(--paper) !important;
@@ -3854,31 +4298,101 @@
       padding: var(--u4);
       transition: border-color 0.12s linear;
     }
-    .kc:hover { border-color: var(--ink) !important; transform: none; box-shadow: none !important; }
-    .kc:active { transform: none; box-shadow: none !important; }
-    .kc-name { font-size: var(--t-body); font-weight: 600; color: var(--ink); letter-spacing: -0.012em; }
-    .kc-row, .kc-info { font-size: var(--t-fine); color: var(--grey-6); }
-    .kc-val { font-size: var(--t-lede); font-weight: 600; color: var(--ink); letter-spacing: -0.02em; }
-    .kc-foot, .kc-stats-row { border-top: var(--rule); padding-top: var(--u3); margin-top: var(--u3); }
-    .kc-btn { background: transparent; border: var(--rule); color: var(--grey-6); }
-    .kc-btn:hover { border-color: var(--ink); color: var(--ink); background: var(--grey-1); }
+
+    .kc:hover {
+      border-color: var(--ink) !important;
+      transform: none;
+      box-shadow: none !important;
+    }
+
+    .kc:active {
+      transform: none;
+      box-shadow: none !important;
+    }
+
+    .kc-name {
+      font-size: var(--t-body);
+      font-weight: 600;
+      color: var(--ink);
+      letter-spacing: -0.012em;
+    }
+
+    .kc-row,
+    .kc-info {
+      font-size: var(--t-fine);
+      color: var(--grey-6);
+    }
+
+    .kc-val {
+      font-size: var(--t-lede);
+      font-weight: 600;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+    }
+
+    .kc-foot,
+    .kc-stats-row {
+      border-top: var(--rule);
+      padding-top: var(--u3);
+      margin-top: var(--u3);
+    }
+
+    .kc-btn {
+      background: transparent;
+      border: var(--rule);
+      color: var(--grey-6);
+    }
+
+    .kc-btn:hover {
+      border-color: var(--ink);
+      color: var(--ink);
+      background: var(--grey-1);
+    }
 
     /* ── Overlays ────────────────────────────────────────────────────── */
-    .ov, .lead-panel-overlay, .sb-overlay, .signup-overlay, #login-wrap {
+    .ov,
+    .lead-panel-overlay,
+    .sb-overlay,
+    .signup-overlay,
+    #login-wrap {
       background: rgba(10, 10, 10, 0.55);
       backdrop-filter: none;
       -webkit-backdrop-filter: none;
     }
-    .modal, .lead-panel, .lp, .login-box, .menu-card {
+
+    .modal,
+    .lead-panel,
+    .lp,
+    .login-box,
+    .menu-card {
       background: var(--paper);
       border: var(--rule);
       border-radius: 0;
       box-shadow: none;
     }
-    .mh, .lp-head { border-bottom: var(--rule); padding: var(--u5); }
-    .mt { font-size: var(--t-h3); font-weight: 700; letter-spacing: -0.025em; color: var(--ink); }
-    .mb, .lp-body { padding: var(--u5); }
-    .mf { border-top: var(--rule); padding: var(--u4) var(--u5); }
+
+    .mh,
+    .lp-head {
+      border-bottom: var(--rule);
+      padding: var(--u5);
+    }
+
+    .mt {
+      font-size: var(--t-h3);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+    }
+
+    .mb,
+    .lp-body {
+      padding: var(--u5);
+    }
+
+    .mf {
+      border-top: var(--rule);
+      padding: var(--u4) var(--u5);
+    }
 
     /* ── Toast ───────────────────────────────────────────────────────── */
     .toast {
@@ -3894,12 +4408,39 @@
     }
 
     /* ── Login ───────────────────────────────────────────────────────── */
-    .login-box { padding: var(--u7); max-width: 380px; }
-    .login-title { font-size: var(--t-h2); font-weight: 700; letter-spacing: -0.03em; color: var(--ink); }
-    .login-sub { font-size: var(--t-small); color: var(--grey-5); }
-    .login-hint { font-size: var(--t-fine); color: var(--grey-5); }
-    .login-err { font-size: var(--t-small); color: var(--a2); border-left: 2px solid var(--a2); padding-left: var(--u3); background: transparent; }
-    .login-logo { filter: grayscale(1); }
+    .login-box {
+      padding: var(--u7);
+      max-width: 380px;
+    }
+
+    .login-title {
+      font-size: var(--t-h2);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--ink);
+    }
+
+    .login-sub {
+      font-size: var(--t-small);
+      color: var(--grey-5);
+    }
+
+    .login-hint {
+      font-size: var(--t-fine);
+      color: var(--grey-5);
+    }
+
+    .login-err {
+      font-size: var(--t-small);
+      color: var(--a2);
+      border-left: 2px solid var(--a2);
+      padding-left: var(--u3);
+      background: transparent;
+    }
+
+    .login-logo {
+      filter: grayscale(1);
+    }
 
     /* ── Empty states ────────────────────────────────────────────────── */
     .empty {
@@ -3912,39 +4453,93 @@
     }
 
     /* ── Activity / notes / calls ────────────────────────────────────── */
-    .act-card, .note-card, .call-card, .tcard, .asp-card, .act-item {
+    .act-card,
+    .note-card,
+    .call-card,
+    .tcard,
+    .asp-card,
+    .act-item {
       background: var(--paper);
       border: var(--rule);
       border-radius: 0;
       box-shadow: none;
     }
-    .act-item { border-width: 0 0 1px; }
-    .note-time, .act-meta, .call-meta { font-size: var(--t-fine); color: var(--grey-5); }
-    .note-author, .act-lft { font-weight: 600; color: var(--ink); }
+
+    .act-item {
+      border-width: 0 0 1px;
+    }
+
+    .note-time,
+    .act-meta,
+    .call-meta {
+      font-size: var(--t-fine);
+      color: var(--grey-5);
+    }
+
+    .note-author,
+    .act-lft {
+      font-weight: 600;
+      color: var(--ink);
+    }
 
     /* ── Mobile ──────────────────────────────────────────────────────── */
     @media (max-width: 900px) {
-      .main { margin-left: 0; }
-      .topbar { padding: var(--u4); }
-      .page-title { font-size: var(--t-h2); }
-      .sc-val { font-size: var(--t-h1); }
-      .sc { padding: var(--u4); }
-      .stats { border-left: none; }
-      .sc { border-left: var(--rule); }
+      .main {
+        margin-left: 0;
+      }
+
+      .topbar {
+        padding: var(--u4);
+      }
+
+      .page-title {
+        font-size: var(--t-h2);
+      }
+
+      .sc-val {
+        font-size: var(--t-h1);
+      }
+
+      .sc {
+        padding: var(--u4);
+      }
+
+      .stats {
+        border-left: none;
+      }
+
+      .sc {
+        border-left: var(--rule);
+      }
     }
 
-    .mobile-nav, .mobile-search, .mobile-status {
+    .mobile-nav,
+    .mobile-search,
+    .mobile-status {
       background: var(--paper);
       border-top: var(--rule);
       box-shadow: none;
       border-radius: 0;
     }
-    .m-nav-item { color: var(--grey-5); font-size: var(--t-micro); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
-    .m-nav-item.active { color: var(--red); }
+
+    .m-nav-item {
+      color: var(--grey-5);
+      font-size: var(--t-micro);
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .m-nav-item.active {
+      color: var(--red);
+    }
 
     /* Respect a reduced-motion preference. */
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
+
+      *,
+      *::before,
+      *::after {
         animation-duration: 0.001ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.001ms !important;
@@ -3961,6 +4556,7 @@
       padding: var(--u4) var(--u7);
       backdrop-filter: none;
     }
+
     .nav-logo {
       font-family: var(--font) !important;
       font-size: var(--t-lede) !important;
@@ -3969,7 +4565,10 @@
       color: var(--ink) !important;
       text-transform: none;
     }
-    .nav-logo span { color: var(--red); }
+
+    .nav-logo span {
+      color: var(--red);
+    }
 
     #hero {
       min-height: 100vh;
@@ -3979,7 +4578,11 @@
       text-align: left;
       overflow: visible;
     }
-    #hero-canvas, #hero-stars-canvas { display: none !important; }
+
+    #hero-canvas,
+    #hero-stars-canvas {
+      display: none !important;
+    }
 
     .hero-grid {
       max-width: 1240px;
@@ -3989,23 +4592,27 @@
       grid-template-columns: repeat(12, 1fr);
       gap: 0 var(--u5);
     }
+
     .hero-rule-top {
       grid-column: 1 / -1;
       border-top: 2px solid var(--ink);
       margin-bottom: var(--u5);
     }
+
     .hero-index {
       grid-column: 1 / 3;
       display: flex;
       flex-direction: column;
       gap: var(--u2);
     }
+
     .hero-idx-num {
       font-size: var(--t-micro);
       font-weight: 600;
       letter-spacing: 0.14em;
       color: var(--grey-4);
     }
+
     .hero-tag {
       border: none;
       background: transparent;
@@ -4021,6 +4628,7 @@
       text-align: left;
       gap: 0;
     }
+
     .hero-h1 {
       font-family: var(--font);
       font-size: clamp(44px, 7.4vw, 104px);
@@ -4030,7 +4638,11 @@
       color: var(--ink);
       margin: 0;
     }
-    .hero-h1 span { color: var(--red); }
+
+    .hero-h1 span {
+      color: var(--red);
+    }
+
     .hero-lede {
       max-width: 46ch;
       margin-top: var(--u5);
@@ -4038,8 +4650,17 @@
       line-height: 1.6;
       color: var(--grey-6);
     }
-    .hero-actions { margin-top: var(--u6); display: flex; gap: var(--u3); }
-    .btn-hero { padding: var(--u3) var(--u6); font-size: var(--t-body); }
+
+    .hero-actions {
+      margin-top: var(--u6);
+      display: flex;
+      gap: var(--u3);
+    }
+
+    .btn-hero {
+      padding: var(--u3) var(--u6);
+      font-size: var(--t-body);
+    }
 
     .hero-facts {
       grid-column: 3 / -1;
@@ -4050,7 +4671,13 @@
       grid-template-columns: repeat(3, 1fr);
       gap: var(--u5);
     }
-    .hero-fact { display: flex; flex-direction: column; gap: var(--u2); }
+
+    .hero-fact {
+      display: flex;
+      flex-direction: column;
+      gap: var(--u2);
+    }
+
     .hero-fact-label {
       font-size: var(--t-micro);
       font-weight: 600;
@@ -4058,15 +4685,45 @@
       text-transform: uppercase;
       color: var(--ink);
     }
-    .hero-fact-body { font-size: var(--t-small); line-height: 1.6; color: var(--grey-5); max-width: 32ch; }
+
+    .hero-fact-body {
+      font-size: var(--t-small);
+      line-height: 1.6;
+      color: var(--grey-5);
+      max-width: 32ch;
+    }
 
     @media (max-width: 900px) {
-      #hero { padding: 0 var(--u4); }
-      .hero-grid { padding-top: 104px; gap: 0; }
-      .hero-index, .hero-content, .hero-facts { grid-column: 1 / -1; }
-      .hero-index { flex-direction: row; justify-content: space-between; margin-bottom: var(--u4); }
-      .hero-facts { grid-template-columns: 1fr; gap: var(--u4); margin-top: var(--u6); }
-      #navbar { padding: var(--u3) var(--u4); }
+      #hero {
+        padding: 0 var(--u4);
+      }
+
+      .hero-grid {
+        padding-top: 104px;
+        gap: 0;
+      }
+
+      .hero-index,
+      .hero-content,
+      .hero-facts {
+        grid-column: 1 / -1;
+      }
+
+      .hero-index {
+        flex-direction: row;
+        justify-content: space-between;
+        margin-bottom: var(--u4);
+      }
+
+      .hero-facts {
+        grid-template-columns: 1fr;
+        gap: var(--u4);
+        margin-top: var(--u6);
+      }
+
+      #navbar {
+        padding: var(--u3) var(--u4);
+      }
     }
 
 
@@ -4074,18 +4731,51 @@
 
     /* Page gutters. The sidebar is a fixed 240px measure; content hangs off
        a consistent 32px gutter inside it. */
-    .main { margin-left: var(--sidebar-w); padding: 0; }
-    .page-section { margin-left: var(--sidebar-w); padding: 0; }
-    .main > *:not(.topbar), .page-section > *:not(.topbar) { margin-left: var(--u6); margin-right: var(--u6); }
-    .main > .stats, .page-section > .stats { margin-left: var(--u6); margin-right: var(--u6); }
-    .topbar { margin: 0 !important; }
-    .main > .card, .page-section > .card { margin-bottom: var(--u5); }
-    .main > *:first-child:not(.topbar), .page-section > *:first-child:not(.topbar) { margin-top: var(--u5); }
-    .stats { margin-top: var(--u5) !important; margin-bottom: var(--u5) !important; }
+    .main {
+      margin-left: var(--sidebar-w);
+      padding: 0;
+    }
+
+    .page-section {
+      margin-left: var(--sidebar-w);
+      padding: 0;
+    }
+
+    .main>*:not(.topbar),
+    .page-section>*:not(.topbar) {
+      margin-left: var(--u6);
+      margin-right: var(--u6);
+    }
+
+    .main>.stats,
+    .page-section>.stats {
+      margin-left: var(--u6);
+      margin-right: var(--u6);
+    }
+
+    .topbar {
+      margin: 0 !important;
+    }
+
+    .main>.card,
+    .page-section>.card {
+      margin-bottom: var(--u5);
+    }
+
+    .main>*:first-child:not(.topbar),
+    .page-section>*:first-child:not(.topbar) {
+      margin-top: var(--u5);
+    }
+
+    .stats {
+      margin-top: var(--u5) !important;
+      margin-bottom: var(--u5) !important;
+    }
 
     /* Section headings: the rule runs the full measure, not just under the
        words — a caption sitting on a line, which is the Swiss convention. */
-    .stitle, .ct {
+    .stitle,
+    .ct {
       display: block;
       width: 100%;
       padding-bottom: var(--u3);
@@ -4112,7 +4802,8 @@
     /* Status notation: a filled square, the plainest possible mark. */
     .stat-sq {
       display: inline-block;
-      width: 8px; height: 8px;
+      width: 8px;
+      height: 8px;
       margin-right: var(--u2);
       vertical-align: middle;
     }
@@ -4131,47 +4822,105 @@
       text-transform: uppercase;
       color: var(--grey-5) !important;
     }
-    #sector-count-box strong { color: var(--ink) !important; }
+
+    #sector-count-box strong {
+      color: var(--ink) !important;
+    }
 
     /* Sidebar rows: keep the icon and label apart. */
-    .ni-ic { display: inline-flex; align-items: center; flex: 0 0 auto; width: 16px; }
-    .ni { align-items: center; }
+    .ni-ic {
+      display: inline-flex;
+      align-items: center;
+      flex: 0 0 auto;
+      width: 16px;
+    }
+
+    .ni {
+      align-items: center;
+    }
 
     /* Icon-only controls read as squares on the grid. */
-    .kc-btn, .bell-btn, .back-btn, .btn-xs {
-      min-width: 32px; height: 32px;
-      display: inline-flex; align-items: center; justify-content: center;
+    .kc-btn,
+    .bell-btn,
+    .back-btn,
+    .btn-xs {
+      min-width: 32px;
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
-    .kc-btn svg, .bell-btn svg { width: 14px; height: 14px; }
+
+    .kc-btn svg,
+    .bell-btn svg {
+      width: 14px;
+      height: 14px;
+    }
 
     /* Mobile: the compose action is the primary one, so it takes the accent. */
-    .hb-btn, .mobile-nav .bp { background: var(--red) !important; border-color: var(--red) !important; color: var(--paper) !important; }
+    .hb-btn,
+    .mobile-nav .bp {
+      background: var(--red) !important;
+      border-color: var(--red) !important;
+      color: var(--paper) !important;
+    }
 
     /* Domain/status <select> options inherit the platform face. */
-    select option { font-family: var(--font); }
+    select option {
+      font-family: var(--font);
+    }
 
     /* Long tables: keep the header legible while scrolling a sector. */
-    .table-wrapper table th { position: sticky; top: 0; z-index: 2; background: var(--paper); }
+    .table-wrapper table th {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: var(--paper);
+    }
 
     /* Links inside data cells carry an underline on hover only — no colour. */
-    .wb-link, table td a { border-bottom: 1px solid transparent; }
-    .wb-link:hover, table td a:hover { border-bottom-color: var(--ink); }
+    .wb-link,
+    table td a {
+      border-bottom: 1px solid transparent;
+    }
+
+    .wb-link:hover,
+    table td a:hover {
+      border-bottom-color: var(--ink);
+    }
 
     @media (max-width: 900px) {
-      .main, .page-section { margin-left: 0; }
-      .main > *:not(.topbar), .page-section > *:not(.topbar) { margin-left: var(--u4); margin-right: var(--u4); }
-      .stats { margin-left: var(--u4) !important; margin-right: var(--u4) !important; }
+
+      .main,
+      .page-section {
+        margin-left: 0;
+      }
+
+      .main>*:not(.topbar),
+      .page-section>*:not(.topbar) {
+        margin-left: var(--u4);
+        margin-right: var(--u4);
+      }
+
+      .stats {
+        margin-left: var(--u4) !important;
+        margin-right: var(--u4) !important;
+      }
     }
 
 
     /* ── Sign-in panel ───────────────────────────────────────────────── */
-    .signup-overlay { align-items: center; }
+    .signup-overlay {
+      align-items: center;
+    }
+
     .login-box {
       padding: var(--u7) var(--u7) var(--u6);
       max-width: 400px;
       display: flex;
       flex-direction: column;
     }
+
     .login-mark {
       font-size: var(--t-small);
       font-weight: 700;
@@ -4181,15 +4930,26 @@
       margin-bottom: var(--u5);
       border-bottom: 2px solid var(--ink);
     }
-    .login-mark span { color: var(--red); }
-    .login-title { margin: 0 0 var(--u2); }
-    .login-sub { margin: 0 0 var(--u6); }
+
+    .login-mark span {
+      color: var(--red);
+    }
+
+    .login-title {
+      margin: 0 0 var(--u2);
+    }
+
+    .login-sub {
+      margin: 0 0 var(--u6);
+    }
+
     .login-box .bp {
       width: 100%;
       padding: var(--u3) var(--u4);
       font-size: var(--t-body);
       margin-top: var(--u2);
     }
+
     .login-hint {
       text-align: left;
       margin: var(--u5) 0 0;
@@ -4197,16 +4957,29 @@
       border-top: var(--rule);
       line-height: 1.5;
     }
-    .login-err { margin-bottom: var(--u4); padding: var(--u2) 0 var(--u2) var(--u3); }
+
+    .login-err {
+      margin-bottom: var(--u4);
+      padding: var(--u2) 0 var(--u2) var(--u3);
+    }
+
     .signup-close {
-      top: var(--u4); right: var(--u4);
-      width: 28px; height: 28px;
-      display: flex; align-items: center; justify-content: center;
+      top: var(--u4);
+      right: var(--u4);
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-size: var(--t-small);
       border: none;
       color: var(--grey-5);
     }
-    .signup-close:hover { color: var(--ink); background: var(--grey-1); }
+
+    .signup-close:hover {
+      color: var(--ink);
+      background: var(--grey-1);
+    }
 
 
     /* ── Final corrections ───────────────────────────────────────────── */
@@ -4221,17 +4994,30 @@
 
     /* Kanban stage colour is carried by the header rule only; the dot and
        the rule agree, so the stage is legible without reading the label. */
-    .kanban-hdr { border-top-width: 3px; border-top-style: solid; }
+    .kanban-hdr {
+      border-top-width: 3px;
+      border-top-style: solid;
+    }
 
     /* Destructive actions stay distinguishable from the primary accent:
        the CRM red is the action colour, the status crimson is a warning. */
-    .kc-btn[title="Delete"], button[title="Delete"] { color: var(--a2); }
-    .kc-btn[title="Delete"]:hover, button[title="Delete"]:hover {
-      background: var(--a2); color: var(--paper); border-color: var(--a2);
+    .kc-btn[title="Delete"],
+    button[title="Delete"] {
+      color: var(--a2);
+    }
+
+    .kc-btn[title="Delete"]:hover,
+    button[title="Delete"]:hover {
+      background: var(--a2);
+      color: var(--paper);
+      border-color: var(--a2);
     }
 
     /* Card action row: small, ruled, evenly set. */
-    .kc-btns { gap: var(--u2); }
+    .kc-btns {
+      gap: var(--u2);
+    }
+
     .kc-btn {
       font-size: var(--t-micro);
       font-weight: 600;
@@ -4253,7 +5039,8 @@
     }
 
     /* Sector tiles on the dashboard: flat cells on the grid. */
-    .tcard, .sector-item {
+    .tcard,
+    .sector-item {
       border-radius: 0;
       box-shadow: none;
       background: var(--paper);
@@ -4267,21 +5054,34 @@
       font-size: var(--t-body);
       padding: var(--u2) var(--u3);
     }
-    .sector-drop-btn:hover { border-color: var(--ink); }
+
+    .sector-drop-btn:hover {
+      border-color: var(--ink);
+    }
+
     .sector-drop-content {
       border: var(--rule);
       border-radius: 0;
       background: var(--paper);
       box-shadow: none;
     }
-    .sector-item:hover { background: var(--grey-1); }
+
+    .sector-item:hover {
+      background: var(--grey-1);
+    }
 
     /* Rating cells lost their star glyph; the header names the column. */
-    .rating-cell { font-variant-numeric: tabular-nums; }
+    .rating-cell {
+      font-variant-numeric: tabular-nums;
+    }
 
 
     /* ── Notice panel: a statement set on the grid, not a coloured alert ── */
-    .card.notice { max-width: 68ch; padding: var(--u6); }
+    .card.notice {
+      max-width: 68ch;
+      padding: var(--u6);
+    }
+
     .notice-label {
       font-size: var(--t-micro);
       font-weight: 600;
@@ -4292,6 +5092,7 @@
       margin-bottom: var(--u5);
       border-bottom: 2px solid var(--ink);
     }
+
     .notice-body {
       font-size: var(--t-lede);
       line-height: 1.65;
@@ -4299,7 +5100,12 @@
       margin-bottom: var(--u4);
       max-width: 60ch;
     }
-    .notice-body strong { color: var(--ink); font-weight: 600; }
+
+    .notice-body strong {
+      color: var(--ink);
+      font-weight: 600;
+    }
+
     .notice-meta {
       font-size: var(--t-micro);
       font-weight: 600;
@@ -4313,12 +5119,15 @@
 
 
     /* ── Team cards ──────────────────────────────────────────────────── */
-    .tgrid, #team-grid, #team-list {
+    .tgrid,
+    #team-grid,
+    #team-list {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: var(--u4);
       align-items: start;
     }
+
     .tm-card {
       background: var(--paper);
       border: var(--rule);
@@ -4327,68 +5136,153 @@
       flex-direction: column;
       gap: var(--u4);
     }
-    .tm-head { display: flex; align-items: flex-start; gap: var(--u3); }
+
+    .tm-head {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--u3);
+    }
+
     .tm-av {
-      width: 36px; height: 36px; flex: 0 0 36px;
-      background: var(--ink); color: var(--paper);
-      display: flex; align-items: center; justify-content: center;
-      font-size: var(--t-fine); font-weight: 600; letter-spacing: 0.02em;
+      width: 36px;
+      height: 36px;
+      flex: 0 0 36px;
+      background: var(--ink);
+      color: var(--paper);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--t-fine);
+      font-weight: 600;
+      letter-spacing: 0.02em;
     }
-    .tm-id { flex: 1; min-width: 0; }
+
+    .tm-id {
+      flex: 1;
+      min-width: 0;
+    }
+
     .tm-name {
-      font-size: var(--t-body); font-weight: 600; letter-spacing: -0.012em;
-      text-transform: capitalize; color: var(--ink);
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      font-size: var(--t-body);
+      font-weight: 600;
+      letter-spacing: -0.012em;
+      text-transform: capitalize;
+      color: var(--ink);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
-    .tm-email, .tm-role {
-      font-size: var(--t-fine); color: var(--grey-5);
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+
+    .tm-email,
+    .tm-role {
+      font-size: var(--t-fine);
+      color: var(--grey-5);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
+
     /* Sits in the flow rather than absolutely, so it can never sit on top of
        a long name the way the old corner button did. */
     .tm-del {
       flex: 0 0 auto;
-      background: none; border: none; cursor: pointer;
+      background: none;
+      border: none;
+      cursor: pointer;
       font-family: var(--font);
-      font-size: var(--t-micro); font-weight: 600;
-      letter-spacing: 0.1em; text-transform: uppercase;
-      color: var(--grey-5); padding: 2px 0;
+      font-size: var(--t-micro);
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--grey-5);
+      padding: 2px 0;
     }
-    .tm-del:hover { color: var(--a2); }
 
-    .tm-figs { display: grid; grid-template-columns: repeat(3, 1fr); border-top: var(--rule); }
-    .tm-fig { padding: var(--u3) 0; border-right: var(--rule); }
-    .tm-fig:last-child { border-right: none; }
+    .tm-del:hover {
+      color: var(--a2);
+    }
+
+    .tm-figs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border-top: var(--rule);
+    }
+
+    .tm-fig {
+      padding: var(--u3) 0;
+      border-right: var(--rule);
+    }
+
+    .tm-fig:last-child {
+      border-right: none;
+    }
+
     .tm-fig-val {
-      font-size: var(--t-h3); font-weight: 600; line-height: 1;
-      letter-spacing: -0.03em; color: var(--ink);
+      font-size: var(--t-h3);
+      font-weight: 600;
+      line-height: 1;
+      letter-spacing: -0.03em;
+      color: var(--ink);
       font-variant-numeric: tabular-nums;
     }
+
     .tm-fig-lbl {
-      font-size: var(--t-micro); font-weight: 600; letter-spacing: 0.12em;
-      text-transform: uppercase; color: var(--grey-5); margin-top: var(--u1);
+      font-size: var(--t-micro);
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--grey-5);
+      margin-top: var(--u1);
     }
-    .tm-actions { display: flex; gap: var(--u2); }
+
+    .tm-actions {
+      display: flex;
+      gap: var(--u2);
+    }
+
     /* Both are ordinary actions: the accent stays reserved for the one
        primary action per screen, not repeated on every card. */
-    .tm-actions .btn { flex: 1; font-size: var(--t-micro); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: var(--u2) 0; }
+    .tm-actions .btn {
+      flex: 1;
+      font-size: var(--t-micro);
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: var(--u2) 0;
+    }
 
 
     /* ── Explainer panel ─────────────────────────────────────────────── */
-    .card.explainer { margin-bottom: var(--u5); }
-    .card.explainer .how-it-works-grid { gap: var(--u5); }
+    .card.explainer {
+      margin-bottom: var(--u5);
+    }
+
+    .card.explainer .how-it-works-grid {
+      gap: var(--u5);
+    }
 
     /* ── Last colour corrections ─────────────────────────────────────── */
 
     /* The score pill kept the old theme's pink fill and a brighter pink
        numeral, so every score in the table read as an alert. It is a
        measurement: set in ink, inside a hairline. */
-    .score-pill { background: transparent !important; color: var(--ink) !important; }
-    .score-pill strong { color: var(--ink) !important; font-size: var(--t-body); }
-    .rating-cell { color: var(--ink); }
+    .score-pill {
+      background: transparent !important;
+      color: var(--ink) !important;
+    }
+
+    .score-pill strong {
+      color: var(--ink) !important;
+      font-size: var(--t-body);
+    }
+
+    .rating-cell {
+      color: var(--ink);
+    }
 
     /* Priority abbreviation sits beside the score as plain notation. */
-    td .priority-mark, td div[style*="font-size:14px"] {
+    td .priority-mark,
+    td div[style*="font-size:14px"] {
       font-size: var(--t-micro) !important;
       font-weight: 600;
       letter-spacing: 0.1em;
@@ -4396,20 +5290,37 @@
     }
 
     /* Mobile: the compose control is the primary action on the bar. */
-    .hb-btn, #tb-add-lead, #sp-tb-add-lead {
+    .hb-btn,
+    #tb-add-lead,
+    #sp-tb-add-lead {
       background: var(--red) !important;
       border: 1px solid var(--red) !important;
       color: var(--paper) !important;
       box-shadow: none !important;
     }
-    .bell-btn { background: var(--paper) !important; color: var(--ink) !important; border: var(--rule) !important; }
+
+    .bell-btn {
+      background: var(--paper) !important;
+      color: var(--ink) !important;
+      border: var(--rule) !important;
+    }
 
     /* Narrow screens: let a wide table scroll inside its own frame rather
        than pushing the page sideways. */
     @media (max-width: 900px) {
-      .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-      .ftabs, .size-tabs { overflow-x: auto; }
-      body { overflow-x: hidden; }
+      .table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .ftabs,
+      .size-tabs {
+        overflow-x: auto;
+      }
+
+      body {
+        overflow-x: hidden;
+      }
     }
   </style>
 </head>
@@ -4482,13 +5393,14 @@
 
         <div class="fg">
           <label class="fl" for="l-email">Email address</label>
-          <input class="fi" id="l-email" type="email" placeholder="name@exora.solutions"
-            autocomplete="username" onkeydown="if(event.key==='Enter')tryLogin()" />
+          <input class="fi" id="l-email" type="email" placeholder="name@exora.solutions" autocomplete="username"
+            onkeydown="if(event.key==='Enter')tryLogin()" />
         </div>
         <div class="fg">
           <label class="fl" for="l-pass">Password</label>
-          <input class="fi" id="l-pass" type="password" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;"
-            autocomplete="current-password" onkeydown="if(event.key==='Enter')tryLogin()" />
+          <input class="fi" id="l-pass" type="password"
+            placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" autocomplete="current-password"
+            onkeydown="if(event.key==='Enter')tryLogin()" />
         </div>
 
         <button class="bp" id="login-btn" onclick="tryLogin()">Sign in</button>
@@ -4509,7 +5421,7 @@
     <div class="logo">Exora&nbsp;<span>Leadforge</span></div>
   </div>
 
-<!-- NOTIFICATION TOAST -->
+  <!-- NOTIFICATION TOAST -->
   <!-- ADMIN NAV -->
   <div class="adm-only" id="adm-nav">
     <div class="nl">Main</div>
@@ -4649,10 +5561,10 @@
     <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
       <input class="fi" id="domain-search-input" placeholder="e.g. Hospitals, Gyms, IT Companies..."
         style="flex:1;min-width:220px;" onkeydown="if(event.key==='Enter')generateDomainLeads()">
-      <input class="fi" id="domain-area-input" placeholder="Area (optional, e.g. Koramangala)"
-        style="width:180px;" onkeydown="if(event.key==='Enter')generateDomainLeads()">
-      <input class="fi" id="domain-city-input" placeholder="City (optional, e.g. Bengaluru)"
-        style="width:180px;" onkeydown="if(event.key==='Enter')generateDomainLeads()">
+      <input class="fi" id="domain-area-input" placeholder="Area (optional, e.g. Koramangala)" style="width:180px;"
+        onkeydown="if(event.key==='Enter')generateDomainLeads()">
+      <input class="fi" id="domain-city-input" placeholder="City or Pincode (required, e.g. Bengaluru or 560001)"
+        style="width:220px;" onkeydown="if(event.key==='Enter')generateDomainLeads()">
       <button class="btn bp" onclick="generateDomainLeads()" id="domain-gen-btn">Generate Leads</button>
     </div>
 
@@ -4706,20 +5618,29 @@
         <div class="page-title" id="leads-page-title">Leads</div>
       </div>
     </div>
-      <div class="tb-right">
-        <div class="search-wrap" style="margin-right:12px;">
-          <input class="search" type="text" placeholder="Search sector leads" oninput="doSearch(this.value); this.nextElementSibling.style.display = this.value ? 'block' : 'none';" style="width:200px;">
-          <span class="search-clear" onclick="this.previousElementSibling.value=''; this.style.display='none'; doSearch('');">&#10005;</span>
-        </div>
-        <button onclick="refreshBrands()" id="refresh-brands-btn" class="btn bg" style="font-size:12px; margin-right:10px;">Refresh Brands</button>
-        <div class="bell-btn" onclick="toggleRemindersPanel()"><i data-lucide="bell"></i><span class="bell-dot" id="bell-dot-leads"></span></div>
-        <button class="btn bp" id="tb-add-lead" onclick="openAddLead()">+ Add Lead</button>
+    <div class="tb-right">
+      <div class="search-wrap" style="margin-right:12px;">
+        <input class="search" type="text" placeholder="Search sector leads"
+          oninput="doSearch(this.value); this.nextElementSibling.style.display = this.value ? 'block' : 'none';"
+          style="width:200px;">
+        <span class="search-clear"
+          onclick="this.previousElementSibling.value=''; this.style.display='none'; doSearch('');">&#10005;</span>
       </div>
+      <button onclick="refreshBrands()" id="refresh-brands-btn" class="btn bg"
+        style="font-size:12px; margin-right:10px;">Refresh Brands</button>
+      <div class="bell-btn" onclick="toggleRemindersPanel()"><i data-lucide="bell"></i><span class="bell-dot"
+          id="bell-dot-leads"></span></div>
+      <button class="btn bp" id="tb-add-lead" onclick="openAddLead()">+ Add Lead</button>
+    </div>
   </div>
-  <div style="background:var(--s1);border:1.5px solid var(--bd);border-radius:var(--r);padding:14px 18px;margin-bottom:20px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
-    <div style="font-family:'Clash Display',sans-serif;font-size:13px;font-weight:700;white-space:nowrap;">Find More</div>
-    <input class="fi" id="leads-area-input" placeholder="Area (optional, e.g. Koramangala)" style="width:180px;" onkeydown="if(event.key==='Enter')triggerLeadsPageGen()">
-    <input class="fi" id="leads-city-input" placeholder="City (optional, e.g. Bengaluru)" style="width:180px;" onkeydown="if(event.key==='Enter')triggerLeadsPageGen()">
+  <div
+    style="background:var(--s1);border:1.5px solid var(--bd);border-radius:var(--r);padding:14px 18px;margin-bottom:20px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+    <div style="font-family:'Clash Display',sans-serif;font-size:13px;font-weight:700;white-space:nowrap;">Find More
+    </div>
+    <input class="fi" id="leads-area-input" placeholder="Area (optional, e.g. Koramangala)" style="width:180px;"
+      onkeydown="if(event.key==='Enter')triggerLeadsPageGen()">
+    <input class="fi" id="leads-city-input" placeholder="City or Pincode (required)" style="width:200px;"
+      onkeydown="if(event.key==='Enter')triggerLeadsPageGen()">
     <button class="btn bp" onclick="triggerLeadsPageGen()" id="leads-gen-btn">Generate More Leads</button>
   </div>
   <div class="card" style="margin-bottom:20px;">
@@ -4833,7 +5754,8 @@
 <div class="ov" id="lead-modal">
   <div class="modal">
     <div class="mh">
-      <div class="mt" id="lm-title">Add New Lead</div><button class="mc" onclick="closeM('lead-modal')">&#10005;</button>
+      <div class="mt" id="lm-title">Add New Lead</div><button class="mc"
+        onclick="closeM('lead-modal')">&#10005;</button>
     </div>
     <div class="mb">
       <div class="fr2">
@@ -5021,7 +5943,8 @@
       <strong>Nomi</strong>. Add a person there and they appear here within the
       hour, with the password they already use and the role their Nomi
       organisation membership gives them &mdash; an <strong>admin</strong> in
-      Nomi is an admin here, a <strong>member</strong> is a salesperson.</p>
+      Nomi is an admin here, a <strong>member</strong> is a salesperson.
+    </p>
     <p class="notice-body">Removing someone in Nomi disables their access here
       on the next sync, while leaving their calls, notes and activity intact.</p>
     <p class="notice-meta">Sync runs hourly &middot; scripts/sync-nomi-users.js</p>
@@ -5043,13 +5966,17 @@
       </button>
       <div style="display:flex; flex-direction:column; margin-left:12px;">
         <div class="page-title">Assign Leads</div>
-        <div style="font-size:12px;color:var(--tx3);margin-top:2px;">Select leads to assign to the new sales person</div>
+        <div style="font-size:12px;color:var(--tx3);margin-top:2px;">Select leads to assign to the new sales person
+        </div>
       </div>
     </div>
     <div class="tb-right">
       <button class="btn bg" onclick="showAdminPage('team',document.getElementById('nav-team'))">Skip</button>
-      <button class="btn bp" id="assign-all-btn" onclick="assignAllLeads()" style="margin-left: 10px; background: rgba(37,99,235,0.08); border: 1.5px solid rgba(37,99,235,0.3); color: var(--acc); box-shadow: 0 4px 15px rgba(37,99,235,0.1);">Assign All</button>
-      <button class="btn bp" id="assign-submit-btn" onclick="submitAssignLeads()" style="margin-left: 10px;">Submit assignment</button>
+      <button class="btn bp" id="assign-all-btn" onclick="assignAllLeads()"
+        style="margin-left: 10px; background: rgba(37,99,235,0.08); border: 1.5px solid rgba(37,99,235,0.3); color: var(--acc); box-shadow: 0 4px 15px rgba(37,99,235,0.1);">Assign
+        All</button>
+      <button class="btn bp" id="assign-submit-btn" onclick="submitAssignLeads()" style="margin-left: 10px;">Submit
+        assignment</button>
     </div>
   </div>
   <div class="alp-assignee" id="alp-assignee"></div>
@@ -5059,7 +5986,8 @@
       style="font-size: 11px; font-weight: 700; color: var(--tx3); text-transform: uppercase; letter-spacing: 0.5px;">Filter
       by Sector:</span>
     <div class="sector-dropdown" style="margin: 0;">
-      <div class="sector-drop-btn" style="height: 32px; min-width: 180px; padding: 0 12px; font-size: 12px;" onclick="this.nextElementSibling.classList.toggle('open')">
+      <div class="sector-drop-btn" style="height: 32px; min-width: 180px; padding: 0 12px; font-size: 12px;"
+        onclick="this.nextElementSibling.classList.toggle('open')">
         <div style="display:flex; align-items:center; gap:8px;">
           <span id="alp-sector-icon"></span>
           <span id="alp-sector-label">All Sectors</span>
@@ -5069,9 +5997,12 @@
       <div class="sector-drop-content" id="alp-domain-ftabs"></div>
     </div>
     <div class="size-tabs" style="height:32px; background:rgba(91,106,247,0.05); border-color:rgba(91,106,247,0.12);">
-      <div class="size-tab active" style="padding:0 12px; font-size:10.5px;" onclick="setAL_AssignedFilter('all', this)">All Leads</div>
-      <div class="size-tab" style="padding:0 12px; font-size:10.5px;" onclick="setAL_AssignedFilter('assigned', this)">Assigned</div>
-      <div class="size-tab" style="padding:0 12px; font-size:10.5px;" onclick="setAL_AssignedFilter('unassigned', this)">Unassigned</div>
+      <div class="size-tab active" style="padding:0 12px; font-size:10.5px;"
+        onclick="setAL_AssignedFilter('all', this)">All Leads</div>
+      <div class="size-tab" style="padding:0 12px; font-size:10.5px;" onclick="setAL_AssignedFilter('assigned', this)">
+        Assigned</div>
+      <div class="size-tab" style="padding:0 12px; font-size:10.5px;"
+        onclick="setAL_AssignedFilter('unassigned', this)">Unassigned</div>
     </div>
   </div>
   <div id="alp-leads-list"></div>
@@ -5113,7 +6044,8 @@
       <div
         style="font-size:10px;font-weight:700;letter-spacing:1.2px;color:var(--tx3);text-transform:uppercase;margin-bottom:4px;">
         GAP BOOST RULES</div>
-      <div style="font-size:12px;color:var(--tx2);margin-bottom:16px;">Bonus points added when a gap is detected on the leads' website</div>
+      <div style="font-size:12px;color:var(--tx2);margin-bottom:16px;">Bonus points added when a gap is detected on the
+        leads' website</div>
       <div id="gap-config-list"></div>
     </div>
   </div>
@@ -5138,8 +6070,10 @@
       <div style="font-size:11.5px;color:var(--tx2);"><strong style="color:var(--tx);">ERP /
           Attendance</strong><br>Detects Fedena, Entab, MyClassboard, SchoolPad</div>
     </div>
-    <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(91,106,247,0.15);font-size:11px;color:var(--tx3);">
-      <strong>Limitation:</strong> Only the direct public website is scanned. If a tool is used internally (separate app/portal not embedded in the website), it won't be detected. Gap = "not found on website" not "doesn't exist".
+    <div
+      style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(91,106,247,0.15);font-size:11px;color:var(--tx3);">
+      <strong>Limitation:</strong> Only the direct public website is scanned. If a tool is used internally (separate
+      app/portal not embedded in the website), it won't be detected. Gap = "not found on website" not "doesn't exist".
     </div>
   </div>
 </div>
@@ -5148,7 +6082,8 @@
 <div class="page-section show-back" id="adminuser-page">
   <div class="topbar">
     <div style="display:flex; align-items:center;">
-      <button class="back-btn" onclick="showAdminPage('dashboard',document.getElementById('nav-dash'))" title="Back to Dashboard">←</button>
+      <button class="back-btn" onclick="showAdminPage('dashboard',document.getElementById('nav-dash'))"
+        title="Back to Dashboard">←</button>
       <button class="hb-btn" onclick="toggleMSB()"
         style="background:var(--s3); border:1px solid var(--acc); color:var(--acc); box-shadow:0 0 10px rgba(37,99,235,0.2);">
         <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2.5" fill="none"
@@ -5185,7 +6120,8 @@
 <div class="page-section show-back" id="team-page">
   <div class="topbar">
     <div style="display:flex; align-items:center;">
-      <button class="back-btn" onclick="showAdminPage('dashboard',document.getElementById('nav-dash'))" title="Back to Dashboard">←</button>
+      <button class="back-btn" onclick="showAdminPage('dashboard',document.getElementById('nav-dash'))"
+        title="Back to Dashboard">←</button>
       <button class="hb-btn" onclick="toggleMSB()"
         style="background:var(--s3); border:1px solid var(--acc); color:var(--acc); box-shadow:0 0 10px rgba(37,99,235,0.2);">
         <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2.5" fill="none"
@@ -5286,14 +6222,15 @@
     <!-- DOMAIN GENERATOR WIDGET (SP) -->
     <div
       style="background:var(--s1);border:1.5px solid var(--bd);border-radius:var(--r);padding:18px 22px;margin: 10px 20px 20px;">
-      <div style="font-family:'Clash Display',sans-serif;font-size:15px;font-weight:700;margin-bottom:14px;">Generate Leads for a Domain</div>
+      <div style="font-family:'Clash Display',sans-serif;font-size:15px;font-weight:700;margin-bottom:14px;">Generate
+        Leads for a Domain</div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
         <input class="fi" id="sp-domain-search-input" placeholder="e.g. Auditing Companies, Fitness Gyms..."
           style="flex:1;min-width:220px;" onkeydown="if(event.key==='Enter')generateDomainLeads('sp')">
-        <input class="fi" id="sp-domain-area-input" placeholder="Area (optional, e.g. Koramangala)"
-          style="width:180px;" onkeydown="if(event.key==='Enter')generateDomainLeads('sp')">
-        <input class="fi" id="sp-domain-city-input" placeholder="City (optional, e.g. Bengaluru)"
-          style="width:180px;" onkeydown="if(event.key==='Enter')generateDomainLeads('sp')">
+        <input class="fi" id="sp-domain-area-input" placeholder="Area (optional, e.g. Koramangala)" style="width:180px;"
+          onkeydown="if(event.key==='Enter')generateDomainLeads('sp')">
+        <input class="fi" id="sp-domain-city-input" placeholder="City or Pincode (required, e.g. Bengaluru or 560001)"
+          style="width:220px;" onkeydown="if(event.key==='Enter')generateDomainLeads('sp')">
         <button class="btn bp" onclick="generateDomainLeads('sp')" id="sp-domain-gen-btn">Generate Leads</button>
       </div>
 
@@ -5328,8 +6265,10 @@
         <i data-lucide="bell"></i> <span class="bell-dot" id="sp-bell-dot"></span>
       </div>
       <div class="search-wrap">
-        <input class="search" type="text" placeholder="Search leads" oninput="spSearch(this.value); this.nextElementSibling.style.display = this.value ? 'block' : 'none';">
-        <span class="search-clear" onclick="this.previousElementSibling.value=''; this.style.display='none'; spSearch('');">&#10005;</span>
+        <input class="search" type="text" placeholder="Search leads"
+          oninput="spSearch(this.value); this.nextElementSibling.style.display = this.value ? 'block' : 'none';">
+        <span class="search-clear"
+          onclick="this.previousElementSibling.value=''; this.style.display='none'; spSearch('');">&#10005;</span>
       </div>
     </div>
   </div>
@@ -5519,7 +6458,7 @@
       detectedBigBrands = data.bigBrands || [];
       brandStatsLoaded = true;
       console.log('Detected chains:', detectedBigBrands);
-    } catch(e) {
+    } catch (e) {
       console.log('Brand stats failed:', e);
       detectedBigBrands = [];
     }
@@ -5705,6 +6644,12 @@
     const cityEl = document.getElementById(cityId);
     const area = (areaEl && areaEl.value.trim()) || '';
     const city = (cityEl && cityEl.value.trim()) || '';
+
+    if (!city) {
+      alert('Please enter the city or pincode');
+      return;
+    }
+
     const locationLabel = [area, city].filter(Boolean).join(', ');
 
     domainGenInFlight = true;
@@ -5804,6 +6749,12 @@
     const cityEl = document.getElementById('leads-city-input');
     const area = (areaEl && areaEl.value.trim()) || '';
     const city = (cityEl && cityEl.value.trim()) || '';
+
+    if (!city) {
+      alert('Please enter the city or pincode');
+      return;
+    }
+
     const locationLabel = [area, city].filter(Boolean).join(', ');
 
     const btn = document.getElementById('leads-gen-btn');
@@ -5969,7 +6920,7 @@
     const d = domains.find(d => d.id === currentDomain);
     if (!d) return;
     const normId = String(currentDomain).toLowerCase().replace(/s$/, '');
-    
+
     // Use role-specific counts if possible
     let count = 0;
     if (currentUser && currentUser.role !== 'admin' && spLeads.length > 0) {
@@ -5986,7 +6937,7 @@
 
     if (document.getElementById('leads-page-title')) document.getElementById('leads-page-title').innerHTML = html;
     if (document.getElementById('sp-leads-page-title')) document.getElementById('sp-leads-page-title').innerHTML = html;
-    
+
     if (document.getElementById('domain-table-title')) document.getElementById('domain-table-title').textContent = ptitle;
     if (document.getElementById('sp-domain-table-title')) document.getElementById('sp-domain-table-title').textContent = ptitle;
 
@@ -6073,7 +7024,7 @@
       history.pushState({ role: 'admin', page, param, elId: el ? el.id : null }, "", "#" + page);
     }
     document.querySelectorAll('.page-section').forEach(s => s.classList.remove('visible'));
-    
+
     const isDash = (page === 'dashboard');
     document.getElementById('admin-main').style.display = isDash ? 'block' : 'none';
 
@@ -6126,7 +7077,7 @@
     const acard = document.getElementById('adm-activity-card');
     if (stats) stats.style.display = page === 'dashboard' ? '' : 'none';
     if (acard) acard.style.display = page === 'dashboard' ? '' : 'none';
-    
+
     if (page === 'team') rTeam();
 
     if (page === 'leads') {
@@ -6235,13 +7186,13 @@
     document.getElementById('sp-s2').textContent = spLeads.filter(l => l.status === 'new').length;
     document.getElementById('sp-s3').textContent = spLeads.filter(l => ['contacted', 'interested', 'proposal'].includes(l.status)).length;
     document.getElementById('sp-s4').textContent = spLeads.filter(l => l.status === 'won').length;
-    
+
     // Also update the reminders count for SP
     try {
       const rows = await get('/reminders/today', true);
       const el = document.getElementById('sp-s5');
       if (el) el.textContent = rows.length;
-    } catch(e) {}
+    } catch (e) { }
   }
 
   function rSPActivity() {
@@ -6254,87 +7205,87 @@
   function getSpFiltered() {
     return spLeads.filter(l => {
 
-    // 1. DOMAIN filter — must match current sector
-    const domainMatch = (() => {
-      const leadDom = String(l.domain || 'school')
-        .toLowerCase()
-        .trim()
-        .replace(/s$/, '');        // remove trailing 's'
-      
-      const curDom = String(currentDomain || 'school')
-        .toLowerCase()
-        .trim()
-        .replace(/s$/, '');        // remove trailing 's'
-      
-      return leadDom === curDom;
-    })();
+      // 1. DOMAIN filter — must match current sector
+      const domainMatch = (() => {
+        const leadDom = String(l.domain || 'school')
+          .toLowerCase()
+          .trim()
+          .replace(/s$/, '');        // remove trailing 's'
 
-    // 2. STATUS filter
-    const statusMatch = spFilt === 'all' || l.status === spFilt;
+        const curDom = String(currentDomain || 'school')
+          .toLowerCase()
+          .trim()
+          .replace(/s$/, '');        // remove trailing 's'
 
-    // 3. SEARCH filter
-    const q = spSq.toLowerCase();
-    const searchMatch = !q
-      || (l.school_name || '').toLowerCase().includes(q)
-      || (l.address || '').toLowerCase().includes(q)
-      || (l.city || '').toLowerCase().includes(q)
-      || (l.area || '').toLowerCase().includes(q);
+        return leadDom === curDom;
+      })();
 
-    // 4. SIZE filter
-    const sizeMatch = (() => {
-      if (currentSize === 'all') return true;
-      const big = isBigBrand(l);
-      if (currentSize === 'big')   return big === true;
-      if (currentSize === 'small') return big === false;
-      return true;
-    })();
+      // 2. STATUS filter
+      const statusMatch = spFilt === 'all' || l.status === spFilt;
 
-    // 5. CHAIN filter
-    const chainMatch = (() => {
-      if (currentChain === 'all') return true;
-      const name = (l.school_name || '').toLowerCase();
-      const chainWords = ['group','pvt ltd','pvt. ltd','& co',
-        'international','global','national','india','holdings',
-        'chain','enterprises','corporation','corp','limited',
-        'ltd','network','academy','institute','management',
-        'solutions','services'];
-      const isChain = chainWords.some(w => name.includes(w));
-      return currentChain === 'chain' ? isChain : !isChain;
-    })();
+      // 3. SEARCH filter
+      const q = spSq.toLowerCase();
+      const searchMatch = !q
+        || (l.school_name || '').toLowerCase().includes(q)
+        || (l.address || '').toLowerCase().includes(q)
+        || (l.city || '').toLowerCase().includes(q)
+        || (l.area || '').toLowerCase().includes(q);
 
-    // 6. DIGITAL PRESENCE filter
-    const digitalMatch = (() => {
-      if (currentDigital === 'all') return true;
-      const w = (l.website || '').trim();
-      const hasNoWeb = !w || w === 'undefined' || w === 'null';
-      if (currentDigital === 'none') return hasNoWeb;
-      if (currentDigital === 'strong') return !hasNoWeb && w.startsWith('https://');
-      if (currentDigital === 'basic') return !hasNoWeb && !w.startsWith('https://');
-      return true;
-    })();
+      // 4. SIZE filter
+      const sizeMatch = (() => {
+        if (currentSize === 'all') return true;
+        const big = isBigBrand(l);
+        if (currentSize === 'big') return big === true;
+        if (currentSize === 'small') return big === false;
+        return true;
+      })();
 
-    // 7. TEMPERATURE filter
-    const tempMatch = (() => {
-      if (currentTemp === 'all') return true;
-      const score = parseInt(l.score) || 0;
-      const status = (l.status || '').toLowerCase();
-      const isHot = score >= 80 && ['interested','proposal','won'].includes(status);
-      const isWarm = score >= 60 && ['contacted','interested'].includes(status);
-      if (currentTemp === 'hot') return isHot;
-      if (currentTemp === 'warm') return isWarm && !isHot;
-      if (currentTemp === 'cold') return !isHot && !isWarm;
-      return true;
-    })();
+      // 5. CHAIN filter
+      const chainMatch = (() => {
+        if (currentChain === 'all') return true;
+        const name = (l.school_name || '').toLowerCase();
+        const chainWords = ['group', 'pvt ltd', 'pvt. ltd', '& co',
+          'international', 'global', 'national', 'india', 'holdings',
+          'chain', 'enterprises', 'corporation', 'corp', 'limited',
+          'ltd', 'network', 'academy', 'institute', 'management',
+          'solutions', 'services'];
+        const isChain = chainWords.some(w => name.includes(w));
+        return currentChain === 'chain' ? isChain : !isChain;
+      })();
 
-    return domainMatch 
-        && statusMatch 
-        && searchMatch 
-        && sizeMatch 
-        && chainMatch 
-        && digitalMatch 
+      // 6. DIGITAL PRESENCE filter
+      const digitalMatch = (() => {
+        if (currentDigital === 'all') return true;
+        const w = (l.website || '').trim();
+        const hasNoWeb = !w || w === 'undefined' || w === 'null';
+        if (currentDigital === 'none') return hasNoWeb;
+        if (currentDigital === 'strong') return !hasNoWeb && w.startsWith('https://');
+        if (currentDigital === 'basic') return !hasNoWeb && !w.startsWith('https://');
+        return true;
+      })();
+
+      // 7. TEMPERATURE filter
+      const tempMatch = (() => {
+        if (currentTemp === 'all') return true;
+        const score = parseInt(l.score) || 0;
+        const status = (l.status || '').toLowerCase();
+        const isHot = score >= 80 && ['interested', 'proposal', 'won'].includes(status);
+        const isWarm = score >= 60 && ['contacted', 'interested'].includes(status);
+        if (currentTemp === 'hot') return isHot;
+        if (currentTemp === 'warm') return isWarm && !isHot;
+        if (currentTemp === 'cold') return !isHot && !isWarm;
+        return true;
+      })();
+
+      return domainMatch
+        && statusMatch
+        && searchMatch
+        && sizeMatch
+        && chainMatch
+        && digitalMatch
         && tempMatch;
-  });
-}
+    });
+  }
 
   function renderSPTable(tbodyId, leadsArray) {
     const tb = document.getElementById(tbodyId);
@@ -6374,7 +7325,7 @@
       const tm = currentTemp === 'all' || getTemperature(l) === currentTemp;
       const q = spSq.toLowerCase();
       const sm = !q || (l.school_name || '').toLowerCase().includes(q) || (l.address || '').toLowerCase().includes(q);
-      
+
       return fm && dm && sm && zm && cm && digiM && tm;
     });
     renderSPTable('sp-status-leads-body', statusLeads);
@@ -6520,7 +7471,7 @@
       let html = `<div class="sector-item active" onclick="setALF('all', this, 'globe', 'All Sectors')">
           <div class="sector-item-left"><span>${icon('globe')}</span> All Sectors</div>
         </div>`;
-      
+
       domains.forEach(d => {
         html += `<div class="sector-item" onclick="setALF('${d.id}', this, '${d.icon}', '${d.label}')">
             <div class="sector-item-left"><span>${icon(d.icon)}</span> ${d.label}</div>
@@ -6552,7 +7503,7 @@
     const domainFilt = alpFilt;
 
     let allLeads = leads;
-    
+
     // Applying Assignment Filter
     if (currentALAssignment === 'unassigned') {
       allLeads = allLeads.filter(l => !l.assigned_id);
@@ -6586,11 +7537,11 @@
     const row = document.getElementById('alp-r-' + id);
     if (cb) cb.checked = alpSelectedIds.includes(id);
     if (row) row.classList.toggle('sel', alpSelectedIds.includes(id));
-  }  async function assignAllLeads() {
+  } async function assignAllLeads() {
     const sp = pendingNewSP; if (!sp) return;
     const domainFilt = alpFilt;
     let vis = leads.filter(l => !l.assigned_id);
-    if (domainFilt !== 'all') vis = vis.filter(l => (l.domain||'school') === domainFilt);
+    if (domainFilt !== 'all') vis = vis.filter(l => (l.domain || 'school') === domainFilt);
     if (vis.length === 0) return toast('No unassigned leads here.', 'info');
     const b = document.getElementById('assign-all-btn'); const oh = b.innerHTML; b.disabled = true; b.innerHTML = '<span class="spin"></span> Assigning...';
     try {
@@ -6606,8 +7557,8 @@
     try {
       const now = new Date().toISOString();
       await post('/leads/assign', { lead_ids: [id], team_id: pendingNewSP.id });
-      leads.forEach(l => { 
-        if (l.id === id) { l.assigned_id = pendingNewSP.id; l.assigned_at = now; } 
+      leads.forEach(l => {
+        if (l.id === id) { l.assigned_id = pendingNewSP.id; l.assigned_at = now; }
       });
       toast('Lead assigned successfully!', 'success');
       renderALLeads(); // Refresh to show the assignment info
@@ -6625,11 +7576,11 @@
     try {
       const now = new Date().toISOString();
       await post('/leads/assign', { lead_ids: alpSelectedIds, team_id: pendingNewSP.id });
-      leads.forEach(l => { 
+      leads.forEach(l => {
         if (alpSelectedIds.includes(l.id)) {
-          l.assigned_id = pendingNewSP.id; 
+          l.assigned_id = pendingNewSP.id;
           l.assigned_at = now;
-        } 
+        }
       });
       toast(`${alpSelectedIds.length} lead${alpSelectedIds.length > 1 ? 's' : ''} assigned to ${pendingNewSP.name}!`, 'success');
 
@@ -6807,108 +7758,108 @@
     currentAssignment = val;
     el.parentNode.querySelectorAll('.size-tab').forEach(t => t.classList.remove('active'));
     if (el) el.classList.add('active');
-    
+
     // Toggle table headers visibility
     const showAss = val === 'assigned';
-    if(document.getElementById('th-assignee')) document.getElementById('th-assignee').style.display = showAss ? 'table-cell' : 'none';
-    if(document.getElementById('th-ass-date')) document.getElementById('th-ass-date').style.display = showAss ? 'table-cell' : 'none';
-    
+    if (document.getElementById('th-assignee')) document.getElementById('th-assignee').style.display = showAss ? 'table-cell' : 'none';
+    if (document.getElementById('th-ass-date')) document.getElementById('th-ass-date').style.display = showAss ? 'table-cell' : 'none';
+
     rLeads();
   }
 
   function getFiltered() {
-  return leads.filter(l => {
+    return leads.filter(l => {
 
-    // 1. DOMAIN filter
-    const domainMatch = (() => {
-      const leadDom = String(l.domain || 'school').toLowerCase().trim().replace(/s$/, '');
-      const curDom = String(currentDomain || 'school').toLowerCase().trim().replace(/s$/, '');
-      return leadDom === curDom;
-    })();
+      // 1. DOMAIN filter
+      const domainMatch = (() => {
+        const leadDom = String(l.domain || 'school').toLowerCase().trim().replace(/s$/, '');
+        const curDom = String(currentDomain || 'school').toLowerCase().trim().replace(/s$/, '');
+        return leadDom === curDom;
+      })();
 
 
-    // 2. STATUS filter
-    const statusMatch = filt === 'all' 
-      || (l.status && l.status.trim().toLowerCase() === filt);
+      // 2. STATUS filter
+      const statusMatch = filt === 'all'
+        || (l.status && l.status.trim().toLowerCase() === filt);
 
-    // 3. SEARCH filter
-    const q = sq.toLowerCase();
-    const searchMatch = !q
-      || (l.school_name || '').toLowerCase().includes(q)
-      || (l.address || '').toLowerCase().includes(q)
-      || (l.phone || '').toLowerCase().includes(q)
-      || (l.city || '').toLowerCase().includes(q)
-      || (l.area || '').toLowerCase().includes(q);
+      // 3. SEARCH filter
+      const q = sq.toLowerCase();
+      const searchMatch = !q
+        || (l.school_name || '').toLowerCase().includes(q)
+        || (l.address || '').toLowerCase().includes(q)
+        || (l.phone || '').toLowerCase().includes(q)
+        || (l.city || '').toLowerCase().includes(q)
+        || (l.area || '').toLowerCase().includes(q);
 
-    // 4. SIZE filter
-    const sizeMatch = (() => {
-      if (currentSize === 'all') return true;
-      const big = isBigBrand(l);
-      if (currentSize === 'big')   return big === true;
-      if (currentSize === 'small') return big === false;
-      return true;
-    })();
+      // 4. SIZE filter
+      const sizeMatch = (() => {
+        if (currentSize === 'all') return true;
+        const big = isBigBrand(l);
+        if (currentSize === 'big') return big === true;
+        if (currentSize === 'small') return big === false;
+        return true;
+      })();
 
-    // 5. CHAIN filter
-    const chainMatch = (() => {
-      if (currentChain === 'all') return true;
-      const name = (l.school_name || '').toLowerCase();
-      const chainWords = ['group','pvt ltd','pvt. ltd','& co',
-        'international','global','national','india','holdings',
-        'chain','enterprises','corporation','corp','limited',
-        'ltd','network','academy','institute','management',
-        'solutions','services'];
-      const isChain = chainWords.some(w => name.includes(w));
-      return currentChain === 'chain' ? isChain : !isChain;
-    })();
+      // 5. CHAIN filter
+      const chainMatch = (() => {
+        if (currentChain === 'all') return true;
+        const name = (l.school_name || '').toLowerCase();
+        const chainWords = ['group', 'pvt ltd', 'pvt. ltd', '& co',
+          'international', 'global', 'national', 'india', 'holdings',
+          'chain', 'enterprises', 'corporation', 'corp', 'limited',
+          'ltd', 'network', 'academy', 'institute', 'management',
+          'solutions', 'services'];
+        const isChain = chainWords.some(w => name.includes(w));
+        return currentChain === 'chain' ? isChain : !isChain;
+      })();
 
-    // 6. DIGITAL PRESENCE filter
-    const digitalMatch = (() => {
-      if (currentDigital === 'all') return true;
-      const w = (l.website || '').trim();
-      const hasNoWeb = !w || w === 'undefined' || w === 'null';
-      if (currentDigital === 'none') return hasNoWeb;
-      if (currentDigital === 'strong') return !hasNoWeb && w.startsWith('https://');
-      if (currentDigital === 'basic') return !hasNoWeb && !w.startsWith('https://');
-      return true;
-    })();
+      // 6. DIGITAL PRESENCE filter
+      const digitalMatch = (() => {
+        if (currentDigital === 'all') return true;
+        const w = (l.website || '').trim();
+        const hasNoWeb = !w || w === 'undefined' || w === 'null';
+        if (currentDigital === 'none') return hasNoWeb;
+        if (currentDigital === 'strong') return !hasNoWeb && w.startsWith('https://');
+        if (currentDigital === 'basic') return !hasNoWeb && !w.startsWith('https://');
+        return true;
+      })();
 
-    // 7. TEMPERATURE filter
-    const tempMatch = (() => {
-      if (currentTemp === 'all') return true;
-      const score = parseInt(l.score) || 0;
-      const status = (l.status || '').toLowerCase();
-      const isHot = score >= 80 && ['interested','proposal','won'].includes(status);
-      const isWarm = score >= 60 && ['contacted','interested'].includes(status);
-      if (currentTemp === 'hot') return isHot;
-      if (currentTemp === 'warm') return isWarm && !isHot;
-      if (currentTemp === 'cold') return !isHot && !isWarm;
-      return true;
-    })();
+      // 7. TEMPERATURE filter
+      const tempMatch = (() => {
+        if (currentTemp === 'all') return true;
+        const score = parseInt(l.score) || 0;
+        const status = (l.status || '').toLowerCase();
+        const isHot = score >= 80 && ['interested', 'proposal', 'won'].includes(status);
+        const isWarm = score >= 60 && ['contacted', 'interested'].includes(status);
+        if (currentTemp === 'hot') return isHot;
+        if (currentTemp === 'warm') return isWarm && !isHot;
+        if (currentTemp === 'cold') return !isHot && !isWarm;
+        return true;
+      })();
 
-    // 8. ASSIGNMENT filter
-    const assignMatch = (() => {
-      if (currentAssignment === 'assigned') return !!l.assigned_id;
-      if (currentAssignment === 'unassigned') return !l.assigned_id;
-      return true;
-    })();
+      // 8. ASSIGNMENT filter
+      const assignMatch = (() => {
+        if (currentAssignment === 'assigned') return !!l.assigned_id;
+        if (currentAssignment === 'unassigned') return !l.assigned_id;
+        return true;
+      })();
 
-    return domainMatch 
-        && statusMatch 
-        && searchMatch 
-        && sizeMatch 
-        && chainMatch 
-        && digitalMatch 
+      return domainMatch
+        && statusMatch
+        && searchMatch
+        && sizeMatch
+        && chainMatch
+        && digitalMatch
         && tempMatch
         && assignMatch;
-  });
-}
+    });
+  }
 
   function rLeads() {
     const tb = document.getElementById('leads-body');
     if (!tb) return;
     const fl = getFiltered();
-    
+
     if (document.getElementById('leads-count-badge')) document.getElementById('leads-count-badge').textContent = fl.length;
 
     if (!fl.length) {
@@ -6999,12 +7950,12 @@
   }
   function viewTeamLeads(tid) {
     const m = team.find(x => x.id === tid);
-    if(!m) return;
+    if (!m) return;
     document.getElementById('team-leads-title').textContent = `Assigned to ${m.name}`;
     const fl = leads.filter(l => l.assigned_id === tid);
-    fl.sort((a,b) => new Date(b.assigned_at || 0) - new Date(a.assigned_at || 0));
+    fl.sort((a, b) => new Date(b.assigned_at || 0) - new Date(a.assigned_at || 0));
     const tb = document.getElementById('team-leads-body');
-    if(!fl.length) {
+    if (!fl.length) {
       tb.innerHTML = '<tr><td colspan="4" style="padding:40px; text-align:center; color:var(--tx3); font-size:13px; background:var(--s2); border-radius:12px; border:1px dashed var(--bd);">No leads assigned yet. Click "Assign Leads" to distribute prospects.</td></tr>';
     } else {
       tb.innerHTML = fl.map(l => `
@@ -7014,7 +7965,7 @@
             <div style="font-size:11px; color:var(--tx3); margin-top:2px;">${l.address || '—'}</div>
           </td>
           <td style="padding:14px 12px; font-size:12px; color:var(--tx2); text-transform:capitalize;">${l.domain || 'school'}</td>
-          <td style="padding:14px 12px;"><span class="badge ${ (l.status||'new').toLowerCase() === 'contacted' ? 'bc' : (l.status||'new').toLowerCase() === 'won' ? 'bw' : 'bn' }">${l.status || 'new'}</span></td>
+          <td style="padding:14px 12px;"><span class="badge ${(l.status || 'new').toLowerCase() === 'contacted' ? 'bc' : (l.status || 'new').toLowerCase() === 'won' ? 'bw' : 'bn'}">${l.status || 'new'}</span></td>
           <td style="padding:14px 12px; border-radius:0 10px 10px 0; font-size:11px; color:var(--tx3);">${fd(l.assigned_at)}</td>
         </tr>
       `).join('');
@@ -7906,7 +8857,7 @@
         if (s.x > canvas.width) s.x = 0;
         if (s.y < 0) s.y = canvas.height;
         if (s.y > canvas.height) s.y = 0;
-        
+
         ctx.beginPath();
         ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(37, 99, 235, ${s.opacity * 0.5})`;
@@ -7961,8 +8912,8 @@
   function closeSignup() {
     const sp = document.getElementById('login-wrap');
     sp.style.opacity = '0';
-    setTimeout(() => { 
-      sp.style.display = 'none'; 
+    setTimeout(() => {
+      sp.style.display = 'none';
       if (signupStop) { signupStop(); signupStop = null; }
       if (signupStarsStop) { signupStarsStop(); signupStarsStop = null; }
       /* landing is static: nothing to restart */
@@ -8032,18 +8983,29 @@
 </script>
 <div class="ov" id="team-leads-ov" onclick="closeM('team-leads-ov')">
   <div class="modal wide" style="max-width:800px; padding:0; overflow:hidden;" onclick="event.stopPropagation()">
-    <div class="mh" style="padding:24px 28px; border-bottom:1.5px solid var(--bd); background:linear-gradient(to right, rgba(91,106,247,0.05), transparent);">
-      <div id="team-leads-title" style="font-family:'Clash Display'; font-size:20px; font-weight:700;">Assigned Leads</div>
-      <button class="close-modal" onclick="closeM('team-leads-ov')" style="background:var(--s3); border:1px solid var(--bd); width:32px; height:32px; border-radius:8px;">&#10005;</button>
+    <div class="mh"
+      style="padding:24px 28px; border-bottom:1.5px solid var(--bd); background:linear-gradient(to right, rgba(91,106,247,0.05), transparent);">
+      <div id="team-leads-title" style="font-family:'Clash Display'; font-size:20px; font-weight:700;">Assigned Leads
+      </div>
+      <button class="close-modal" onclick="closeM('team-leads-ov')"
+        style="background:var(--s3); border:1px solid var(--bd); width:32px; height:32px; border-radius:8px;">&#10005;</button>
     </div>
     <div style="max-height:65vh; overflow-y:auto; padding:0 28px 28px;">
       <table style="width:100%; border-collapse:separate; border-spacing:0 8px;">
         <thead style="position:sticky; top:0; background:var(--s1); z-index:10;">
           <tr style="text-align:left;">
-            <th style="padding:15px 12px; font-size:10px; color:var(--tx3); text-transform:uppercase; letter-spacing:1px; font-weight:800;">Lead Information</th>
-            <th style="padding:15px 12px; font-size:10px; color:var(--tx3); text-transform:uppercase; letter-spacing:1px; font-weight:800;">Sector</th>
-            <th style="padding:15px 12px; font-size:10px; color:var(--tx3); text-transform:uppercase; letter-spacing:1px; font-weight:800;">Status</th>
-            <th style="padding:15px 12px; font-size:10px; color:var(--tx3); text-transform:uppercase; letter-spacing:1px; font-weight:800;">Assigned On</th>
+            <th
+              style="padding:15px 12px; font-size:10px; color:var(--tx3); text-transform:uppercase; letter-spacing:1px; font-weight:800;">
+              Lead Information</th>
+            <th
+              style="padding:15px 12px; font-size:10px; color:var(--tx3); text-transform:uppercase; letter-spacing:1px; font-weight:800;">
+              Sector</th>
+            <th
+              style="padding:15px 12px; font-size:10px; color:var(--tx3); text-transform:uppercase; letter-spacing:1px; font-weight:800;">
+              Status</th>
+            <th
+              style="padding:15px 12px; font-size:10px; color:var(--tx3); text-transform:uppercase; letter-spacing:1px; font-weight:800;">
+              Assigned On</th>
           </tr>
         </thead>
         <tbody id="team-leads-body"></tbody>
@@ -8056,7 +9018,7 @@
   function runTypewriter(el, text, speed) {
     if (el.dataset.typing === "true") return;
     el.dataset.typing = "true";
-    
+
     const startTyping = () => {
       let i = 0;
       el.textContent = "";
