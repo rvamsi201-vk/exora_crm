@@ -4870,6 +4870,47 @@
       font-family: var(--font);
     }
 
+    /* ── Status select — clean, compact dropdown ───────────────────── */
+    select.status-sel {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      background: var(--paper);
+      border: 1px solid var(--grey-3);
+      border-radius: 0;
+      padding: 4px 22px 4px 8px;
+      font-family: var(--font);
+      font-size: var(--t-micro);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      outline: none;
+      min-width: 100px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 6px center;
+      background-size: 8px 5px;
+      transition: border-color 0.15s;
+    }
+    select.status-sel:hover,
+    select.status-sel:focus {
+      border-color: var(--ink);
+    }
+    select.status-sel option {
+      background: var(--paper);
+      color: var(--ink);
+      font-weight: 600;
+      padding: 6px 8px;
+    }
+    /* Status colours applied via data-attribute or class */
+    select.status-sel.s-new        { color: var(--a5); border-color: var(--a5); }
+    select.status-sel.s-contacted  { color: #b26a00;   border-color: #b26a00;  }
+    select.status-sel.s-interested { color: #d4880f;   border-color: #d4880f;  }
+    select.status-sel.s-proposal   { color: #7b42a6;   border-color: #7b42a6;  }
+    select.status-sel.s-won        { color: var(--a3);  border-color: var(--a3); }
+    select.status-sel.s-lost       { color: var(--a2);  border-color: var(--a2); }
+
     /* Long tables: keep the header legible while scrolling a sector. */
     .table-wrapper table th {
       position: sticky;
@@ -7298,7 +7339,7 @@
     <td style="white-space:nowrap;">${websiteCell(l)}</td>
     <td><div class="rating-cell" style="font-size:12.5px;">${l.rating || '—'}</div></td>
     <td><div style="display:flex;align-items:center;gap:12px;"><div class="score-pill"><strong>${l.score || 0}</strong> /100</div><div style="font-size:14px;">${l.priority === 'high' ? 'HIGH' : l.priority === 'medium' ? 'MED' : 'LOW'}</div></div></td>
-    <td><select class="badge ${bc[l.status] || 'bn'}" onchange="spUpdStatus(${l.id},this.value,this)" style="background:none;border:none;cursor:pointer;color:inherit;font-weight:700;">
+    <td><select class="status-sel s-${l.status || 'new'}" onchange="spUpdStatus(${l.id},this.value,this)">
       <option value="new" ${l.status === 'new' ? 'selected' : ''}>New</option>
       <option value="contacted" ${l.status === 'contacted' ? 'selected' : ''}>Contacted</option>
       <option value="interested" ${l.status === 'interested' ? 'selected' : ''}>Interested</option>
@@ -7401,8 +7442,7 @@
   function spSearch(q) { spSq = q; rMyLeads(); }
 
   async function spUpdStatus(id, status, sel) {
-    const bc = { new: 'bn', contacted: 'bc', interested: 'bi', proposal: 'bp', won: 'bw', lost: 'bl' };
-    if (sel) sel.className = `badge ${bc[status] || 'bn'}`;
+    if (sel) sel.className = `status-sel s-${status || 'new'}`;
     try {
       await patch(`/leads/${id}`, { status });
       const l = spLeads.find(l => l.id == id);
@@ -7874,7 +7914,7 @@
       const init = m ? m.name.split(' ').map(n => n[0]).join('').slice(0, 2) : '?';
       const pStr = (l.phone && l.phone.trim() && l.phone !== 'undefined' && l.phone !== 'null') ? l.phone : '—';
       const assCell = (currentAssignment === 'assigned') ? `<td style="white-space:nowrap;"><div style="background:${m?.color}15; color:${m?.color}; border:1px solid ${m?.color}30; padding:4px 10px; border-radius:6px; font-size:11px; font-weight:700;">${m?.name || '—'}</div></td><td style="font-size:11px; color:var(--tx3);">${fd(l.assigned_at)}</td>` : '';
-      return `<tr><td><div class="sn">${l.school_name || '—'}</div><div class="sa">${l.address || ''}</div>${locationLine(l)}<div style="margin-top:6px;">${l.pitch ? `<a class="wb-link" style="cursor:pointer;white-space:nowrap;" onclick="showPitch(${l.id})">View Pitch</a>` : `<a class="wb-link" style="cursor:pointer;white-space:nowrap;color:var(--tx3);" onclick="spGeneratePitch(${l.id}, this)">Generate Pitch</a>`}</div></td><td><div style="font-size:12px;color:var(--tx2);white-space:nowrap;">${pStr}</div></td><td style="white-space:nowrap;">${websiteCell(l)}</td><td><div class="rating-cell" style="font-size:12.5px;">${l.rating || '—'}</div></td><td><div style="display:flex;align-items:center;gap:12px;"><div class="score-pill"><strong>${l.score || 0}</strong> /100</div><div style="font-size:14px;">${l.priority === 'high' ? 'HIGH' : l.priority === 'medium' ? 'MED' : 'LOW'}</div></div></td><td><select class="badge ${bc[curStatus] || 'bn'}" onchange="updStatus(${l.id},this.value,this)" style="background:none;border:none;cursor:pointer;color:inherit;font-weight:700;">
+      return `<tr><td><div class="sn">${l.school_name || '—'}</div><div class="sa">${l.address || ''}</div>${locationLine(l)}<div style="margin-top:6px;">${l.pitch ? `<a class="wb-link" style="cursor:pointer;white-space:nowrap;" onclick="showPitch(${l.id})">View Pitch</a>` : `<a class="wb-link" style="cursor:pointer;white-space:nowrap;color:var(--tx3);" onclick="spGeneratePitch(${l.id}, this)">Generate Pitch</a>`}</div></td><td><div style="font-size:12px;color:var(--tx2);white-space:nowrap;">${pStr}</div></td><td style="white-space:nowrap;">${websiteCell(l)}</td><td><div class="rating-cell" style="font-size:12.5px;">${l.rating || '—'}</div></td><td><div style="display:flex;align-items:center;gap:12px;"><div class="score-pill"><strong>${l.score || 0}</strong> /100</div><div style="font-size:14px;">${l.priority === 'high' ? 'HIGH' : l.priority === 'medium' ? 'MED' : 'LOW'}</div></div></td><td><select class="status-sel s-${curStatus}" onchange="updStatus(${l.id},this.value,this)">
 
           <option value="new" ${curStatus === 'new' ? 'selected' : ''}>New</option>
           <option value="contacted" ${curStatus === 'contacted' ? 'selected' : ''}>Contacted</option>
@@ -8133,8 +8173,7 @@
   }
   async function delLead(id) { if (!confirm('Are you sure you want to delete this lead?')) return; try { await del(`/leads/${id}`); leads = leads.filter(l => l.id !== id); renderAll(); toast('Lead deleted', ''); } catch (e) { toast('Error: ' + e.message, 'error'); } }
   async function updStatus(id, status, sel) {
-    const bc = { new: 'bn', contacted: 'bc', interested: 'bi', proposal: 'bp', won: 'bw', lost: 'bl' };
-    if (sel) sel.className = `badge ${bc[status] || 'bn'}`;
+    if (sel) sel.className = `status-sel s-${status || 'new'}`;
     try {
       await patch(`/leads/${id}/status`, { status });
       const leadId = Number(id);
