@@ -5,45 +5,95 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ExoraLeadForge</title>
+  <!-- One neutral grotesque for the whole platform. Inter is the closest
+       widely-available descendant of the Akzidenz/Helvetica line the
+       International Typographic Style is built on. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;700&family=Press+Start+2P&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
     rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
+    /* ══════════════════════════════════════════════════════════════
+       SWISS / INTERNATIONAL TYPOGRAPHIC STYLE
+       Objective, grid-led, typographic. The rules this file follows:
+         · One neutral grotesque. Hierarchy comes from size, weight and
+           space — never from decoration.
+         · Achromatic ground. Black, white, and a graded grey ramp. Colour
+           is information, never ornament, so exactly one accent (red)
+           marks the primary action and the active state.
+         · No radius, no shadow, no gradient. Edges are hairline rules.
+         · Everything sits on an 8px spacing grid.
+       Legacy variable names (--acc, --s1..--s3, --tx..--tx3, --bd, --r)
+       are kept: ~3,000 lines of component CSS reference them, so
+       remapping the values here re-skins the entire platform coherently.
+       ══════════════════════════════════════════════════════════════ */
     :root {
-      /* Light admin dashboard palette. Variable names are kept stable
-         (--acc, --s1/s2/s3, --tx/tx2/tx3, --bd, ...) since the whole app
-         is built on them — only the values changed, from dark-purple to
-         light/blue, so this cascades everywhere safely. */
-      --bg: #f4f6fb;
-      --surface: #ffffff;
+      /* ── Achromatic ramp ───────────────────────────────────────── */
+      --paper:  #ffffff;   /* ground                                  */
+      --ink:    #0a0a0a;   /* primary text, rules at full strength     */
+      --grey-1: #fafafa;   /* faintest fill — zebra rows, inputs       */
+      --grey-2: #f2f2f2;   /* panel tint                               */
+      --grey-3: #e4e4e4;   /* hairline rule                            */
+      --grey-4: #c9c9c9;   /* disabled edge                            */
+      --grey-5: #8c8c8c;   /* secondary text                           */
+      --grey-6: #5c5c5c;   /* tertiary text on white                   */
+
+      /* ── The single accent ─────────────────────────────────────── */
+      --red:      #e1000f;
+      --red-dark: #b8000c;
+
+      /* ── Legacy aliases, remapped ──────────────────────────────── */
+      --bg:      var(--grey-2);
+      --surface: var(--paper);
+      --card:    var(--paper);
+      --border:  var(--grey-3);
+      --text:    var(--ink);
+      --muted:   var(--grey-5);
+      --acc:     var(--ink);      /* nav/active ink, not a colour wash */
+      --purple:  var(--red);
+      --purple-soft: transparent;
+      --s1: var(--paper);
+      --s2: var(--grey-1);
+      --s3: var(--grey-2);
+      --s4: var(--grey-4);
+      --bd: var(--grey-3);
+      --tx:  var(--ink);
+      --tx2: var(--grey-6);
+      --tx3: var(--grey-5);
+      --r: 0px;                    /* Swiss geometry: square corners   */
+
+      /* ── Status. Encoding data, so these earn their colour; kept
+           desaturated so they read as notation, not decoration. ──── */
+      --a2: #c8102e;   /* negative — lost, overdue, error   */
+      --a3: #1a7f4b;   /* positive — won, qualified, live   */
+      --a4: #b26a00;   /* caution  — pending, warm          */
+      --a5: #14568c;   /* neutral  — new, informational     */
+
+      /* ── Type scale (major-third-ish, tuned for dense data) ────── */
+      --t-micro: 10px;   /* uppercase labels, tracked wide    */
+      --t-fine:  11px;
+      --t-small: 12px;
+      --t-body:  13px;
+      --t-lede:  15px;
+      --t-h3:    18px;
+      --t-h2:    24px;
+      --t-h1:    32px;
+      --t-display: 48px;
+
+      /* ── 8px spacing grid ──────────────────────────────────────── */
+      --u1: 4px;  --u2: 8px;  --u3: 12px; --u4: 16px;
+      --u5: 24px; --u6: 32px; --u7: 48px; --u8: 64px;
+
+      /* ── Structure ─────────────────────────────────────────────── */
+      --rule: 1px solid var(--grey-3);
+      --rule-strong: 1px solid var(--ink);
+      --sidebar-w: 240px;
+
+      --font: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+
       color-scheme: light;
-      --card: #ffffff;
-      --border: #e2e8f0;
-      --purple: #7c3aed;
-      --purple-soft: rgba(37, 99, 235, 0.08);
-      --text: #0f172a;
-      --muted: rgba(15, 23, 42, 0.5);
-      --acc: #2563eb;
-      --s1: #ffffff;
-      --s2: #f8fafc;
-      --s3: #eef2f9;
-      --bd: #e5e9f2;
-      --tx: #0f172a;
-      --tx2: rgba(15, 23, 42, 0.62);
-      --tx3: rgba(15, 23, 42, 0.4);
-      --r: 12px;
-      /* Status/accent colors — used throughout for KPI cards, pipeline
-         stages, and badges (new=acc, contacted=a5, interested=a4,
-         proposal=purple, won/qualified=a3, lost=a2). These five were
-         referenced via var(--a2)..var(--a5) but never defined anywhere
-         in the stylesheet, so every gradient/color using them was
-         silently invalid; defining them here both fixes that and
-         supplies the "colorful KPI cards" this redesign asks for. */
-      --a2: #ef4444;
-      --a3: #16a34a;
-      --a4: #f59e0b;
-      --a5: #0ea5e9;
     }
 
     * {
@@ -53,7 +103,7 @@
     }
 
     body {
-      font-family: 'DM Sans', sans-serif;
+      font-family: var(--font);
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
@@ -91,7 +141,7 @@
       left: 60%;
       width: 50vw;
       height: 50vw;
-      background: radial-gradient(circle, rgba(91, 106, 247, 0.07) 0%, transparent 65%);
+      background: var(--paper);
       pointer-events: none;
       z-index: 0;
     }
@@ -120,7 +170,7 @@
 
     .sidebar::-webkit-scrollbar-thumb {
       background: rgba(91, 106, 247, 0.3);
-      border-radius: 4px;
+      border-radius: 0;
     }
 
     /* ── LANDING UI STYLES ── */
@@ -143,7 +193,7 @@
       justify-content: space-between;
       padding: 18px 40px;
       background: rgba(7, 5, 15, 0.45);
-      backdrop-filter: blur(18px);
+      backdrop-filter: none;
       border-bottom: 0.5px solid var(--border);
       overflow: visible;
     }
@@ -159,7 +209,7 @@
     }
 
     .nav-logo {
-      font-family: 'Press Start 2P', cursive;
+      font-family: var(--font);
       font-size: 16px;
       color: #a050ff;
       letter-spacing: 0px;
@@ -228,7 +278,7 @@
       border: 1px solid var(--border);
       color: var(--tx);
       padding: 10px 18px;
-      border-radius: 12px;
+      border-radius: 0;
       font-size: 13px;
       font-weight: 600;
       cursor: pointer;
@@ -252,11 +302,11 @@
       margin-top: 8px;
       background: var(--bg);
       border: 1px solid var(--border);
-      border-radius: 12px;
+      border-radius: 0;
       padding: 8px;
       width: 100%;
       min-width: 240px;
-      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.14);
+      box-shadow: none;
       z-index: 1000;
       display: none;
       transform-origin: top;
@@ -270,12 +320,12 @@
     @keyframes dropFade {
       from {
         opacity: 0;
-        transform: translateY(-10px);
+        transform: none;
       }
 
       to {
         opacity: 1;
-        transform: translateY(0);
+        transform: none;
       }
     }
 
@@ -284,7 +334,7 @@
       align-items: center;
       justify-content: space-between;
       padding: 10px 14px;
-      border-radius: 8px;
+      border-radius: 0;
       cursor: pointer;
       transition: all 0.15s;
       margin-bottom: 2px;
@@ -315,7 +365,7 @@
       font-weight: 700;
       background: var(--s3);
       padding: 2px 6px;
-      border-radius: 4px;
+      border-radius: 0;
     }
 
     .sector-drop-arrow {
@@ -332,7 +382,7 @@
       border: 0.5px solid var(--border);
       color: var(--muted);
       padding: 9px 20px;
-      border-radius: 8px;
+      border-radius: 0;
       font-size: 13px;
       cursor: pointer;
       transition: all 0.2s;
@@ -348,11 +398,11 @@
       border: none;
       color: #fff;
       padding: 9px 22px;
-      border-radius: 8px;
+      border-radius: 0;
       font-size: 13px;
       cursor: pointer;
       font-weight: 500;
-      box-shadow: 0 0 20px rgba(37, 99, 235, 0.3);
+      box-shadow: none;
     }
 
     #mega-menu {
@@ -360,7 +410,7 @@
       inset: 0;
       z-index: 11000;
       background: rgba(7, 5, 15, 0.8);
-      backdrop-filter: blur(24px);
+      backdrop-filter: none;
       display: none;
       align-items: center;
       justify-content: center;
@@ -401,7 +451,7 @@
     .menu-card {
       background: var(--card);
       border: 0.5px solid var(--border);
-      border-radius: 16px;
+      border-radius: 0;
       padding: 24px;
       display: flex;
       flex-direction: column;
@@ -414,7 +464,7 @@
     }
 
     .menu-card-title {
-      font-family: 'Syne', sans-serif;
+      font-family: var(--font);
       font-size: 18px;
       font-weight: 700;
       color: var(--text);
@@ -455,12 +505,12 @@
       color: var(--purple);
       border: 0.5px solid var(--border);
       padding: 6px 18px;
-      border-radius: 999px;
+      border-radius: 0;
       background: var(--purple-soft);
     }
 
     .hero-h1 {
-      font-family: 'Syne', sans-serif;
+      font-family: var(--font);
       font-size: clamp(38px, 6vw, 72px);
       font-weight: 800;
       line-height: 1.1;
@@ -473,7 +523,7 @@
 
     .btn-hero {
       padding: 13px 32px;
-      border-radius: 12px;
+      border-radius: 0;
       font-size: 15px;
       font-weight: 600;
       cursor: pointer;
@@ -485,12 +535,12 @@
       background: #5b6af7;
       border: none;
       color: #fff;
-      box-shadow: 0 0 28px rgba(91, 106, 247, 0.4);
+      box-shadow: none;
     }
 
     .btn-hero-primary:hover {
       background: #4a59e6;
-      box-shadow: 0 0 40px rgba(91, 106, 247, 0.6);
+      box-shadow: none;
     }
 
     #login-wrap {
@@ -501,8 +551,8 @@
       opacity: 0;
       transition: opacity 0.4s;
       background: rgba(0,0,0,0.65);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
     }
 
 
@@ -523,8 +573,8 @@
     .login-box {
       background: rgba(13, 10, 26, 0.6);
       border: 0.5px solid rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(48px);
-      border-radius: 24px;
+      backdrop-filter: none;
+      border-radius: 0;
       padding: 52px 48px;
       width: 100%;
       max-width: 420px;
@@ -548,7 +598,7 @@
     }
 
     .logo {
-      font-family: 'Press Start 2P', cursive;
+      font-family: var(--font);
       font-size: 11px;
       color: #a050ff;
       white-space: nowrap;
@@ -568,14 +618,14 @@
       height: 38px;
       background: var(--s3);
       border: 1.5px solid var(--acc);
-      border-radius: 12px;
+      border-radius: 0;
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
       overflow: hidden;
       flex-shrink: 0;
-      box-shadow: 0 0 15px rgba(37, 99, 235, 0.4);
+      box-shadow: none;
     }
 
     .logo-img {
@@ -607,7 +657,7 @@
       align-items: center;
       gap: 9px;
       padding: 9px 10px;
-      border-radius: 9px;
+      border-radius: 0;
       cursor: pointer;
       color: var(--tx2);
       font-size: 13px;
@@ -637,7 +687,7 @@
       padding: 1.5px 5px;
       background: var(--a2);
       color: white;
-      border-radius: 4px;
+      border-radius: 0;
       margin-left: 6px;
       font-weight: 700;
       vertical-align: middle;
@@ -650,7 +700,7 @@
       padding: 2px 7px;
       background: rgba(255, 255, 255, 0.05);
       color: var(--tx2);
-      border-radius: 20px;
+      border-radius: 0;
       font-weight: 700;
       margin-left: auto;
       transition: all 0.2s;
@@ -667,7 +717,7 @@
       transition: all 0.2s;
       font-size: 11px;
       padding: 2px 6px;
-      border-radius: 5px;
+      border-radius: 0;
       cursor: pointer;
       color: var(--tx3);
       filter: grayscale(1);
@@ -722,7 +772,7 @@
       gap: 7px;
       background: rgba(29, 233, 160, 0.07);
       border: 1px solid rgba(29, 233, 160, 0.15);
-      border-radius: 8px;
+      border-radius: 0;
       padding: 8px 11px;
       font-size: 11px;
       color: var(--a3);
@@ -732,7 +782,7 @@
     .dot {
       width: 6px;
       height: 6px;
-      border-radius: 50%;
+      border-radius: 0;
       background: var(--a3);
       animation: blink 2s infinite;
     }
@@ -767,7 +817,7 @@
     }
 
     .page-title {
-      font-family: 'Clash Display', sans-serif;
+      font-family: var(--font);
       font-size: 26px;
       font-weight: 700;
       letter-spacing: -0.5px;
@@ -782,12 +832,12 @@
     .search {
       background: var(--s1);
       border: 1.5px solid var(--bd);
-      border-radius: 9px;
+      border-radius: 0;
       padding: 8px 32px 8px 13px;
       color: var(--tx);
       font-size: 13px;
       outline: none;
-      font-family: 'Cabinet Grotesk', sans-serif;
+      font-family: var(--font);
       width: 210px;
       transition: border-color 0.2s;
     }
@@ -823,13 +873,13 @@
 
     .btn {
       padding: 8px 16px;
-      border-radius: 9px;
+      border-radius: 0;
       font-size: 13px;
       font-weight: 700;
       cursor: pointer;
       border: none;
       transition: all 0.2s;
-      font-family: 'Cabinet Grotesk', sans-serif;
+      font-family: var(--font);
     }
 
     .bp {
@@ -839,7 +889,7 @@
 
     .bp:hover {
       background: #1d4ed8;
-      transform: translateY(-1px);
+      transform: none;
     }
 
     .bg {
@@ -861,7 +911,7 @@
     .wbar {
       background: var(--s1);
       border: 1.5px solid var(--bd);
-      border-radius: var(--r);
+      border-radius: 0;
       padding: 13px 18px;
       margin-bottom: 20px;
       display: flex;
@@ -871,7 +921,7 @@
     }
 
     .wbar-lbl {
-      font-family: 'Clash Display', sans-serif;
+      font-family: var(--font);
       font-size: 13px;
       font-weight: 600;
       white-space: nowrap;
@@ -884,7 +934,7 @@
       gap: 8px;
       background: var(--s2);
       border: 1.5px solid var(--bd);
-      border-radius: 8px;
+      border-radius: 0;
       padding: 7px 12px;
       min-width: 240px;
     }
@@ -906,7 +956,7 @@
       color: var(--tx3);
       cursor: pointer;
       padding: 2px 5px;
-      border-radius: 5px;
+      border-radius: 0;
       font-size: 13px;
       transition: all 0.15s;
     }
@@ -927,7 +977,7 @@
     .sc {
       background: var(--s1);
       border: 1.5px solid var(--bd);
-      border-radius: var(--r);
+      border-radius: 0;
       padding: 18px 20px;
       position: relative;
       overflow: hidden;
@@ -935,7 +985,7 @@
     }
 
     .sc:hover {
-      transform: translateY(-2px);
+      transform: none;
     }
 
     .sc::after {
@@ -945,27 +995,27 @@
       left: 0;
       right: 0;
       height: 2px;
-      border-radius: 12px 12px 0 0;
+      border-radius: 0;
     }
 
     .sc.c1::after {
-      background: linear-gradient(90deg, var(--acc), var(--a5));
+      background: var(--paper);
     }
 
     .sc.c2::after {
-      background: linear-gradient(90deg, var(--a2), #ff9a8b);
+      background: var(--paper);
     }
 
     .sc.c3::after {
-      background: linear-gradient(90deg, var(--a3), #52e8b8);
+      background: var(--paper);
     }
 
     .sc.c4::after {
-      background: linear-gradient(90deg, var(--a4), #f7c948);
+      background: var(--paper);
     }
 
     .sc.c5::after {
-      background: linear-gradient(90deg, #f53d2d, #ff8c00);
+      background: var(--paper);
     }
 
     .sc-ic {
@@ -986,7 +1036,7 @@
     }
 
     .sc-val {
-      font-family: 'Clash Display', sans-serif;
+      font-family: var(--font);
       font-size: 34px;
       font-weight: 700;
       letter-spacing: -1.5px;
@@ -1015,7 +1065,7 @@
     .card {
       background: var(--s1);
       border: 1.5px solid var(--bd);
-      border-radius: var(--r);
+      border-radius: 0;
       overflow: hidden;
     }
 
@@ -1030,7 +1080,7 @@
     }
 
     .ct {
-      font-family: 'Clash Display', sans-serif;
+      font-family: var(--font);
       font-size: 15px;
       font-weight: 600;
     }
@@ -1042,7 +1092,7 @@
 
     .ft {
       padding: 4px 11px;
-      border-radius: 20px;
+      border-radius: 0;
       font-size: 11.5px;
       font-weight: 700;
       cursor: pointer;
@@ -1065,7 +1115,7 @@
       justify-content: center;
       background: var(--s2);
       border: 1.5px solid var(--bd);
-      border-radius: 10px;
+      border-radius: 0;
       cursor: pointer;
       transition: all 0.2s;
       font-size: 18px;
@@ -1075,7 +1125,7 @@
 
     .bell-btn:hover {
       background: var(--bd);
-      transform: translateY(-1px);
+      transform: none;
     }
 
     .bell-dot {
@@ -1086,7 +1136,7 @@
       color: white;
       font-size: 10px;
       font-weight: 800;
-      border-radius: 50%;
+      border-radius: 0;
       min-width: 18px;
       height: 18px;
       padding: 0 4px;
@@ -1097,7 +1147,7 @@
       transform: scale(0.5);
       transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       pointer-events: none;
-      box-shadow: 0 0 12px rgba(242, 91, 126, 0.5);
+      box-shadow: none;
       z-index: 10;
       border: 2px solid var(--s2);
     }
@@ -1121,14 +1171,14 @@
       width: 40px;
       align-items: center;
       justify-content: center;
-      border-radius: 8px;
+      border-radius: 0;
     }
 
     .sb-overlay {
       position: fixed;
       inset: 0;
       background: rgba(15, 23, 42, 0.12);
-      backdrop-filter: blur(2px);
+      backdrop-filter: none;
       z-index: 4999;
       opacity: 0;
       visibility: hidden;
@@ -1149,7 +1199,7 @@
       color: var(--tx);
       width: 36px;
       height: 36px;
-      border-radius: 10px;
+      border-radius: 0;
       display: none;
       align-items: center;
       justify-content: center;
@@ -1160,22 +1210,22 @@
 
     @keyframes pulse {
       0% {
-        box-shadow: 0 0 0 0 rgba(242, 91, 126, 0.7);
+        box-shadow: none;
       }
 
       70% {
-        box-shadow: 0 0 0 8px rgba(242, 91, 126, 0);
+        box-shadow: none;
       }
 
       100% {
-        box-shadow: 0 0 0 0 rgba(242, 91, 126, 0);
+        box-shadow: none;
       }
     }
 
     .btn-xs {
       padding: 4px 8px;
       font-size: 11px;
-      border-radius: 4px;
+      border-radius: 0;
       cursor: pointer;
       border: none;
       font-weight: 600;
@@ -1195,7 +1245,7 @@
     .badge {
       font-size: 10px;
       padding: 2px 6px;
-      border-radius: 4px;
+      border-radius: 0;
       font-weight: 700;
       text-transform: uppercase;
     }
@@ -1278,7 +1328,7 @@
       align-items: center;
       gap: 4px;
       padding: 3px 9px;
-      border-radius: 20px;
+      border-radius: 0;
       font-size: 11px;
       font-weight: 700;
     }
@@ -1335,7 +1385,7 @@
       font-size: 11px;
       font-weight: 700;
       outline: none;
-      font-family: 'Cabinet Grotesk', sans-serif;
+      font-family: var(--font);
       color: inherit;
     }
 
@@ -1347,7 +1397,7 @@
     .ib {
       width: 26px;
       height: 26px;
-      border-radius: 6px;
+      border-radius: 0;
       border: 1.5px solid var(--bd);
       background: var(--s2);
       color: var(--tx2);
@@ -1404,13 +1454,13 @@
     .ps-dot {
       width: 7px;
       height: 7px;
-      border-radius: 50%;
+      border-radius: 0;
     }
 
     .ps-cnt {
       background: var(--s3);
       padding: 1px 8px;
-      border-radius: 20px;
+      border-radius: 0;
       font-size: 11px;
       font-weight: 700;
       color: var(--tx2);
@@ -1419,13 +1469,13 @@
     .pb {
       height: 4px;
       background: var(--s3);
-      border-radius: 10px;
+      border-radius: 0;
       overflow: hidden;
     }
 
     .pbf {
       height: 100%;
-      border-radius: 10px;
+      border-radius: 0;
       transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
@@ -1448,7 +1498,7 @@
     }
 
     .stitle {
-      font-family: 'Clash Display', sans-serif;
+      font-family: var(--font);
       font-size: 18px;
       font-weight: 700;
     }
@@ -1462,7 +1512,7 @@
     .tcard {
       background: var(--s1);
       border: 1.5px solid var(--bd);
-      border-radius: var(--r);
+      border-radius: 0;
       padding: 18px 14px;
       text-align: center;
       cursor: pointer;
@@ -1471,8 +1521,8 @@
 
     .tcard:hover {
       border-color: var(--acc);
-      transform: translateY(-3px);
-      box-shadow: 0 10px 30px rgba(91, 106, 247, 0.1);
+      transform: none;
+      box-shadow: none;
     }
 
     .tc-add {
@@ -1492,12 +1542,12 @@
     .av {
       width: 48px;
       height: 48px;
-      border-radius: 50%;
+      border-radius: 0;
       margin: 0 auto 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: 'Clash Display', sans-serif;
+      font-family: var(--font);
       font-weight: 700;
       font-size: 15px;
       position: relative;
@@ -1510,7 +1560,7 @@
       right: 1px;
       width: 10px;
       height: 10px;
-      border-radius: 50%;
+      border-radius: 0;
       background: var(--a3);
       border: 2px solid var(--s1);
     }
@@ -1522,7 +1572,7 @@
       right: 1px;
       width: 10px;
       height: 10px;
-      border-radius: 50%;
+      border-radius: 0;
       background: var(--tx3);
       border: 2px solid var(--s1);
     }
@@ -1543,7 +1593,7 @@
     }
 
     .tc-num {
-      font-family: 'Clash Display', sans-serif;
+      font-family: var(--font);
       font-size: 24px;
       font-weight: 700;
     }
@@ -1560,7 +1610,7 @@
       position: fixed;
       inset: 0;
       background: rgba(0, 0, 0, 0.75);
-      backdrop-filter: blur(8px);
+      backdrop-filter: none;
       z-index: 500;
       align-items: center;
       justify-content: center;
@@ -1573,11 +1623,11 @@
     .modal {
       background: var(--s1);
       border: 1.5px solid var(--bd);
-      border-radius: 18px;
+      border-radius: 0;
       width: 500px;
       max-height: 88vh;
       overflow-y: auto;
-      box-shadow: 0 30px 80px rgba(15, 23, 42, 0.16);
+      box-shadow: none;
       animation: mup 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
@@ -1587,12 +1637,12 @@
 
     @keyframes mup {
       from {
-        transform: translateY(24px);
+        transform: none;
         opacity: 0
       }
 
       to {
-        transform: translateY(0);
+        transform: none;
         opacity: 1
       }
     }
@@ -1606,7 +1656,7 @@
     }
 
     .mt {
-      font-family: 'Clash Display', sans-serif;
+      font-family: var(--font);
       font-size: 17px;
       font-weight: 700;
     }
@@ -1614,7 +1664,7 @@
     .mc {
       width: 28px;
       height: 28px;
-      border-radius: 7px;
+      border-radius: 0;
       border: 1.5px solid var(--bd);
       background: var(--s2);
       color: var(--tx2);
@@ -1660,12 +1710,12 @@
       width: 100%;
       background: var(--s2);
       border: 1.5px solid var(--bd);
-      border-radius: 9px;
+      border-radius: 0;
       padding: 10px 13px;
       color: var(--tx);
       font-size: 13.5px;
       outline: none;
-      font-family: 'Cabinet Grotesk', sans-serif;
+      font-family: var(--font);
       transition: border-color 0.2s;
     }
 
@@ -1677,12 +1727,12 @@
       width: 100%;
       background: var(--s2);
       border: 1.5px solid var(--bd);
-      border-radius: 9px;
+      border-radius: 0;
       padding: 10px 13px;
       color: var(--tx);
       font-size: 13.5px;
       outline: none;
-      font-family: 'Cabinet Grotesk', sans-serif;
+      font-family: var(--font);
     }
 
     .fr2 {
@@ -1703,18 +1753,18 @@
     .td-av {
       width: 62px;
       height: 62px;
-      border-radius: 50%;
+      border-radius: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: 'Clash Display', sans-serif;
+      font-family: var(--font);
       font-weight: 700;
       font-size: 22px;
       flex-shrink: 0;
     }
 
     .td-info h2 {
-      font-family: 'Clash Display', sans-serif;
+      font-family: var(--font);
       font-weight: 700;
       font-size: 20px;
     }
@@ -1738,7 +1788,7 @@
     }
 
     .td-sv {
-      font-family: 'Clash Display', sans-serif;
+      font-family: var(--font);
       font-weight: 700;
       font-size: 22px;
     }
@@ -1768,22 +1818,22 @@
       right: 20px;
       background: var(--s2);
       border: 1.5px solid var(--bd);
-      border-radius: 10px;
+      border-radius: 0;
       padding: 11px 16px;
       font-size: 13px;
       z-index: 9999;
       display: flex;
       align-items: center;
       gap: 9px;
-      transform: translateY(70px);
+      transform: none;
       opacity: 0;
       transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
       max-width: 300px;
-      box-shadow: 0 20px 50px rgba(15, 23, 42, 0.12);
+      box-shadow: none;
     }
 
     .toast.show {
-      transform: translateY(0);
+      transform: none;
       opacity: 1;
     }
 
@@ -1803,7 +1853,7 @@
       font-size: 11px;
       font-weight: 700;
       padding: 5px 10px;
-      border-radius: 20px;
+      border-radius: 0;
       border: 1px solid;
     }
 
@@ -1845,16 +1895,16 @@
 
     ::-webkit-scrollbar-thumb {
       background: var(--bd);
-      border-radius: 10px;
+      border-radius: 0;
     }
 
     /* LOGIN */
     .login-box {
       background: var(--s1);
-      border-radius: 20px;
+      border-radius: 0;
       padding: 36px 32px;
       width: 390px;
-      box-shadow: 0 40px 100px rgba(15, 23, 42, 0.16);
+      box-shadow: none;
     }
 
     .login-logo {
@@ -1862,7 +1912,7 @@
       align-items: center;
       gap: 10px;
       margin-bottom: 28px;
-      font-family: 'Clash Display', sans-serif;
+      font-family: var(--font);
       font-size: 22px;
       font-weight: 700;
     }
@@ -1872,7 +1922,7 @@
     }
 
     .login-title {
-      font-family: 'Clash Display', sans-serif;
+      font-family: var(--font);
       font-size: 26px;
       font-weight: 700;
       margin-bottom: 5px;
@@ -1887,7 +1937,7 @@
     .role-tabs {
       display: flex;
       background: var(--s2);
-      border-radius: 10px;
+      border-radius: 0;
       padding: 4px;
       gap: 4px;
       margin-bottom: 22px;
@@ -1896,7 +1946,7 @@
     .rtab {
       flex: 1;
       padding: 9px;
-      border-radius: 7px;
+      border-radius: 0;
       text-align: center;
       cursor: pointer;
       font-size: 13px;
@@ -1929,7 +1979,7 @@
     .login-err {
       background: rgba(242, 91, 126, 0.1);
       border: 1px solid rgba(242, 91, 126, 0.25);
-      border-radius: 8px;
+      border-radius: 0;
       padding: 9px 13px;
       font-size: 12.5px;
       color: var(--a2);
@@ -1948,19 +1998,19 @@
       align-items: center;
       gap: 9px;
       padding: 8px 6px;
-      border-radius: 9px;
+      border-radius: 0;
       margin-bottom: 8px;
     }
 
     .u-av {
       width: 34px;
       height: 34px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--acc), var(--a5));
+      border-radius: 0;
+      background: var(--paper);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: 'Clash Display', sans-serif;
+      font-family: var(--font);
       font-weight: 700;
       font-size: 12px;
       flex-shrink: 0;
@@ -1986,13 +2036,13 @@
       width: 100%;
       background: none;
       border: 1.5px solid var(--bd);
-      border-radius: 8px;
+      border-radius: 0;
       padding: 7px;
       color: var(--tx2);
       font-size: 12px;
       font-weight: 700;
       cursor: pointer;
-      font-family: 'Cabinet Grotesk', sans-serif;
+      font-family: var(--font);
       transition: all 0.15s;
       letter-spacing: 0.2px;
     }
@@ -2029,13 +2079,13 @@
     .asp-card {
       background: var(--s1);
       border: 1.5px solid var(--bd);
-      border-radius: 18px;
+      border-radius: 0;
       padding: 28px;
       max-width: 600px;
     }
 
     .asp-title {
-      font-family: 'Clash Display', sans-serif;
+      font-family: var(--font);
       font-size: 22px;
       font-weight: 700;
       margin-bottom: 22px;
@@ -2049,7 +2099,7 @@
       padding: 12px 16px;
       background: var(--s1);
       border: 1.5px solid var(--bd);
-      border-radius: 10px;
+      border-radius: 0;
       margin-bottom: 7px;
       cursor: pointer;
       transition: border-color 0.15s;
@@ -2074,7 +2124,7 @@
     .alp-assignee {
       background: rgba(91, 106, 247, 0.08);
       border: 1px solid rgba(91, 106, 247, 0.2);
-      border-radius: 10px;
+      border-radius: 0;
       padding: 12px 16px;
       margin-bottom: 18px;
       font-size: 13px;
@@ -2094,7 +2144,7 @@
     .act-card {
       background: var(--s1);
       border: 1.5px solid var(--bd);
-      border-radius: var(--r);
+      border-radius: 0;
     }
 
     .act-item {
@@ -2139,7 +2189,7 @@
       align-items: center;
       gap: 5px;
       padding: 4px 10px;
-      border-radius: 20px;
+      border-radius: 0;
       font-size: 11px;
       font-weight: 700;
       background: rgba(91, 106, 247, 0.1);
@@ -2158,7 +2208,7 @@
       background: rgba(242, 91, 126, 0.15);
       color: #ff85a1;
       padding: 4px 10px;
-      border-radius: 20px;
+      border-radius: 0;
       font-size: 11px;
       font-weight: 700;
     }
@@ -2175,7 +2225,7 @@
       position: fixed;
       inset: 0;
       background: rgba(0, 0, 0, 0.55);
-      backdrop-filter: blur(4px);
+      backdrop-filter: none;
       z-index: 600;
       opacity: 0;
       pointer-events: none;
@@ -2199,7 +2249,7 @@
       display: flex;
       flex-direction: column;
       transition: right 0.35s cubic-bezier(0.34, 1.10, 0.64, 1);
-      box-shadow: -20px 0 60px rgba(15, 23, 42, 0.14);
+      box-shadow: none;
     }
 
     .lead-panel.open {
@@ -2214,11 +2264,11 @@
       justify-content: space-between;
       gap: 12px;
       flex-shrink: 0;
-      background: linear-gradient(135deg, rgba(91, 106, 247, 0.06) 0%, transparent 80%);
+      background: var(--paper);
     }
 
     .lp-school-name {
-      font-family: 'Clash Display', sans-serif;
+      font-family: var(--font);
       font-size: 18px;
       font-weight: 700;
       line-height: 1.2;
@@ -2237,7 +2287,7 @@
     .lp-close {
       width: 30px;
       height: 30px;
-      border-radius: 8px;
+      border-radius: 0;
       border: 1.5px solid var(--bd);
       background: var(--s2);
       color: var(--tx2);
@@ -2317,7 +2367,7 @@
     .lp-form {
       background: var(--s2);
       border: 1.5px solid var(--bd);
-      border-radius: 12px;
+      border-radius: 0;
       padding: 16px;
       margin-bottom: 20px;
     }
@@ -2347,12 +2397,12 @@
       width: 100%;
       background: var(--s3);
       border: 1.5px solid var(--bd);
-      border-radius: 8px;
+      border-radius: 0;
       padding: 8px 11px;
       color: #ffffff;
       font-size: 13px;
       outline: none;
-      font-family: 'DM Sans', sans-serif;
+      font-family: var(--font);
       transition: border-color 0.2s;
       color-scheme: dark;
     }
@@ -2385,12 +2435,12 @@
       background: var(--acc);
       color: #fff;
       border: none;
-      border-radius: 8px;
+      border-radius: 0;
       padding: 10px;
       font-size: 13px;
       font-weight: 700;
       cursor: pointer;
-      font-family: 'Cabinet Grotesk', sans-serif;
+      font-family: var(--font);
       transition: all 0.2s;
       display: flex;
       align-items: center;
@@ -2401,7 +2451,7 @@
 
     .lp-btn:hover {
       background: #6e7df8;
-      transform: translateY(-1px);
+      transform: none;
     }
 
     .lp-btn:disabled {
@@ -2413,7 +2463,7 @@
     .call-card {
       background: var(--s2);
       border: 1.5px solid var(--bd);
-      border-radius: 10px;
+      border-radius: 0;
       padding: 13px 15px;
       margin-bottom: 9px;
       transition: border-color 0.15s;
@@ -2432,7 +2482,7 @@
 
     .call-outcome-badge {
       padding: 3px 9px;
-      border-radius: 20px;
+      border-radius: 0;
       font-size: 10.5px;
       font-weight: 700;
     }
@@ -2497,7 +2547,7 @@
     .note-card {
       background: var(--s2);
       border: 1.5px solid var(--bd);
-      border-radius: 10px;
+      border-radius: 0;
       padding: 13px 15px;
       margin-bottom: 9px;
       transition: border-color 0.15s;
@@ -2587,25 +2637,25 @@
 
     .kanban-board::-webkit-scrollbar-thumb {
       background: var(--s4);
-      border-radius: 10px;
+      border-radius: 0;
     }
 
     .kanban-col {
       background: rgba(13, 13, 31, 0.6);
       border: 1px solid var(--bd);
-      border-radius: 16px;
+      border-radius: 0;
       min-width: 320px;
       max-width: 320px;
       display: flex;
       flex-direction: column;
       transition: all 0.3s ease;
-      backdrop-filter: blur(8px);
+      backdrop-filter: none;
     }
 
     .kanban-col.drag-over {
       background: rgba(91, 106, 247, 0.1);
       border-color: var(--acc);
-      transform: scale(1.02);
+      transform: none;
     }
 
     .kanban-hdr {
@@ -2625,12 +2675,12 @@
     .kanban-dot {
       width: 10px;
       height: 10px;
-      border-radius: 50%;
-      box-shadow: 0 0 10px currentColor;
+      border-radius: 0;
+      box-shadow: none;
     }
 
     .kanban-title {
-      font-family: 'Clash Display', sans-serif;
+      font-family: var(--font);
       font-weight: 600;
       font-size: 15px;
       color: var(--tx);
@@ -2639,7 +2689,7 @@
     .kanban-count {
       background: rgba(255, 255, 255, 0.08);
       padding: 2px 10px;
-      border-radius: 20px;
+      border-radius: 0;
       font-size: 11px;
       color: var(--tx2);
       font-weight: 700;
@@ -2669,24 +2719,24 @@
       background: #13132a;
       /* Slightly darker than column */
       border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: 12px;
+      border-radius: 0;
       padding: 16px;
       cursor: grab;
       transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+      box-shadow: none;
     }
 
     .kc:active {
       cursor: grabbing;
       transform: rotate(2deg) scale(1.05);
       z-index: 1000;
-      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.12);
+      box-shadow: none;
     }
 
     .kc:hover {
       border-color: rgba(91, 106, 247, 0.3);
-      transform: translateY(-3px);
-      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.10);
+      transform: none;
+      box-shadow: none;
     }
 
     .move-to-wrap { position: relative; margin-top: 12px; display: none; }
@@ -2698,7 +2748,7 @@
       background: rgba(91,106,247,0.1);
       border: 1px solid rgba(91,106,247,0.3);
       color: var(--acc);
-      border-radius: 20px;
+      border-radius: 0;
       font-size: 11px;
       padding: 5px 12px;
       cursor: pointer;
@@ -2710,8 +2760,8 @@
       width: 170px;
       background: #1a1e2e;
       border: 1px solid #2e3250;
-      border-radius: 10px;
-      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.14);
+      border-radius: 0;
+      box-shadow: none;
       display: none;
       flex-direction: column;
       padding: 6px;
@@ -2724,14 +2774,14 @@
       align-items: center;
       gap: 10px;
       padding: 9px 12px;
-      border-radius: 6px;
+      border-radius: 0;
       color: var(--tx2);
       font-size: 11.5px;
       cursor: pointer;
       transition: background 0.2s;
     }
     .move-opt:hover { background: rgba(255,255,255,0.06); color: var(--tx); }
-    .move-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .move-dot { width: 8px; height: 8px; border-radius: 0; flex-shrink: 0; }
 
 
     .topbar {
@@ -2755,13 +2805,13 @@
       justify-content: center;
       background: var(--s3);
       border: 1px solid var(--acc)30;
-      border-radius: 12px;
+      border-radius: 0;
       color: var(--acc);
       cursor: pointer;
       margin-right: 12px;
       font-size: 18px;
       transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.05);
+      box-shadow: none;
     }
     .back-btn:hover { background: var(--acc); color: white; transform: translateX(-2px); }
     .page-section.show-back .back-btn { display: flex; }
@@ -2791,7 +2841,7 @@
     }
 
     .kc-name {
-      font-family: 'Clash Display', sans-serif;
+      font-family: var(--font);
       font-weight: 600;
       font-size: 15px;
       color: var(--tx);
@@ -2806,7 +2856,7 @@
       color: var(--a4);
       font-size: 9px;
       padding: 2px 6px;
-      border-radius: 4px;
+      border-radius: 0;
       font-weight: 800;
       text-transform: uppercase;
       margin-left: 8px;
@@ -2861,7 +2911,7 @@
     .kc-btn {
       width: 28px;
       height: 28px;
-      border-radius: 8px;
+      border-radius: 0;
       border: 1px solid var(--bd);
       background: var(--s3);
       color: var(--tx2);
@@ -2884,7 +2934,7 @@
       gap: 5px;
       background: var(--s2);
       padding: 4px;
-      border-radius: 9px;
+      border-radius: 0;
     }
 
     .size-tab {
@@ -2892,7 +2942,7 @@
       font-size: 11px;
       font-weight: 700;
       cursor: pointer;
-      border-radius: 6px;
+      border-radius: 0;
       color: rgba(255, 255, 255, 0.4);
       transition: all 0.2s;
       white-space: nowrap;
@@ -2922,7 +2972,7 @@
       padding: 8px 5px;
       z-index: 2000;
       height: 65px;
-      backdrop-filter: blur(10px);
+      backdrop-filter: none;
     }
 
     .m-nav-item {
@@ -2975,7 +3025,7 @@
         justify-content: center;
         padding: 12px 0;
         width: 100%;
-        border-radius: 12px;
+        border-radius: 0;
       }
 
       .sidebar .ni-ic {
@@ -3041,7 +3091,7 @@
         max-width: 85% !important;
         z-index: 10000 !important;
         display: flex !important;
-        box-shadow: 15px 0 50px rgba(15, 23, 42, 0.16);
+        box-shadow: none;
         background: #ffffff !important;
         transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
         margin-left: 0 !important;
@@ -3193,7 +3243,7 @@
         background: var(--acc) !important;
         color: transparent !important;
         position: relative !important;
-        border-radius: 12px !important;
+        border-radius: 0;
         width: 44px !important;
         height: 44px !important;
         padding: 0 !important;
@@ -3273,7 +3323,7 @@
         width: 100% !important;
         min-width: 100% !important;
         background: var(--s1) !important;
-        border-radius: 8px !important;
+        border-radius: 0;
         border-top: none !important;
         padding: 0 !important;
         margin-bottom: 6px !important;
@@ -3387,77 +3437,1063 @@
         gap: 12px !important;
       }
     }
+
+    /* ══════════════════════════════════════════════════════════════════
+       SWISS LAYER
+       Loaded last so it settles the platform's shared language after the
+       legacy component rules. Everything below is structure, type and
+       space — the two things this style forbids (ornament and arbitrary
+       colour) are simply absent.
+       ══════════════════════════════════════════════════════════════════ */
+
+    /* ── Foundation ──────────────────────────────────────────────────── */
+    html { -webkit-text-size-adjust: 100%; }
+
+    body {
+      font-family: var(--font);
+      font-size: var(--t-body);
+      line-height: 1.5;
+      letter-spacing: -0.006em;
+      color: var(--ink);
+      background: var(--grey-2);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      font-feature-settings: 'kern' 1, 'liga' 1, 'cv05' 1;
+    }
+
+    /* The decorative purple nebula behind the old theme. */
+    body::before { display: none !important; content: none !important; }
+
+    /* Figures are compared column-to-column all over this app, so every
+       numeral gets the same advance width. */
+    .sc-val, .kc-val, .tc-num, .ni-count, .kanban-count, .score-pill,
+    table td, table th, .td-sv, .badge, .wbar-lbl, input, .fi, .lp-input {
+      font-variant-numeric: tabular-nums;
+      font-feature-settings: 'tnum' 1;
+    }
+
+    ::selection { background: var(--ink); color: var(--paper); }
+
+    a { color: inherit; text-decoration: none; }
+    a:focus-visible, button:focus-visible, input:focus-visible,
+    select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
+      outline: 2px solid var(--red);
+      outline-offset: 2px;
+    }
+
+    /* ── The one repeated typographic device: a tracked micro-label ──── */
+    .nl, .sc-lbl, .fl, .lp-label, .shdr, .hero-tag, .tc-lbl, .lp-sec-title,
+    .stitle, table th, .ftabs .ft, .role-tabs .rtab, .size-tabs .size-tab {
+      font-size: var(--t-micro);
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--grey-5);
+    }
+
+    /* ── Sidebar: a fixed measure, ruled off from the work surface ───── */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--paper);
+      border-right: var(--rule);
+      padding: var(--u5) 0 var(--u4);
+      gap: 0;
+    }
+
+    .logo {
+      font-family: var(--font) !important;
+      font-size: var(--t-lede);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--ink);
+      text-transform: none;
+      padding: 0 var(--u5) var(--u5);
+      border-bottom: var(--rule);
+      margin-bottom: var(--u4);
+      /* The old build typed this out character by character and clipped
+         it mid-word; the name is set once, whole. */
+      animation: none !important;
+      clip-path: none !important;
+      width: auto;
+      white-space: nowrap;
+    }
+    .logo span { color: var(--red); opacity: 1; }
+    .typing-cursor { display: none !important; }
+
+    .logo-mark {
+      width: 28px; height: 28px;
+      background: var(--ink);
+      border: none;
+      box-shadow: none;
+    }
+    .logo-img { filter: invert(1) grayscale(1); image-rendering: auto; }
+
+    .nl { padding: var(--u5) var(--u5) var(--u2); margin: 0; }
+    .sidebar .nl:first-of-type { padding-top: 0; }
+
+    .ni {
+      padding: var(--u2) var(--u5);
+      margin: 0;
+      gap: var(--u3);
+      font-size: var(--t-body);
+      font-weight: 500;
+      color: var(--grey-6);
+      border-left: 2px solid transparent;
+      transition: background 0.12s linear, color 0.12s linear;
+    }
+    .ni:hover { background: var(--grey-1); color: var(--ink); }
+    .ni.active {
+      background: transparent;
+      border-left-color: var(--red);
+      color: var(--ink);
+      font-weight: 600;
+    }
+    .ni.active .ni-ic svg { color: var(--red); }
+    .ni-ic svg { width: 16px; height: 16px; margin-right: 0; }
+
+    .ni-count, .ni-badge {
+      background: var(--grey-2);
+      color: var(--grey-6);
+      border: none;
+      font-size: var(--t-micro);
+      font-weight: 600;
+      padding: 1px var(--u2);
+      letter-spacing: 0.04em;
+    }
+    .ni.active .ni-count { background: var(--ink); color: var(--paper); }
+
+    .user-foot, .sb-foot { border-top: var(--rule); padding: var(--u4) var(--u5) 0; margin-top: var(--u4); }
+    .u-av, .av, .td-av, .avo, .avf {
+      background: var(--ink) !important;
+      color: var(--paper) !important;
+      font-size: var(--t-fine);
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+    .u-name { font-size: var(--t-body); font-weight: 600; letter-spacing: -0.01em; }
+    .u-role { font-size: var(--t-fine); color: var(--grey-5); }
+
+    .srv-status, .live-pill {
+      font-size: var(--t-micro);
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      background: transparent;
+      border: var(--rule);
+      color: var(--grey-6);
+      padding: var(--u1) var(--u2);
+    }
+    .srv-ok { border-color: var(--a3); color: var(--a3); }
+    .srv-err { border-color: var(--a2); color: var(--a2); }
+
+    .signout-btn {
+      background: transparent;
+      border: var(--rule);
+      color: var(--grey-6);
+      font-size: var(--t-small);
+      font-weight: 500;
+      padding: var(--u2) var(--u3);
+      transition: border-color 0.12s linear, color 0.12s linear;
+    }
+    .signout-btn:hover { border-color: var(--ink); color: var(--ink); }
+
+    /* ── Work surface ────────────────────────────────────────────────── */
+    .main { margin-left: var(--sidebar-w); background: var(--grey-2); }
+
+    .topbar {
+      background: var(--paper);
+      border-bottom: var(--rule);
+      border-radius: 0;
+      padding: var(--u5) var(--u6);
+      margin: 0;
+      gap: var(--u4);
+    }
+
+    .page-title {
+      font-size: var(--t-h1);
+      font-weight: 700;
+      letter-spacing: -0.035em;
+      line-height: 1.1;
+      color: var(--ink);
+    }
+    .ps, .tsec { font-size: var(--t-small); color: var(--grey-5); letter-spacing: 0; }
+
+    .page-section { padding: 0; }
+    .card {
+      background: var(--paper);
+      border: var(--rule);
+      border-radius: 0;
+      padding: var(--u5);
+      box-shadow: none;
+    }
+    .stitle, .ct {
+      font-size: var(--t-micro);
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--grey-5);
+      padding-bottom: var(--u3);
+      margin-bottom: var(--u4);
+      border-bottom: var(--rule);
+    }
+
+    /* ── Key figures. A rule above, the number large, the label small:
+          the whole hierarchy carried by size and space alone. ───────── */
+    .stats { gap: 0; border-left: var(--rule); }
+    .sc {
+      background: var(--paper);
+      border: var(--rule);
+      border-left: none;
+      border-radius: 0;
+      padding: var(--u5);
+      box-shadow: none;
+      position: relative;
+      transition: background 0.12s linear;
+    }
+    .sc:hover { background: var(--grey-1); transform: none; }
+    /* The five coloured top-bars are ornament: one shared rule replaces them. */
+    .sc::after { display: none !important; }
+    .sc-ic { display: none !important; }
+    .sc-lbl { margin-bottom: var(--u4); display: block; }
+    .sc-val {
+      font-size: var(--t-display);
+      font-weight: 600;
+      letter-spacing: -0.045em;
+      line-height: 1;
+      color: var(--ink);
+      margin: 0 0 var(--u2);
+    }
+    .sc-sub { font-size: var(--t-fine); color: var(--grey-5); letter-spacing: 0; }
+    .sc-sub.up { color: var(--a3); }
+
+    /* ── Controls ────────────────────────────────────────────────────── */
+    .btn, .btn-hero, .bp, .btn-primary, .btn-outline, .btn-ghost,
+    .btn-success, .btn-xs, .bsm, .kc-btn, .lp-btn, .cpbtn, .tc-add {
+      font-family: var(--font);
+      border-radius: 0;
+      box-shadow: none;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+      transition: background 0.12s linear, color 0.12s linear, border-color 0.12s linear;
+    }
+
+    .btn, .bsm, .btn-xs {
+      background: var(--paper);
+      border: 1px solid var(--grey-4);
+      color: var(--ink);
+      font-size: var(--t-small);
+      padding: var(--u2) var(--u4);
+    }
+    .btn:hover, .bsm:hover, .btn-xs:hover { border-color: var(--ink); background: var(--grey-1); }
+
+    /* Primary action — the single place the accent is spent. */
+    .bp, .btn-primary, .btn-hero-primary, .btn.bp {
+      background: var(--red) !important;
+      border: 1px solid var(--red) !important;
+      color: var(--paper) !important;
+      font-weight: 600;
+      opacity: 1;
+    }
+    .bp:hover, .btn-primary:hover, .btn-hero-primary:hover, .btn.bp:hover {
+      background: var(--red-dark) !important;
+      border-color: var(--red-dark) !important;
+      box-shadow: none;
+    }
+    .bp:disabled, .btn:disabled { background: var(--grey-3) !important; border-color: var(--grey-3) !important; color: var(--grey-5) !important; cursor: not-allowed; }
+
+    .btn-ghost, .btn-outline {
+      background: transparent;
+      border: 1px solid var(--grey-4);
+      color: var(--ink);
+    }
+    .btn-ghost:hover, .btn-outline:hover { border-color: var(--ink); background: var(--grey-1); }
+    .btn-success { background: var(--a3); border: 1px solid var(--a3); color: var(--paper); }
+
+    .back-btn, .bell-btn, .mc, .lp-close, .signup-close, .menu-close, .search-clear {
+      background: transparent;
+      border: var(--rule);
+      border-radius: 0;
+      color: var(--ink);
+      box-shadow: none;
+    }
+    .back-btn:hover, .bell-btn:hover, .mc:hover, .lp-close:hover { border-color: var(--ink); background: var(--grey-1); }
+
+    /* ── Fields ──────────────────────────────────────────────────────── */
+    .fi, .ssel, .search, .lp-input, .lp-select, .lp-textarea, input, select, textarea {
+      font-family: var(--font);
+      font-size: var(--t-body);
+      background: var(--paper);
+      border: 1px solid var(--grey-4);
+      border-radius: 0;
+      color: var(--ink);
+      padding: var(--u2) var(--u3);
+      box-shadow: none;
+      transition: border-color 0.12s linear;
+    }
+    .fi:focus, .ssel:focus, .search:focus, .lp-input:focus,
+    .lp-select:focus, .lp-textarea:focus, input:focus, select:focus, textarea:focus {
+      border-color: var(--ink);
+      outline: none;
+    }
+    ::placeholder { color: var(--grey-5); opacity: 1; }
+    .fl, .lp-label { display: block; margin-bottom: var(--u2); }
+    .fg, .lp-fg { margin-bottom: var(--u4); }
+
+    /* ── Tabs: a baseline rule, the active tab marked in red ─────────── */
+    .ftabs, .role-tabs, .size-tabs, .lp-tabs {
+      gap: 0;
+      border-bottom: var(--rule);
+      background: transparent;
+      padding: 0;
+    }
+    .ft, .rtab, .size-tab, .lp-tab {
+      background: transparent !important;
+      border: none !important;
+      border-bottom: 2px solid transparent !important;
+      border-radius: 0 !important;
+      color: var(--grey-5) !important;
+      padding: var(--u3) var(--u4) !important;
+      margin-bottom: -1px;
+    }
+    .ft:hover, .rtab:hover, .size-tab:hover, .lp-tab:hover { color: var(--ink) !important; }
+    .ft.active, .rtab.active, .size-tab.active, .lp-tab.active {
+      color: var(--ink) !important;
+      border-bottom-color: var(--red) !important;
+      font-weight: 600;
+    }
+
+    /* ── Tables: rules only. No cell borders, no fills, no rounding. ─── */
+    .table-wrapper { border: var(--rule); background: var(--paper); overflow-x: auto; }
+    table { border-collapse: collapse; width: 100%; }
+    table th {
+      text-align: left;
+      background: var(--paper);
+      border-bottom: var(--rule-strong);
+      padding: var(--u3) var(--u4);
+      white-space: nowrap;
+    }
+    table td {
+      border-bottom: var(--rule);
+      padding: var(--u4);
+      font-size: var(--t-body);
+      color: var(--ink);
+      vertical-align: middle;
+    }
+    table tbody tr:last-child td { border-bottom: none; }
+    table tbody tr { transition: background 0.1s linear; }
+    table tbody tr:hover { background: var(--grey-1); }
+
+    /* ── Tags and status. Square, ruled, lowercase-free. ─────────────── */
+    .badge, .kc-tag, .sp-badge, .score-pill, .call-outcome-badge, .bg, .bl, .bw, .bq, .bn, .bx, .bi {
+      border-radius: 0 !important;
+      font-size: var(--t-micro);
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 3px var(--u2);
+      background: transparent;
+      border: 1px solid currentColor;
+      box-shadow: none;
+    }
+    .badge.gray, .bg { color: var(--grey-5); }
+    .badge.yellow, .bq { color: var(--a4); }
+    .bn, .bi { color: var(--a5); }
+    .bw { color: var(--a3); }
+    .bl, .bx { color: var(--a2); }
+
+    .dot, .ps-dot, .move-dot, .kanban-dot, .bell-dot {
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      width: 8px; height: 8px;
+    }
+
+    /* ── Kanban ──────────────────────────────────────────────────────
+       The columns and cards were still carrying the pre-light-theme
+       palette (#13132a on rgba(13,13,31,.6)), which rendered near-black
+       text on a near-black card — the pipeline was unreadable. Rebuilt
+       on paper with the stage colour carried by a single top rule. */
+    .kanban-board { gap: 0; border-left: var(--rule); margin-top: var(--u5); }
+    .kanban-col {
+      background: var(--grey-1) !important;
+      border: var(--rule);
+      border-left: none;
+      border-radius: 0;
+      backdrop-filter: none;
+      min-width: 300px; max-width: 300px;
+    }
+    .kanban-col.drag-over { background: var(--paper) !important; border-color: var(--ink); transform: none; }
+    .kanban-hdr {
+      background: var(--paper);
+      border-bottom: var(--rule);
+      border-top: 2px solid var(--ink);
+      padding: var(--u4);
+    }
+    .kanban-title {
+      font-family: var(--font);
+      font-size: var(--t-micro);
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink);
+    }
+    .kanban-count {
+      background: transparent;
+      border: var(--rule);
+      color: var(--grey-6);
+      font-size: var(--t-micro);
+      padding: 1px var(--u2);
+    }
+    .kanban-list { padding: var(--u3); gap: var(--u3); }
+    .kanban-empty-msg { font-style: normal; font-size: var(--t-fine); color: var(--grey-5); text-transform: uppercase; letter-spacing: 0.12em; }
+
+    .kc {
+      background: var(--paper) !important;
+      border: var(--rule) !important;
+      border-radius: 0;
+      box-shadow: none !important;
+      padding: var(--u4);
+      transition: border-color 0.12s linear;
+    }
+    .kc:hover { border-color: var(--ink) !important; transform: none; box-shadow: none !important; }
+    .kc:active { transform: none; box-shadow: none !important; }
+    .kc-name { font-size: var(--t-body); font-weight: 600; color: var(--ink); letter-spacing: -0.012em; }
+    .kc-row, .kc-info { font-size: var(--t-fine); color: var(--grey-6); }
+    .kc-val { font-size: var(--t-lede); font-weight: 600; color: var(--ink); letter-spacing: -0.02em; }
+    .kc-foot, .kc-stats-row { border-top: var(--rule); padding-top: var(--u3); margin-top: var(--u3); }
+    .kc-btn { background: transparent; border: var(--rule); color: var(--grey-6); }
+    .kc-btn:hover { border-color: var(--ink); color: var(--ink); background: var(--grey-1); }
+
+    /* ── Overlays ────────────────────────────────────────────────────── */
+    .ov, .lead-panel-overlay, .sb-overlay, .signup-overlay, #login-wrap {
+      background: rgba(10, 10, 10, 0.55);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+    .modal, .lead-panel, .lp, .login-box, .menu-card {
+      background: var(--paper);
+      border: var(--rule);
+      border-radius: 0;
+      box-shadow: none;
+    }
+    .mh, .lp-head { border-bottom: var(--rule); padding: var(--u5); }
+    .mt { font-size: var(--t-h3); font-weight: 700; letter-spacing: -0.025em; color: var(--ink); }
+    .mb, .lp-body { padding: var(--u5); }
+    .mf { border-top: var(--rule); padding: var(--u4) var(--u5); }
+
+    /* ── Toast ───────────────────────────────────────────────────────── */
+    .toast {
+      background: var(--ink);
+      color: var(--paper);
+      border: none;
+      border-radius: 0;
+      font-size: var(--t-small);
+      font-weight: 500;
+      letter-spacing: 0;
+      padding: var(--u3) var(--u5);
+      box-shadow: none;
+    }
+
+    /* ── Login ───────────────────────────────────────────────────────── */
+    .login-box { padding: var(--u7); max-width: 380px; }
+    .login-title { font-size: var(--t-h2); font-weight: 700; letter-spacing: -0.03em; color: var(--ink); }
+    .login-sub { font-size: var(--t-small); color: var(--grey-5); }
+    .login-hint { font-size: var(--t-fine); color: var(--grey-5); }
+    .login-err { font-size: var(--t-small); color: var(--a2); border-left: 2px solid var(--a2); padding-left: var(--u3); background: transparent; }
+    .login-logo { filter: grayscale(1); }
+
+    /* ── Empty states ────────────────────────────────────────────────── */
+    .empty {
+      color: var(--grey-5);
+      font-size: var(--t-small);
+      border: 1px dashed var(--grey-3);
+      background: transparent;
+      padding: var(--u7) var(--u5);
+      text-align: center;
+    }
+
+    /* ── Activity / notes / calls ────────────────────────────────────── */
+    .act-card, .note-card, .call-card, .tcard, .asp-card, .act-item {
+      background: var(--paper);
+      border: var(--rule);
+      border-radius: 0;
+      box-shadow: none;
+    }
+    .act-item { border-width: 0 0 1px; }
+    .note-time, .act-meta, .call-meta { font-size: var(--t-fine); color: var(--grey-5); }
+    .note-author, .act-lft { font-weight: 600; color: var(--ink); }
+
+    /* ── Mobile ──────────────────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .main { margin-left: 0; }
+      .topbar { padding: var(--u4); }
+      .page-title { font-size: var(--t-h2); }
+      .sc-val { font-size: var(--t-h1); }
+      .sc { padding: var(--u4); }
+      .stats { border-left: none; }
+      .sc { border-left: var(--rule); }
+    }
+
+    .mobile-nav, .mobile-search, .mobile-status {
+      background: var(--paper);
+      border-top: var(--rule);
+      box-shadow: none;
+      border-radius: 0;
+    }
+    .m-nav-item { color: var(--grey-5); font-size: var(--t-micro); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
+    .m-nav-item.active { color: var(--red); }
+
+    /* Respect a reduced-motion preference. */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+      }
+    }
+
+
+    /* ── Landing ─────────────────────────────────────────────────────
+       A 12-column field with generous margins. Everything hangs off one
+       left axis; the eye is led by scale, not by contrast tricks. */
+    #navbar {
+      background: var(--paper);
+      border-bottom: var(--rule);
+      padding: var(--u4) var(--u7);
+      backdrop-filter: none;
+    }
+    .nav-logo {
+      font-family: var(--font) !important;
+      font-size: var(--t-lede) !important;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--ink) !important;
+      text-transform: none;
+    }
+    .nav-logo span { color: var(--red); }
+
+    #hero {
+      min-height: 100vh;
+      display: block;
+      background: var(--paper);
+      padding: 0 var(--u7);
+      text-align: left;
+      overflow: visible;
+    }
+    #hero-canvas, #hero-stars-canvas { display: none !important; }
+
+    .hero-grid {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding-top: 136px;
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 0 var(--u5);
+    }
+    .hero-rule-top {
+      grid-column: 1 / -1;
+      border-top: 2px solid var(--ink);
+      margin-bottom: var(--u5);
+    }
+    .hero-index {
+      grid-column: 1 / 3;
+      display: flex;
+      flex-direction: column;
+      gap: var(--u2);
+    }
+    .hero-idx-num {
+      font-size: var(--t-micro);
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      color: var(--grey-4);
+    }
+    .hero-tag {
+      border: none;
+      background: transparent;
+      padding: 0;
+      color: var(--red);
+      letter-spacing: 0.14em;
+    }
+
+    .hero-content {
+      grid-column: 3 / 11;
+      display: block;
+      align-items: flex-start;
+      text-align: left;
+      gap: 0;
+    }
+    .hero-h1 {
+      font-family: var(--font);
+      font-size: clamp(44px, 7.4vw, 104px);
+      font-weight: 700;
+      line-height: 0.95;
+      letter-spacing: -0.045em;
+      color: var(--ink);
+      margin: 0;
+    }
+    .hero-h1 span { color: var(--red); }
+    .hero-lede {
+      max-width: 46ch;
+      margin-top: var(--u5);
+      font-size: var(--t-lede);
+      line-height: 1.6;
+      color: var(--grey-6);
+    }
+    .hero-actions { margin-top: var(--u6); display: flex; gap: var(--u3); }
+    .btn-hero { padding: var(--u3) var(--u6); font-size: var(--t-body); }
+
+    .hero-facts {
+      grid-column: 3 / -1;
+      margin-top: var(--u8);
+      padding-top: var(--u4);
+      border-top: var(--rule);
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--u5);
+    }
+    .hero-fact { display: flex; flex-direction: column; gap: var(--u2); }
+    .hero-fact-label {
+      font-size: var(--t-micro);
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink);
+    }
+    .hero-fact-body { font-size: var(--t-small); line-height: 1.6; color: var(--grey-5); max-width: 32ch; }
+
+    @media (max-width: 900px) {
+      #hero { padding: 0 var(--u4); }
+      .hero-grid { padding-top: 104px; gap: 0; }
+      .hero-index, .hero-content, .hero-facts { grid-column: 1 / -1; }
+      .hero-index { flex-direction: row; justify-content: space-between; margin-bottom: var(--u4); }
+      .hero-facts { grid-template-columns: 1fr; gap: var(--u4); margin-top: var(--u6); }
+      #navbar { padding: var(--u3) var(--u4); }
+    }
+
+
+    /* ── Refinements ─────────────────────────────────────────────────── */
+
+    /* Page gutters. The sidebar is a fixed 240px measure; content hangs off
+       a consistent 32px gutter inside it. */
+    .main { margin-left: var(--sidebar-w); padding: 0; }
+    .page-section { margin-left: var(--sidebar-w); padding: 0; }
+    .main > *:not(.topbar), .page-section > *:not(.topbar) { margin-left: var(--u6); margin-right: var(--u6); }
+    .main > .stats, .page-section > .stats { margin-left: var(--u6); margin-right: var(--u6); }
+    .topbar { margin: 0 !important; }
+    .main > .card, .page-section > .card { margin-bottom: var(--u5); }
+    .main > *:first-child:not(.topbar), .page-section > *:first-child:not(.topbar) { margin-top: var(--u5); }
+    .stats { margin-top: var(--u5) !important; margin-bottom: var(--u5) !important; }
+
+    /* Section headings: the rule runs the full measure, not just under the
+       words — a caption sitting on a line, which is the Swiss convention. */
+    .stitle, .ct {
+      display: block;
+      width: 100%;
+      padding-bottom: var(--u3);
+      margin-bottom: var(--u4);
+      border-bottom: var(--rule);
+    }
+
+    /* Key figures must survive long currency strings (₹16,55,000) without
+       overflowing their cell, so the display size is viewport-relative. */
+    .sc-val {
+      font-size: clamp(26px, 2.7vw, 44px);
+      white-space: nowrap;
+      letter-spacing: -0.05em;
+    }
+
+    /* Score is data, not an alarm — red is reserved for the primary action. */
+    .score-pill {
+      border-color: var(--grey-4) !important;
+      color: var(--ink) !important;
+      background: transparent !important;
+      padding: 2px var(--u2);
+    }
+
+    /* Status notation: a filled square, the plainest possible mark. */
+    .stat-sq {
+      display: inline-block;
+      width: 8px; height: 8px;
+      margin-right: var(--u2);
+      vertical-align: middle;
+    }
+
+    /* Sidebar sector tally — was a tinted, dashed, rounded chip. */
+    #sector-count-box {
+      background: transparent !important;
+      border: none !important;
+      border-top: var(--rule) !important;
+      border-radius: 0 !important;
+      margin: var(--u4) 0 0 !important;
+      padding: var(--u4) var(--u5) 0 !important;
+      font-size: var(--t-micro) !important;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--grey-5) !important;
+    }
+    #sector-count-box strong { color: var(--ink) !important; }
+
+    /* Sidebar rows: keep the icon and label apart. */
+    .ni-ic { display: inline-flex; align-items: center; flex: 0 0 auto; width: 16px; }
+    .ni { align-items: center; }
+
+    /* Icon-only controls read as squares on the grid. */
+    .kc-btn, .bell-btn, .back-btn, .btn-xs {
+      min-width: 32px; height: 32px;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    .kc-btn svg, .bell-btn svg { width: 14px; height: 14px; }
+
+    /* Mobile: the compose action is the primary one, so it takes the accent. */
+    .hb-btn, .mobile-nav .bp { background: var(--red) !important; border-color: var(--red) !important; color: var(--paper) !important; }
+
+    /* Domain/status <select> options inherit the platform face. */
+    select option { font-family: var(--font); }
+
+    /* Long tables: keep the header legible while scrolling a sector. */
+    .table-wrapper table th { position: sticky; top: 0; z-index: 2; background: var(--paper); }
+
+    /* Links inside data cells carry an underline on hover only — no colour. */
+    .wb-link, table td a { border-bottom: 1px solid transparent; }
+    .wb-link:hover, table td a:hover { border-bottom-color: var(--ink); }
+
+    @media (max-width: 900px) {
+      .main, .page-section { margin-left: 0; }
+      .main > *:not(.topbar), .page-section > *:not(.topbar) { margin-left: var(--u4); margin-right: var(--u4); }
+      .stats { margin-left: var(--u4) !important; margin-right: var(--u4) !important; }
+    }
+
+
+    /* ── Sign-in panel ───────────────────────────────────────────────── */
+    .signup-overlay { align-items: center; }
+    .login-box {
+      padding: var(--u7) var(--u7) var(--u6);
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+    }
+    .login-mark {
+      font-size: var(--t-small);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      padding-bottom: var(--u4);
+      margin-bottom: var(--u5);
+      border-bottom: 2px solid var(--ink);
+    }
+    .login-mark span { color: var(--red); }
+    .login-title { margin: 0 0 var(--u2); }
+    .login-sub { margin: 0 0 var(--u6); }
+    .login-box .bp {
+      width: 100%;
+      padding: var(--u3) var(--u4);
+      font-size: var(--t-body);
+      margin-top: var(--u2);
+    }
+    .login-hint {
+      text-align: left;
+      margin: var(--u5) 0 0;
+      padding-top: var(--u4);
+      border-top: var(--rule);
+      line-height: 1.5;
+    }
+    .login-err { margin-bottom: var(--u4); padding: var(--u2) 0 var(--u2) var(--u3); }
+    .signup-close {
+      top: var(--u4); right: var(--u4);
+      width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: var(--t-small);
+      border: none;
+      color: var(--grey-5);
+    }
+    .signup-close:hover { color: var(--ink); background: var(--grey-1); }
+
+
+    /* ── Final corrections ───────────────────────────────────────────── */
+
+    /* The landing wordmark carried word-spacing:-3px and a glow, which
+       closed the gap between the two words entirely. */
+    .nav-logo {
+      word-spacing: normal !important;
+      text-shadow: none !important;
+      letter-spacing: -0.03em !important;
+    }
+
+    /* Kanban stage colour is carried by the header rule only; the dot and
+       the rule agree, so the stage is legible without reading the label. */
+    .kanban-hdr { border-top-width: 3px; border-top-style: solid; }
+
+    /* Destructive actions stay distinguishable from the primary accent:
+       the CRM red is the action colour, the status crimson is a warning. */
+    .kc-btn[title="Delete"], button[title="Delete"] { color: var(--a2); }
+    .kc-btn[title="Delete"]:hover, button[title="Delete"]:hover {
+      background: var(--a2); color: var(--paper); border-color: var(--a2);
+    }
+
+    /* Card action row: small, ruled, evenly set. */
+    .kc-btns { gap: var(--u2); }
+    .kc-btn {
+      font-size: var(--t-micro);
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0 var(--u2);
+      min-width: 0;
+    }
+
+    /* Table action buttons pick up the same treatment. */
+    table .btn-xs {
+      font-size: var(--t-micro);
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      min-width: 0;
+      padding: var(--u1) var(--u2);
+      height: auto;
+    }
+
+    /* Sector tiles on the dashboard: flat cells on the grid. */
+    .tcard, .sector-item {
+      border-radius: 0;
+      box-shadow: none;
+      background: var(--paper);
+    }
+
+    /* Domain dropdown control. */
+    .sector-drop-btn {
+      border: 1px solid var(--grey-4);
+      border-radius: 0;
+      background: var(--paper);
+      font-size: var(--t-body);
+      padding: var(--u2) var(--u3);
+    }
+    .sector-drop-btn:hover { border-color: var(--ink); }
+    .sector-drop-content {
+      border: var(--rule);
+      border-radius: 0;
+      background: var(--paper);
+      box-shadow: none;
+    }
+    .sector-item:hover { background: var(--grey-1); }
+
+    /* Rating cells lost their star glyph; the header names the column. */
+    .rating-cell { font-variant-numeric: tabular-nums; }
+
+
+    /* ── Notice panel: a statement set on the grid, not a coloured alert ── */
+    .card.notice { max-width: 68ch; padding: var(--u6); }
+    .notice-label {
+      font-size: var(--t-micro);
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--grey-5);
+      padding-bottom: var(--u3);
+      margin-bottom: var(--u5);
+      border-bottom: 2px solid var(--ink);
+    }
+    .notice-body {
+      font-size: var(--t-lede);
+      line-height: 1.65;
+      color: var(--grey-6);
+      margin-bottom: var(--u4);
+      max-width: 60ch;
+    }
+    .notice-body strong { color: var(--ink); font-weight: 600; }
+    .notice-meta {
+      font-size: var(--t-micro);
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--grey-5);
+      padding-top: var(--u4);
+      border-top: var(--rule);
+      margin: 0;
+    }
+
+
+    /* ── Team cards ──────────────────────────────────────────────────── */
+    .tgrid, #team-grid, #team-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: var(--u4);
+      align-items: start;
+    }
+    .tm-card {
+      background: var(--paper);
+      border: var(--rule);
+      padding: var(--u4);
+      display: flex;
+      flex-direction: column;
+      gap: var(--u4);
+    }
+    .tm-head { display: flex; align-items: flex-start; gap: var(--u3); }
+    .tm-av {
+      width: 36px; height: 36px; flex: 0 0 36px;
+      background: var(--ink); color: var(--paper);
+      display: flex; align-items: center; justify-content: center;
+      font-size: var(--t-fine); font-weight: 600; letter-spacing: 0.02em;
+    }
+    .tm-id { flex: 1; min-width: 0; }
+    .tm-name {
+      font-size: var(--t-body); font-weight: 600; letter-spacing: -0.012em;
+      text-transform: capitalize; color: var(--ink);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .tm-email, .tm-role {
+      font-size: var(--t-fine); color: var(--grey-5);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    /* Sits in the flow rather than absolutely, so it can never sit on top of
+       a long name the way the old corner button did. */
+    .tm-del {
+      flex: 0 0 auto;
+      background: none; border: none; cursor: pointer;
+      font-family: var(--font);
+      font-size: var(--t-micro); font-weight: 600;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--grey-5); padding: 2px 0;
+    }
+    .tm-del:hover { color: var(--a2); }
+
+    .tm-figs { display: grid; grid-template-columns: repeat(3, 1fr); border-top: var(--rule); }
+    .tm-fig { padding: var(--u3) 0; border-right: var(--rule); }
+    .tm-fig:last-child { border-right: none; }
+    .tm-fig-val {
+      font-size: var(--t-h3); font-weight: 600; line-height: 1;
+      letter-spacing: -0.03em; color: var(--ink);
+      font-variant-numeric: tabular-nums;
+    }
+    .tm-fig-lbl {
+      font-size: var(--t-micro); font-weight: 600; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--grey-5); margin-top: var(--u1);
+    }
+    .tm-actions { display: flex; gap: var(--u2); }
+    /* Both are ordinary actions: the accent stays reserved for the one
+       primary action per screen, not repeated on every card. */
+    .tm-actions .btn { flex: 1; font-size: var(--t-micro); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: var(--u2) 0; }
+
+
+    /* ── Explainer panel ─────────────────────────────────────────────── */
+    .card.explainer { margin-bottom: var(--u5); }
+    .card.explainer .how-it-works-grid { gap: var(--u5); }
+
+    /* ── Last colour corrections ─────────────────────────────────────── */
+
+    /* The score pill kept the old theme's pink fill and a brighter pink
+       numeral, so every score in the table read as an alert. It is a
+       measurement: set in ink, inside a hairline. */
+    .score-pill { background: transparent !important; color: var(--ink) !important; }
+    .score-pill strong { color: var(--ink) !important; font-size: var(--t-body); }
+    .rating-cell { color: var(--ink); }
+
+    /* Priority abbreviation sits beside the score as plain notation. */
+    td .priority-mark, td div[style*="font-size:14px"] {
+      font-size: var(--t-micro) !important;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      color: var(--grey-6);
+    }
+
+    /* Mobile: the compose control is the primary action on the bar. */
+    .hb-btn, #tb-add-lead, #sp-tb-add-lead {
+      background: var(--red) !important;
+      border: 1px solid var(--red) !important;
+      color: var(--paper) !important;
+      box-shadow: none !important;
+    }
+    .bell-btn { background: var(--paper) !important; color: var(--ink) !important; border: var(--rule) !important; }
+
+    /* Narrow screens: let a wide table scroll inside its own frame rather
+       than pushing the page sideways. */
+    @media (max-width: 900px) {
+      .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      .ftabs, .size-tabs { overflow-x: auto; }
+      body { overflow-x: hidden; }
+    }
   </style>
 </head>
 
 <div id="home-page">
   <!-- NAVBAR -->
   <nav id="navbar">
-    <div class="nav-logo">EXORA LEADFORGE</div>
+    <div class="nav-logo">Exora&nbsp;<span>Leadforge</span></div>
     <div class="nav-links">
     </div>
     <div class="nav-actions">
-      <button class="btn-primary" style="background:#5b6af7;" onclick="openSignup()">Login</button>
+      <button class="btn-primary" onclick="openSignup()">Sign in</button>
     </div>
   </nav>
 
 
-  <!-- HERO -->
+  <!-- HERO
+       Swiss composition: flush-left on a 12-column grid, hierarchy from
+       type size alone. The two decorative canvases that used to sit here
+       (a particle field and a rotating vortex) were removed — the vortex
+       rendered on top of the headline and made it unreadable. -->
   <section id="hero">
-    <canvas id="hero-stars-canvas" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0.6;"></canvas>
-    <canvas id="hero-canvas"></canvas>
-    <div class="hero-content">
-      <span class="hero-tag">Next-gen CRM Platform</span>
-      <h1 class="hero-h1">Relationships<br /><span>in Motion</span></h1>
-      <p style="font-size:16px; color:var(--muted); max-width:440px; line-height:1.7; margin-top:24px;">Manage your
-        pipeline, automate workflows, and close deals faster with AI-powered insights.</p>
-      <div style="display:flex; gap:14px; margin-top:32px;">
+    <div class="hero-grid">
+      <div class="hero-rule-top"></div>
+
+      <div class="hero-index">
+        <span class="hero-tag">Lead intelligence</span>
+        <span class="hero-idx-num">01</span>
+      </div>
+
+      <div class="hero-content">
+        <h1 class="hero-h1">Relationships<br><span>in motion</span></h1>
+        <p class="hero-lede">Find the accounts worth your time, score them on
+          evidence, and move every one of them through a pipeline you can
+          actually see.</p>
+        <div class="hero-actions">
+          <button class="btn-hero btn-hero-primary" onclick="openSignup()">Sign in</button>
+        </div>
+      </div>
+
+      <div class="hero-facts">
+        <div class="hero-fact">
+          <span class="hero-fact-label">Discovery</span>
+          <span class="hero-fact-body">Sector-wide sourcing with de-duplication and enrichment on arrival.</span>
+        </div>
+        <div class="hero-fact">
+          <span class="hero-fact-label">Scoring</span>
+          <span class="hero-fact-body">A transparent, weighted model — every point traceable to a signal.</span>
+        </div>
+        <div class="hero-fact">
+          <span class="hero-fact-label">Pipeline</span>
+          <span class="hero-fact-body">Stages, owners, activity and follow-up on one board.</span>
+        </div>
       </div>
     </div>
   </section>
 
   <div id="login-wrap">
-    <canvas id="signup-stars-canvas" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0.6;"></canvas>
-    <canvas id="signup-canvas" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none;"></canvas>
-
+    <!-- The two ornamental canvases that used to sit behind this panel are
+         gone; they rendered a purple vortex straight through the form. -->
     <div class="signup-overlay">
       <div class="login-box">
-        <button class="signup-close" onclick="closeSignup()">✕</button>
+        <button class="signup-close" onclick="closeSignup()" aria-label="Close">&#10005;</button>
 
-        <h2 id="login-title" style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:#d0bfff;margin-bottom:12px;height:42px;line-height:1.2;display:block;">
-          LOGIN</h2>
-        <p style="font-size:14px;color:rgba(208,191,255,0.45);margin-bottom:36px;">Sign in to access your CRM dashboard
-        </p>
+        <div class="login-mark">Exora <span>Leadforge</span></div>
+        <h2 id="login-title" class="login-title">Sign in</h2>
+        <p class="login-sub">Access your workspace.</p>
 
-        <div class="login-err" id="login-err"
-          style="display:none; color:var(--a2); margin-bottom:12px; font-size:13px;"></div>
+        <div class="login-err" id="login-err" style="display:none;"></div>
 
-        <div class="form-group" style="margin-bottom:20px;">
-          <label
-            style="display:block; font-size:11px; color:rgba(232,232,255,0.5); margin-bottom:8px; text-transform:uppercase; letter-spacing:1.5px; font-weight:700;">Email
-            Address</label>
-          <input class="form-input" id="l-email" type="email" placeholder="Enter Email"
-            style="width:100%; background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:14px 16px; color:#e8e8ff; font-size:14px; outline:none;"
-            onkeydown="if(event.key==='Enter')tryLogin()" />
+        <div class="fg">
+          <label class="fl" for="l-email">Email address</label>
+          <input class="fi" id="l-email" type="email" placeholder="name@exora.solutions"
+            autocomplete="username" onkeydown="if(event.key==='Enter')tryLogin()" />
         </div>
-        <div class="form-group" style="margin-bottom:32px;">
-          <label
-            style="display:block; font-size:11px; color:rgba(232,232,255,0.5); margin-bottom:8px; text-transform:uppercase; letter-spacing:1.5px; font-weight:700;">Password</label>
-          <input class="form-input" id="l-pass" type="password" placeholder="••••••••"
-            style="width:100%; background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:14px 16px; color:#e8e8ff; font-size:14px; outline:none;"
-            onkeydown="if(event.key==='Enter')tryLogin()" />
+        <div class="fg">
+          <label class="fl" for="l-pass">Password</label>
+          <input class="fi" id="l-pass" type="password" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;"
+            autocomplete="current-password" onkeydown="if(event.key==='Enter')tryLogin()" />
         </div>
 
-        <button class="btn-signup" id="login-btn" onclick="tryLogin()"
-          style="width:100%; padding:14px; background:#5b6af7; border:none; border-radius:12px; color:white; font-size:15px; font-weight:700; cursor:pointer; box-shadow:0 0 30px rgba(91,106,247,0.4); transition:background 0.2s;">
-          Sign In →
-        </button>
+        <button class="bp" id="login-btn" onclick="tryLogin()">Sign in</button>
 
-        <style>
-          #login-btn:hover {
-            background: #6e7df8 !important;
-          }
-        </style>
+        <p class="login-hint">Accounts are managed in Nomi. Use the same credentials.</p>
       </div>
     </div>
   </div>
@@ -3467,10 +4503,10 @@
 <div class="sb-overlay" id="sb-overlay" onclick="toggleMSB()"></div>
 
 <aside class="sidebar" id="main-sidebar" style="display:none">
-  <button class="sb-close" onclick="toggleMSB()">✕</button>
+  <button class="sb-close" onclick="toggleMSB()">&#10005;</button>
   <div
     style="padding-top: 18px; margin-bottom:12px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px;">
-    <div class="logo">EXORA LEADFORGE</div>
+    <div class="logo">Exora&nbsp;<span>Leadforge</span></div>
   </div>
 
 <!-- NOTIFICATION TOAST -->
@@ -3491,9 +4527,6 @@
     <div class="nl">Workspace</div>
     <div class="ni" id="nav-team" onclick="showAdminPage('team',this)"><span class="ni-ic"><i
           data-lucide="users"></i></span>Team</div>
-    <div class="ni" id="nav-addsp" onclick="showAdminPage('addsp',this)"><span class="ni-ic"><i
-          data-lucide="user-plus"></i></span>Add Sales Person
-    </div>
     <div class="ni" id="nav-adminuser" onclick="showAdminPage('adminuser',this)"><span class="ni-ic"><i
           data-lucide="settings"></i></span>Admin
       User</div>
@@ -3503,7 +4536,7 @@
           data-lucide="sliders"></i></span>Score Engine
     </div>
     <div class="ni" id="nav-score-run" onclick="runScoring(); if(window.innerWidth<=480)toggleMSB(false)">
-      <span class="ni-ic"><i data-lucide="zap"></i></span>📊 Score Leads
+      <span class="ni-ic"><i data-lucide="zap"></i></span>Score Leads
     </div>
   </div>
 
@@ -3567,7 +4600,7 @@
       <div class="bell-btn" id="reminders-bell" onclick="toggleRemindersPanel()" title="Today's Reminders">
         <i data-lucide="bell"></i> <span class="bell-dot" id="bell-dot"></span>
       </div>
-      <button class="btn bg" id="score-btn" onclick="runScoring()">📊 Score Leads</button>
+      <button class="btn bg" id="score-btn" onclick="runScoring()">Score Leads</button>
       <button class="btn bp" id="tb-add-lead" onclick="openAddLead()">+ Add Lead</button>
     </div>
   </div>
@@ -3578,31 +4611,31 @@
   <!-- STATS -->
   <div class="stats">
     <div class="sc c1">
-      <div class="sc-ic">🏫</div>
+      <div class="sc-ic" aria-hidden="true"></div>
       <div class="sc-lbl">Total Leads</div>
       <div class="sc-val" id="s1">—</div>
       <div class="sc-sub up">all leads</div>
     </div>
     <div class="sc c2">
-      <div class="sc-ic">🔥</div>
+      <div class="sc-ic" aria-hidden="true"></div>
       <div class="sc-lbl">New Leads</div>
       <div class="sc-val" id="s2">—</div>
       <div class="sc-sub">awaiting contact</div>
     </div>
     <div class="sc c3">
-      <div class="sc-ic">⭐</div>
+      <div class="sc-ic" aria-hidden="true"></div>
       <div class="sc-lbl">Avg Rating</div>
       <div class="sc-val" id="s3">—</div>
       <div class="sc-sub">across all leads</div>
     </div>
     <div class="sc c4">
-      <div class="sc-ic">🏆</div>
+      <div class="sc-ic" aria-hidden="true"></div>
       <div class="sc-lbl">Won Deals</div>
       <div class="sc-val" id="s4">—</div>
       <div class="sc-sub">won / total</div>
     </div>
     <div class="sc c5" style="cursor:pointer;" onclick="toggleRemindersPanel()">
-      <div class="sc-ic">🔔</div>
+      <div class="sc-ic" aria-hidden="true"></div>
       <div class="sc-lbl">Today's Reminders</div>
       <div class="sc-val" id="s5">0</div>
       <div class="sc-sub">pending for today</div>
@@ -3611,7 +4644,7 @@
 
   <div
     style="background:var(--s1);border:1.5px solid var(--bd);border-radius:var(--r);padding:18px 22px;margin-bottom:20px;">
-    <div style="font-family:'Clash Display',sans-serif;font-size:15px;font-weight:700;margin-bottom:14px;">⚡ Generate
+    <div style="font-family:'Clash Display',sans-serif;font-size:15px;font-weight:700;margin-bottom:14px;">Generate
       Leads for a Domain</div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
       <input class="fi" id="domain-search-input" placeholder="e.g. Hospitals, Gyms, IT Companies..."
@@ -3620,7 +4653,7 @@
         style="width:180px;" onkeydown="if(event.key==='Enter')generateDomainLeads()">
       <input class="fi" id="domain-city-input" placeholder="City (optional, e.g. Bengaluru)"
         style="width:180px;" onkeydown="if(event.key==='Enter')generateDomainLeads()">
-      <button class="btn bp" onclick="generateDomainLeads()" id="domain-gen-btn">⚡ Generate Leads</button>
+      <button class="btn bp" onclick="generateDomainLeads()" id="domain-gen-btn">Generate Leads</button>
     </div>
 
   </div>
@@ -3675,19 +4708,19 @@
     </div>
       <div class="tb-right">
         <div class="search-wrap" style="margin-right:12px;">
-          <input class="search" type="text" placeholder="🔍 Search sector leads..." oninput="doSearch(this.value); this.nextElementSibling.style.display = this.value ? 'block' : 'none';" style="width:200px;">
-          <span class="search-clear" onclick="this.previousElementSibling.value=''; this.style.display='none'; doSearch('');">✕</span>
+          <input class="search" type="text" placeholder="Search sector leads" oninput="doSearch(this.value); this.nextElementSibling.style.display = this.value ? 'block' : 'none';" style="width:200px;">
+          <span class="search-clear" onclick="this.previousElementSibling.value=''; this.style.display='none'; doSearch('');">&#10005;</span>
         </div>
-        <button onclick="refreshBrands()" id="refresh-brands-btn" class="btn bg" style="font-size:12px; margin-right:10px;">🔍 Refresh Brands</button>
+        <button onclick="refreshBrands()" id="refresh-brands-btn" class="btn bg" style="font-size:12px; margin-right:10px;">Refresh Brands</button>
         <div class="bell-btn" onclick="toggleRemindersPanel()"><i data-lucide="bell"></i><span class="bell-dot" id="bell-dot-leads"></span></div>
         <button class="btn bp" id="tb-add-lead" onclick="openAddLead()">+ Add Lead</button>
       </div>
   </div>
   <div style="background:var(--s1);border:1.5px solid var(--bd);border-radius:var(--r);padding:14px 18px;margin-bottom:20px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
-    <div style="font-family:'Clash Display',sans-serif;font-size:13px;font-weight:700;white-space:nowrap;">⚡ Find More</div>
+    <div style="font-family:'Clash Display',sans-serif;font-size:13px;font-weight:700;white-space:nowrap;">Find More</div>
     <input class="fi" id="leads-area-input" placeholder="Area (optional, e.g. Koramangala)" style="width:180px;" onkeydown="if(event.key==='Enter')triggerLeadsPageGen()">
     <input class="fi" id="leads-city-input" placeholder="City (optional, e.g. Bengaluru)" style="width:180px;" onkeydown="if(event.key==='Enter')triggerLeadsPageGen()">
-    <button class="btn bp" onclick="triggerLeadsPageGen()" id="leads-gen-btn">⚡ Generate More Leads</button>
+    <button class="btn bp" onclick="triggerLeadsPageGen()" id="leads-gen-btn">Generate More Leads</button>
   </div>
   <div class="card" style="margin-bottom:20px;">
     <div class="ch" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
@@ -3740,7 +4773,7 @@
     </div>
     <div class="tb-right">
       <button class="btn bg" onclick="loadPipeline()" style="display:flex;align-items:center;gap:6px;">
-        <span style="font-size:14px;">🔄</span> Refresh
+        Refresh
       </button>
       <button class="btn bp" onclick="openAddLead()">+ Add Lead</button>
     </div>
@@ -3749,22 +4782,22 @@
   <!-- PIPELINE KPI CARDS -->
   <div class="stats" id="pipe-kpis" style="margin-bottom:24px;">
     <div class="sc c1">
-      <div class="sc-ic">📊</div>
+      <div class="sc-ic" aria-hidden="true"></div>
       <div class="sc-lbl">Total Leads</div>
       <div class="sc-val" id="pkpi-total">0</div>
     </div>
     <div class="sc c2">
-      <div class="sc-ic">⚖️</div>
+      <div class="sc-ic" aria-hidden="true"></div>
       <div class="sc-lbl">Opportunity Value</div>
       <div class="sc-val" id="pkpi-val">₹0</div>
     </div>
     <div class="sc c3">
-      <div class="sc-ic">🔥</div>
+      <div class="sc-ic" aria-hidden="true"></div>
       <div class="sc-lbl">Interested / Warm</div>
       <div class="sc-val" id="pkpi-warm">0</div>
     </div>
     <div class="sc c4">
-      <div class="sc-ic">🏆</div>
+      <div class="sc-ic" aria-hidden="true"></div>
       <div class="sc-lbl">Closed Won</div>
       <div class="sc-val" id="pkpi-won">0</div>
     </div>
@@ -3780,7 +4813,7 @@
       <div class="sector-drop-btn"
         onclick="this.parentElement.querySelector('.sector-drop-content').classList.toggle('open')">
         <div style="display:flex;align-items:center;gap:10px;">
-          <span id="current-sector-icon">🔍</span>
+          <span id="current-sector-icon"></span>
           <span id="current-sector-label">All Domains</span>
         </div>
         <span class="sector-drop-arrow">▼</span>
@@ -3800,7 +4833,7 @@
 <div class="ov" id="lead-modal">
   <div class="modal">
     <div class="mh">
-      <div class="mt" id="lm-title">Add New Lead</div><button class="mc" onclick="closeM('lead-modal')">✕</button>
+      <div class="mt" id="lm-title">Add New Lead</div><button class="mc" onclick="closeM('lead-modal')">&#10005;</button>
     </div>
     <div class="mb">
       <div class="fr2">
@@ -3822,21 +4855,21 @@
       <div class="fr2">
         <div class="fg"><label class="fl">Domain</label>
           <select class="fi" id="f-domain">
-            <option value="school">🏫 Schools</option>
-            <option value="manufacturing">🏭 Manufacturing</option>
-            <option value="gym">💪 Gyms</option>
-            <option value="hospital">🏥 Hospitals</option>
-            <option value="salon">✂️ Salons</option>
+            <option value="school">Schools</option>
+            <option value="manufacturing">Manufacturing</option>
+            <option value="gym">Gyms</option>
+            <option value="hospital">Hospitals</option>
+            <option value="salon">Salons</option>
           </select>
         </div>
         <div class="fg"><label class="fl">Status</label>
           <select class="fi" id="f-status">
-            <option value="new">🔵 New</option>
-            <option value="contacted">🟠 Contacted</option>
-            <option value="interested">🟡 Interested</option>
-            <option value="proposal">🟣 Proposal Sent</option>
-            <option value="won">🟢 Won</option>
-            <option value="lost">🔴 Lost</option>
+            <option value="new">New</option>
+            <option value="contacted">Contacted</option>
+            <option value="interested">Interested</option>
+            <option value="proposal">Proposal Sent</option>
+            <option value="won">Won</option>
+            <option value="lost">Lost</option>
           </select>
         </div>
       </div>
@@ -3857,7 +4890,7 @@
 <div class="ov" id="team-modal">
   <div class="modal">
     <div class="mh">
-      <div class="mt">Add Team Member</div><button class="mc" onclick="closeM('team-modal')">✕</button>
+      <div class="mt">Add Team Member</div><button class="mc" onclick="closeM('team-modal')">&#10005;</button>
     </div>
     <div class="mb">
       <div class="fr2">
@@ -3919,7 +4952,7 @@
           </div>
         </div>
       </div>
-      <button class="mc" style="align-self:flex-start" onclick="closeM('td-modal')">✕</button>
+      <button class="mc" style="align-self:flex-start" onclick="closeM('td-modal')">&#10005;</button>
     </div>
     <div class="mb">
       <div
@@ -3934,14 +4967,14 @@
 <div class="ov" id="wh-modal">
   <div class="modal">
     <div class="mh">
-      <div class="mt">🔗 n8n Webhook Setup</div><button class="mc" onclick="closeM('wh-modal')">✕</button>
+      <div class="mt">n8n Webhook Setup</div><button class="mc" onclick="closeM('wh-modal')">&#10005;</button>
     </div>
     <div class="mb">
       <div class="fg">
         <label class="fl">Webhook URL (paste in n8n HTTP Request node)</label>
         <div class="wurl" style="border-radius:9px;padding:10px 13px;border:1.5px solid var(--bd);">
           <input type="text" value="http://localhost:3001/webhook/leads" readonly style="font-size:12px;" id="wh-ep">
-          <button class="cpbtn" onclick="cpEl('wh-ep')">📋</button>
+          <button class="cpbtn" onclick="cpEl('wh-ep')">Copy</button>
         </div>
       </div>
       <div
@@ -3955,7 +4988,7 @@
           style="color:var(--a3);background:var(--s3);padding:4px 8px;border-radius:4px;display:block;margin-top:4px;font-size:11px;">{"school_name":"{{$json.school_name}}","address":"{{$json.address}}","phone":"{{$json.phone}}","website":"{{$json.website}}","rating":"{{$json.rating}}","reviews":"{{$json.reviews}}"}</code>
       </div>
     </div>
-    <div class="mf"><button class="btn bp" onclick="closeM('wh-modal')">Got it ✓</button></div>
+    <div class="mf"><button class="btn bp" onclick="closeM('wh-modal')">Got it</button></div>
   </div>
 </div>
 
@@ -3963,7 +4996,7 @@
 <div class="ov" id="pitch-modal">
   <div class="modal">
     <div class="mh">
-      <div class="mt">🤖 Exora Sales AI Report</div><button class="mc" onclick="closeM('pitch-modal')">✕</button>
+      <div class="mt">Exora Sales AI Report</div><button class="mc" onclick="closeM('pitch-modal')">&#10005;</button>
     </div>
     <div class="mb"
       style="max-height:60vh;overflow-y:auto;white-space:pre-wrap;font-family:monospace;font-size:12px;color:var(--tx2);background:var(--s2);padding:16px;border-radius:8px;line-height:1.6;"
@@ -3975,56 +5008,26 @@
 <div class="page-section show-back" id="addsp-page">
   <div class="topbar">
     <div style="display:flex; align-items:center;">
-      <button class="back-btn" onclick="showAdminPage('dashboard',document.getElementById('nav-dash'))">←</button>
-      <button class="hb-btn" onclick="toggleMSB()"
-        style="background:var(--s3); border:1px solid var(--acc); color:var(--acc); box-shadow:0 0 10px rgba(37,99,235,0.2);">
-        <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2.5" fill="none"
-          stroke-linecap="round" stroke-linejoin="round">
-          <line x1="3" y1="12" x2="21" y2="12"></line>
-          <line x1="3" y1="6" x2="21" y2="6"></line>
-          <line x1="3" y1="18" x2="21" y2="18"></line>
-        </svg>
-      </button>
-      <div class="page-title">Add Sales Person</div>
-      <div style="font-size:12px;color:var(--tx3);margin-top:2px;">Register a new sales team member</div>
+      <button class="back-btn" onclick="showAdminPage('dashboard',document.getElementById('nav-dash'))">&#8592;</button>
+      <div style="display:flex; flex-direction:column; margin-left:12px;">
+        <div class="page-title">People</div>
+        <div class="ps">Accounts are managed in Nomi</div>
+      </div>
     </div>
   </div>
-  <div class="asp-card">
-    <div class="asp-title">New Sales Person Registration</div>
-    <div class="fr2">
-      <div class="fg"><label class="fl">FIRST NAME</label><input class="fi" id="asp-fname" placeholder="Arjun"></div>
-      <div class="fg"><label class="fl">LAST NAME</label><input class="fi" id="asp-lname" placeholder="Sharma"></div>
-    </div>
-    <div class="fg"><label class="fl">EMAIL ADDRESS</label><input class="fi" id="asp-email" type="email"
-        placeholder="arjun@leadflow.com"></div>
-    <div class="fg"><label class="fl">PHONE NUMBER</label><input class="fi" id="asp-phone"
-        placeholder="+91 98765 43210"></div>
-    <div class="fr2">
-      <div class="fg"><label class="fl">PASSWORD</label><input class="fi" id="asp-pass" type="password"
-          placeholder="••••••••"></div>
-      <div class="fg"><label class="fl">TERRITORY</label><input class="fi" id="asp-territory"
-          placeholder="Bengaluru North"></div>
-    </div>
-    <div class="fr2">
-      <div class="fg"><label class="fl">COLOR</label><select class="fs" id="asp-color">
-          <option value="#5b6af7">Blue</option>
-          <option value="#f25b7e">Pink</option>
-          <option value="#1de9a0">Green</option>
-          <option value="#f5a623">Orange</option>
-          <option value="#3ecfff">Cyan</option>
-        </select></div>
-    </div>
-    <div id="asp-err"
-      style="display:none;background:rgba(242,91,126,0.1);border:1px solid rgba(242,91,126,0.25);border-radius:8px;padding:9px 13px;font-size:12.5px;color:var(--a2);margin-bottom:12px;">
-    </div>
-    <div style="display:flex;gap:10px;margin-top:6px;">
-      <button class="btn bg" onclick="showAdminPage('dashboard',document.getElementById('nav-dash'))">Cancel</button>
-      <button class="btn bp" id="asp-btn" onclick="registerSP()">Create Account &amp; Assign Leads →</button>
-    </div>
+  <div class="card notice">
+    <div class="notice-label">Directory</div>
+    <p class="notice-body">Everyone who can sign in to this CRM comes from
+      <strong>Nomi</strong>. Add a person there and they appear here within the
+      hour, with the password they already use and the role their Nomi
+      organisation membership gives them &mdash; an <strong>admin</strong> in
+      Nomi is an admin here, a <strong>member</strong> is a salesperson.</p>
+    <p class="notice-body">Removing someone in Nomi disables their access here
+      on the next sync, while leaving their calls, notes and activity intact.</p>
+    <p class="notice-meta">Sync runs hourly &middot; scripts/sync-nomi-users.js</p>
   </div>
 </div>
 
-<!-- ASSIGN LEADS PAGE -->
 <div class="page-section show-back" id="assignleads-page">
   <div class="topbar">
     <div style="display:flex; align-items:center;">
@@ -4045,8 +5048,8 @@
     </div>
     <div class="tb-right">
       <button class="btn bg" onclick="showAdminPage('team',document.getElementById('nav-team'))">Skip</button>
-      <button class="btn bp" id="assign-all-btn" onclick="assignAllLeads()" style="margin-left: 10px; background: rgba(37,99,235,0.08); border: 1.5px solid rgba(37,99,235,0.3); color: var(--acc); box-shadow: 0 4px 15px rgba(37,99,235,0.1);">⚡ Assign All</button>
-      <button class="btn bp" id="assign-submit-btn" onclick="submitAssignLeads()" style="margin-left: 10px;">✓ Submit Assignment</button>
+      <button class="btn bp" id="assign-all-btn" onclick="assignAllLeads()" style="margin-left: 10px; background: rgba(37,99,235,0.08); border: 1.5px solid rgba(37,99,235,0.3); color: var(--acc); box-shadow: 0 4px 15px rgba(37,99,235,0.1);">Assign All</button>
+      <button class="btn bp" id="assign-submit-btn" onclick="submitAssignLeads()" style="margin-left: 10px;">Submit assignment</button>
     </div>
   </div>
   <div class="alp-assignee" id="alp-assignee"></div>
@@ -4089,11 +5092,11 @@
         </svg>
       </button>
       <div style="display:flex; flex-direction:column; margin-left:12px;">
-        <div class="page-title">⚡ Score Engine Settings</div>
+        <div class="page-title">Score Engine Settings</div>
         <div style="font-size:12px;color:var(--tx3);margin-top:2px;">Scoring rules are saved in your database</div>
       </div>
     </div>
-    <button class="btn bp" onclick="loadScoreSettings()" style="font-size:12px;">🔄 Refresh</button>
+    <button class="btn bp" onclick="loadScoreSettings()" style="font-size:12px;">Refresh</button>
   </div>
   <div class="score-grid" style="padding:20px; gap:18px;">
     <!-- BASE SCORE CARD -->
@@ -4115,9 +5118,8 @@
     </div>
   </div>
   <!-- Detection method explainer -->
-  <div
-    style="margin:0 20px 20px;background:rgba(91,106,247,0.06);border:1.5px solid rgba(91,106,247,0.2);border-radius:var(--r);padding:18px;">
-    <div style="font-size:11px;font-weight:700;color:var(--acc);margin-bottom:10px;">🔍 HOW GAP DETECTION WORKS</div>
+  <div class="card explainer">
+    <div class="notice-label">How gap detection works</div>
     <div class="how-it-works-grid" style="gap:12px;">
       <div style="font-size:11.5px;color:var(--tx2);"><strong style="color:var(--tx);">CRM / Enquiry</strong><br>Scans
         for HubSpot, LeadSquared, Zoho, Meritto scripts in webpage code</div>
@@ -4137,7 +5139,7 @@
           Attendance</strong><br>Detects Fedena, Entab, MyClassboard, SchoolPad</div>
     </div>
     <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(91,106,247,0.15);font-size:11px;color:var(--tx3);">
-      ⚠️ <strong>Limitation:</strong> Only the direct public website is scanned. If a tool is used internally (separate app/portal not embedded in the website), it won't be detected. Gap = "not found on website" not "doesn't exist".
+      <strong>Limitation:</strong> Only the direct public website is scanned. If a tool is used internally (separate app/portal not embedded in the website), it won't be detected. Gap = "not found on website" not "doesn't exist".
     </div>
   </div>
 </div>
@@ -4157,8 +5159,8 @@
         </svg>
       </button>
       <div style="display:flex; flex-direction:column; margin-left:12px;">
-        <div class="page-title">Admin Settings</div>
-        <div style="font-size:12px;color:var(--tx3);margin-top:2px;">Update your credentials</div>
+        <div class="page-title">Account</div>
+        <div class="ps">Your details, as held in Nomi</div>
       </div>
     </div>
   </div>
@@ -4235,31 +5237,31 @@
   </div>
   <div class="sp-stats">
     <div class="sc c1">
-      <div class="sc-ic">📋</div>
+      <div class="sc-ic" aria-hidden="true"></div>
       <div class="sc-lbl">My Leads</div>
       <div class="sc-val" id="sp-s1">—</div>
       <div class="sc-sub">assigned to me</div>
     </div>
     <div class="sc c2">
-      <div class="sc-ic">⏳</div>
+      <div class="sc-ic" aria-hidden="true"></div>
       <div class="sc-lbl">Active</div>
       <div class="sc-val" id="sp-s2">—</div>
       <div class="sc-sub">new & contacted</div>
     </div>
     <div class="sc c3">
-      <div class="sc-ic">🟡</div>
+      <div class="sc-ic" aria-hidden="true"></div>
       <div class="sc-lbl">Interested</div>
       <div class="sc-val" id="sp-s3">—</div>
       <div class="sc-sub">potential leads</div>
     </div>
     <div class="sc c4">
-      <div class="sc-ic">🏆</div>
+      <div class="sc-ic" aria-hidden="true"></div>
       <div class="sc-lbl">Won</div>
       <div class="sc-val" id="sp-s4">—</div>
       <div class="sc-sub">successfully won</div>
     </div>
     <div class="sc c5" style="background:rgba(242,91,126,0.08); border-color:rgba(242,91,126,0.2);">
-      <div class="sc-ic">🔔</div>
+      <div class="sc-ic" aria-hidden="true"></div>
       <div class="sc-lbl" style="color:var(--a2)">Reminders Today</div>
       <div class="sc-val" id="sp-s5" style="color:var(--a2)">0</div>
       <div class="sc-sub">due for follow-up</div>
@@ -4284,8 +5286,7 @@
     <!-- DOMAIN GENERATOR WIDGET (SP) -->
     <div
       style="background:var(--s1);border:1.5px solid var(--bd);border-radius:var(--r);padding:18px 22px;margin: 10px 20px 20px;">
-      <div style="font-family:'Clash Display',sans-serif;font-size:15px;font-weight:700;margin-bottom:14px;">⚡
-        Generate Leads for a Domain</div>
+      <div style="font-family:'Clash Display',sans-serif;font-size:15px;font-weight:700;margin-bottom:14px;">Generate Leads for a Domain</div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
         <input class="fi" id="sp-domain-search-input" placeholder="e.g. Auditing Companies, Fitness Gyms..."
           style="flex:1;min-width:220px;" onkeydown="if(event.key==='Enter')generateDomainLeads('sp')">
@@ -4293,7 +5294,7 @@
           style="width:180px;" onkeydown="if(event.key==='Enter')generateDomainLeads('sp')">
         <input class="fi" id="sp-domain-city-input" placeholder="City (optional, e.g. Bengaluru)"
           style="width:180px;" onkeydown="if(event.key==='Enter')generateDomainLeads('sp')">
-        <button class="btn bp" onclick="generateDomainLeads('sp')" id="sp-domain-gen-btn">⚡ Generate Leads</button>
+        <button class="btn bp" onclick="generateDomainLeads('sp')" id="sp-domain-gen-btn">Generate Leads</button>
       </div>
 
     </div>
@@ -4327,8 +5328,8 @@
         <i data-lucide="bell"></i> <span class="bell-dot" id="sp-bell-dot"></span>
       </div>
       <div class="search-wrap">
-        <input class="search" type="text" placeholder="🔍 Search leads..." oninput="spSearch(this.value); this.nextElementSibling.style.display = this.value ? 'block' : 'none';">
-        <span class="search-clear" onclick="this.previousElementSibling.value=''; this.style.display='none'; spSearch('');">✕</span>
+        <input class="search" type="text" placeholder="Search leads" oninput="spSearch(this.value); this.nextElementSibling.style.display = this.value ? 'block' : 'none';">
+        <span class="search-clear" onclick="this.previousElementSibling.value=''; this.style.display='none'; spSearch('');">&#10005;</span>
       </div>
     </div>
   </div>
@@ -4358,7 +5359,7 @@
       </table>
     </div>
     <div id="sp-rescore-wrap" style="padding:15px;border-top:1px solid var(--bd);text-align:right;display:none;">
-      <button class="btn bg" style="font-size:12px;" onclick="rescoreSector('sp')">🔄 Re-score this Sector</button>
+      <button class="btn bg" style="font-size:12px;" onclick="rescoreSector('sp')">Re-score this Sector</button>
     </div>
   </div>
 </div>
@@ -4376,16 +5377,16 @@
         <select id="lp-status-select" class="badge bn"
           style="background:var(--s2); border:1.5px solid var(--bd); padding:4px 8px; border-radius:6px; cursor:pointer;"
           onchange="updStatus(currentPanelLeadId, this.value, this)">
-          <option value="new">🔵 New</option>
-          <option value="contacted">🟠 Contacted</option>
-          <option value="interested">🟡 Interested</option>
-          <option value="proposal">🟣 Proposal Sent</option>
-          <option value="won">🟢 Won</option>
-          <option value="lost">🔴 Lost</option>
+          <option value="new">New</option>
+          <option value="contacted">Contacted</option>
+          <option value="interested">Interested</option>
+          <option value="proposal">Proposal Sent</option>
+          <option value="won">Won</option>
+          <option value="lost">Lost</option>
         </select>
       </div>
     </div>
-    <button class="lp-close" onclick="closeLeadPanel()">✕</button>
+    <button class="lp-close" onclick="closeLeadPanel()">&#10005;</button>
   </div>
   <div class="lp-tabs">
     <div class="lp-tab active" id="lp-tab-log" onclick="switchLPTab('log')" style="display:none !important;"><i
@@ -4404,7 +5405,7 @@
   <div class="lp-body">
     <!-- PITCH PANE -->
     <div class="lp-pane" id="lp-pane-pitch" style="padding:20px;">
-      <div class="lp-sec-title">🤖 AI Sales Pitch Report</div>
+      <div class="lp-sec-title">AI Sales Pitch Report</div>
       <div id="lp-pitch-content" style="margin-top:12px;"></div>
     </div>
     <!-- LOG CALL -->
@@ -4415,12 +5416,12 @@
           <div class="lp-fg">
             <label class="lp-label">OUTCOME</label>
             <select class="lp-select" id="lp-outcome">
-              <option value="interested">✅ Interested</option>
-              <option value="callback">🔄 Call Back Later</option>
-              <option value="no_answer" selected>📵 No Answer</option>
-              <option value="voicemail">📼 Left Voicemail</option>
-              <option value="not_interested">❌ Not Interested</option>
-              <option value="closed">🎯 Deal Closed!</option>
+              <option value="interested">Interested</option>
+              <option value="callback">Call Back Later</option>
+              <option value="no_answer" selected>No Answer</option>
+              <option value="voicemail">Left Voicemail</option>
+              <option value="not_interested">Not Interested</option>
+              <option value="closed">Deal Closed</option>
             </select>
           </div>
           <div class="lp-fg">
@@ -4437,7 +5438,7 @@
           <label class="lp-label">NEXT FOLLOW-UP DATE</label>
           <input class="lp-input" id="lp-followup" type="date">
         </div>
-        <button class="lp-btn" id="lp-log-btn" onclick="logCall()">📞 Save Call Log</button>
+        <button class="lp-btn" id="lp-log-btn" onclick="logCall()">Save Call Log</button>
       </div>
     </div>
     <!-- CALL HISTORY -->
@@ -4454,7 +5455,7 @@
         <div class="lp-fg">
           <textarea class="lp-textarea" id="lp-note-text" placeholder="Type your note here..."></textarea>
         </div>
-        <button class="lp-btn" id="lp-note-btn" onclick="addNote()">📝 Save Note</button>
+        <button class="lp-btn" id="lp-note-btn" onclick="addNote()">Save Note</button>
       </div>
       <div class="lp-sec-title">Previous Notes</div>
       <div id="lp-notes-list">
@@ -4473,7 +5474,7 @@
           <label class="lp-label">REMINDER NOTE</label>
           <textarea class="lp-textarea" id="lp-remind-note" placeholder="What should we remind you about?"></textarea>
         </div>
-        <button class="lp-btn bp" id="lp-remind-btn" onclick="saveReminder()">🔔 Save Reminder</button>
+        <button class="lp-btn bp" id="lp-remind-btn" onclick="saveReminder()">Save Reminder</button>
       </div>
       <div class="lp-sec-title">Reminders for this Lead</div>
       <div id="lp-remind-list">
@@ -4491,7 +5492,7 @@
       <div class="lp-school-name">Today's Reminders</div>
       <div class="lp-school-meta">Tasks and follow-ups scheduled for today</div>
     </div>
-    <button class="lp-close" onclick="toggleRemindersPanel()">✕</button>
+    <button class="lp-close" onclick="toggleRemindersPanel()">&#10005;</button>
   </div>
   <div class="lp-body">
     <div id="today-rem-list" style="padding:15px;">
@@ -4527,17 +5528,17 @@
   // ── Website column helper ─────────────────────────────────
   function locationLine(l) {
     const loc = [l.area, l.city].filter(v => v && v.trim()).join(', ');
-    return loc ? `<div class="sa" style="color:var(--tx3);">📍 ${loc}</div>` : '';
+    return loc ? `<div class="sa" style="color:var(--tx3);">${loc}</div>` : '';
   }
   function websiteCell(l) {
     const w = (l.website && l.website.trim() && l.website !== 'undefined' && l.website !== 'null') ? l.website : '';
     if (!w) {
       return '<span style="color:var(--tx3);font-size:11px;">— No Website</span>';
     }
-    const visitLink = `<a href="${w}" target="_blank" class="wb-link" title="${w}" style="white-space:nowrap;">🌐 Visit Site</a>`;
+    const visitLink = `<a href="${w}" target="_blank" class="wb-link" title="${w}" style="white-space:nowrap;">Visit Site</a>`;
     if (l.website_status === 'broken') {
       return `<div style="display:flex;flex-direction:column;gap:3px;">`
-        + `<span style="background:rgba(242,91,126,0.12);color:var(--a2);padding:2px 7px;border-radius:20px;font-size:10.5px;font-weight:700;white-space:nowrap;">⚠️ Broken</span>`
+        + `<span style="background:rgba(242,91,126,0.12);color:var(--a2);padding:2px 7px;border-radius:20px;font-size:10.5px;font-weight:700;white-space:nowrap;">Broken</span>`
         + visitLink
         + `</div>`;
     }
@@ -4582,7 +5583,7 @@
         const isSelected = currentDomain === d.id;
         const normId = String(d.id).toLowerCase().replace(/s$/, '');
         const count = domainCounts[normId] || domainCounts[String(d.id).toLowerCase()] || 0;
-        const delBtn = d.id !== 'school' ? `<span class="ni-del" title="Delete Sector" onclick="event.stopPropagation();deleteDomain('${d.id}')">✕</span>` : '';
+        const delBtn = d.id !== 'school' ? `<span class="ni-del" title="Delete Sector" onclick="event.stopPropagation();deleteDomain('${d.id}')">&#10005;</span>` : '';
         return `<div class="ni ${isSelected ? 'active' : ''}" id="nav-leads-${d.id}" onclick="showAdminPage('leads', this, '${d.id}')">
             <div style="display:flex;align-items:center;gap:9px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
               <span class="ni-ic">${icon(d.icon)}</span>${d.label}
@@ -4657,12 +5658,12 @@
   async function deleteDomain(domainId) {
     if (domainId === 'school') return;
 
-    const confirmed = confirm(`Are you sure you want to delete the "${domainId}" sector? \n\n⚠️ This will also delete ALL leads associated with this sector.`);
+    const confirmed = confirm(`Are you sure you want to delete the "${domainId}" sector? \n\nThis will also delete ALL leads associated with this sector.`);
     if (!confirmed) return;
 
     try {
       await del(`/domains/${domainId}`);
-      toast(`🗑️ Sector and its leads deleted.`, 'success');
+      toast(`Sector and its leads deleted.`, 'success');
 
       // Remove from local list
       domains = domains.filter(d => d.id !== domainId);
@@ -4732,7 +5733,11 @@
 
     try {
       // Run dedup first to clean up any messy data
-      await post('/leads/dedup', {}, true).catch(err => console.log('Dedup pre-run err:', err));
+      // Admin-only: hard-deletes duplicate rows table-wide, so a
+      // salesperson's generate run skips it rather than eating a 403.
+      if (currentUser.role === 'admin') {
+        await post('/leads/dedup', {}, true).catch(err => console.log('Dedup pre-run err:', err));
+      }
 
       // 1. Create domain in DB
       const res = await post('/domains', {
@@ -4761,7 +5766,7 @@
         area, city
       }, true).catch(err => console.log('n8n trigger err:', err));
 
-      toast(`🚀 Searching for ${label}s${locationLabel ? ' in ' + locationLabel : ''}...`, 'info');
+      toast(`Searching for ${label}s${locationLabel ? ' in ' + locationLabel : ''}...`, 'info');
       input.value = '';
       if (areaEl) areaEl.value = '';
       if (cityEl) cityEl.value = '';
@@ -4774,18 +5779,20 @@
 
       const p = result.pipeline || {};
       const parts = [`${p.scraped || 0} saved`];
+      if (p.assigned) parts.push(`${p.assigned} assigned to you`);
+      if (p.outside_area) parts.push(`${p.outside_area} just outside the area`);
       if (p.skipped) parts.push(`${p.skipped} duplicate`);
-      if (p.rejected) parts.push(`${p.rejected} rejected (location mismatch)`);
+      if (p.rejected) parts.push(`${p.rejected} in a different city`);
       if (p.errors) parts.push(`${p.errors} errors`);
       const tone = (p.scraped || 0) > 0 ? 'success' : ((p.rejected || 0) || (p.errors || 0) ? 'error' : 'info');
-      toast(`✅ ${label}s search complete — ${parts.join(', ')}`, tone);
+      toast(`${label}s search complete — ${parts.join(', ')}`, tone);
 
     } catch (e) {
       toast('Search failed: ' + e.message, 'error');
     } finally {
       domainGenInFlight = false;
       btn.disabled = false;
-      btn.innerHTML = '⚡ Generate Leads';
+      btn.innerHTML = 'Generate Leads';
     }
   }
 
@@ -4806,7 +5813,11 @@
 
     try {
       // Run dedup first
-      await post('/leads/dedup', {}, true).catch(err => console.log('Dedup pre-run err:', err));
+      // Admin-only: hard-deletes duplicate rows table-wide, so a
+      // salesperson's generate run skips it rather than eating a 403.
+      if (currentUser.role === 'admin') {
+        await post('/leads/dedup', {}, true).catch(err => console.log('Dedup pre-run err:', err));
+      }
       post('/trigger-n8n', {
         generated_by_name: currentUser.name,
         custom_query: d.query,
@@ -4814,7 +5825,7 @@
         area, city
       }, true).catch(err => console.log('n8n trigger err:', err));
 
-      toast(`🚀 Searching for more ${d.label}${locationLabel ? ' in ' + locationLabel : ''}...`, 'info');
+      toast(`Searching for more ${d.label}${locationLabel ? ' in ' + locationLabel : ''}...`, 'info');
 
       const result = await post('/trigger-all', { query: d.query, domain: d.id, area, city }, true);
       if (currentUser.role === 'admin') await loadAdminData();
@@ -4822,11 +5833,13 @@
 
       const p = result.pipeline || {};
       const parts = [`${p.scraped || 0} saved`];
+      if (p.assigned) parts.push(`${p.assigned} assigned to you`);
+      if (p.outside_area) parts.push(`${p.outside_area} just outside the area`);
       if (p.skipped) parts.push(`${p.skipped} duplicate`);
-      if (p.rejected) parts.push(`${p.rejected} rejected (location mismatch)`);
+      if (p.rejected) parts.push(`${p.rejected} in a different city`);
       if (p.errors) parts.push(`${p.errors} errors`);
       const tone = (p.scraped || 0) > 0 ? 'success' : ((p.rejected || 0) || (p.errors || 0) ? 'error' : 'info');
-      toast(`✅ ${d.label} search complete — ${parts.join(', ')}`, tone);
+      toast(`${d.label} search complete — ${parts.join(', ')}`, tone);
 
     } catch (e) {
       toast('Search failed: ' + e.message, 'error');
@@ -4847,13 +5860,13 @@
 
     try {
       const sectorLeads = (role === 'admin' ? leads : spLeads).filter(l => (l.domain || 'school') === currentDomain);
-      toast(`🔄 Rescoring ${sectorLeads.length} leads...`, 'info');
+      toast(`Rescoring ${sectorLeads.length} leads...`, 'info');
 
       for (const l of sectorLeads) {
         await post(`/leads/${l.id}/score`, {}, true);
       }
 
-      toast(`✅ Successfully updated ${sectorLeads.length} leads!`, 'success');
+      toast(`Successfully updated ${sectorLeads.length} leads!`, 'success');
       if (role === 'admin') await loadAdminData(); else await loadSPData();
     } catch (e) {
       toast('Error: ' + e.message, 'error');
@@ -4867,9 +5880,9 @@
     // Admin
     const c1 = document.getElementById('prospects-filter-list');
     if (c1) {
-      let h1 = `<div class="ni" onclick="showAdminPage('prospects', this, 'all')"><span class="ni-ic">📋</span>All</div>`;
+      let h1 = `<div class="ni" onclick="showAdminPage('prospects', this, 'all')">All</div>`;
       statuses.forEach(s => {
-        const icon = s === 'new' ? '🔵' : s === 'contacted' ? '🟠' : s === 'qualified' ? '🟢' : '🔴';
+        const icon = `<span class="stat-sq" style="background:${s === 'new' ? 'var(--a5)' : s === 'contacted' ? 'var(--a4)' : s === 'qualified' ? 'var(--a3)' : 'var(--a2)'}"></span>`;
         h1 += `<div class="ni" onclick="showAdminPage('prospects', this, '${s}')"><span class="ni-ic">${icon}</span>${s.charAt(0).toUpperCase() + s.slice(1)}</div>`;
       });
       c1.innerHTML = h1;
@@ -4877,9 +5890,9 @@
     // Sales Person
     const c2 = document.getElementById('sp-prospects-filter-list');
     if (c2) {
-      let h2 = `<div class="ni" onclick="showSPPage('prospects', this, 'all')"><span class="ni-ic">📋</span>All</div>`;
+      let h2 = `<div class="ni" onclick="showSPPage('prospects', this, 'all')">All</div>`;
       statuses.forEach(s => {
-        const icon = s === 'new' ? '🔵' : s === 'contacted' ? '🟠' : s === 'qualified' ? '🟢' : '🔴';
+        const icon = `<span class="stat-sq" style="background:${s === 'new' ? 'var(--a5)' : s === 'contacted' ? 'var(--a4)' : s === 'qualified' ? 'var(--a3)' : 'var(--a2)'}"></span>`;
         h2 += `<div class="ni" onclick="showSPPage('prospects', this, '${s}')"><span class="ni-ic">${icon}</span>${s.charAt(0).toUpperCase() + s.slice(1)}</div>`;
       });
       c2.innerHTML = h2;
@@ -5042,7 +6055,7 @@
     } catch (e) {
       document.getElementById('srv-badge').className = 'srv-status srv-err';
       document.getElementById('srv-badge').textContent = '● Server Offline';
-      toast('⚠️ Backend offline — run: node server.js', 'error');
+      toast('Backend offline — run: node server.js', 'error');
       return;
     }
 
@@ -5161,7 +6174,7 @@
         throw new Error(data.error || 'Failed to update credentials');
       }
 
-      toast('✅ Credentials updated successfully!', 'success');
+      toast('Credentials updated successfully!', 'success');
 
       // Update local session
       saveAuth(data.token, data.user);
@@ -5235,7 +6248,7 @@
     const bc = { new: 'bn', contacted: 'bc', interested: 'bi', proposal: 'bp', won: 'bw', lost: 'bl' };
     const el = document.getElementById('sp-activity');
     if (!spLeads.length) { el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--tx3);font-size:13px;">No leads assigned yet. Contact your admin.</div>'; return; }
-    el.innerHTML = spLeads.slice(0, 8).map(l => `<div class="act-item"><div class="act-lft"><h4>${l.school_name || '—'}</h4><p>${l.address || l.phone || '—'}</p><div class="act-meta">${l.phone ? '📞 ' + l.phone : ''}${l.rating ? ' ⭐ ' + l.rating : ''} ${l.website ? `<a class="wb-link" href="${l.website}" target="_blank">🌐 Visit</a>` : ''}</div></div><span class="badge ${bc[l.status] || 'bn'}">${l.status}</span></div>`).join('');
+    el.innerHTML = spLeads.slice(0, 8).map(l => `<div class="act-item"><div class="act-lft"><h4>${l.school_name || '—'}</h4><p>${l.address || l.phone || '—'}</p><div class="act-meta">${l.phone ? l.phone : ''}${l.rating ? ' · ' + l.rating : ''} ${l.website ? `<a class="wb-link" href="${l.website}" target="_blank">Visit</a>` : ''}</div></div><span class="badge ${bc[l.status] || 'bn'}">${l.status}</span></div>`).join('');
   }
 
   function getSpFiltered() {
@@ -5329,20 +6342,20 @@
     if (!leadsArray.length) { tb.innerHTML = '<tr class="empty"><td colspan="7">No leads found.</td></tr>'; return; }
     const bc = { new: 'bn', contacted: 'bc', interested: 'bi', proposal: 'bp', won: 'bw', lost: 'bl' };
     tb.innerHTML = leadsArray.map(l => `<tr>
-    <td><div class="sn">${l.school_name || '—'}</div><div class="sa">${l.address || ''}</div>${locationLine(l)}<div style="margin-top:6px;">${l.pitch ? `<a class="wb-link" style="cursor:pointer;white-space:nowrap;" onclick="showPitch(${l.id})">🤖 View Pitch</a>` : `<a class="wb-link" style="cursor:pointer;white-space:nowrap;color:var(--tx3);" onclick="spGeneratePitch(${l.id}, this)">⚡ Generate Pitch</a>`}</div></td>
+    <td><div class="sn">${l.school_name || '—'}</div><div class="sa">${l.address || ''}</div>${locationLine(l)}<div style="margin-top:6px;">${l.pitch ? `<a class="wb-link" style="cursor:pointer;white-space:nowrap;" onclick="showPitch(${l.id})">View Pitch</a>` : `<a class="wb-link" style="cursor:pointer;white-space:nowrap;color:var(--tx3);" onclick="spGeneratePitch(${l.id}, this)">Generate Pitch</a>`}</div></td>
     <td><div style="font-size:12px;color:var(--tx2);white-space:nowrap;">${(l.phone && l.phone.trim() && l.phone !== 'undefined' && l.phone !== 'null') ? l.phone : '—'}</div></td>
     <td style="white-space:nowrap;">${websiteCell(l)}</td>
-    <td><div style="color:var(--a4);font-size:12.5px;">${l.rating || '—'} ⭐</div></td>
-    <td><div style="display:flex;align-items:center;gap:12px;"><div class="score-pill"><strong>${l.score || 0}</strong> /100</div><div style="font-size:14px;">${l.priority == '🔥 high' ? '🔥' : l.priority == '⚡ medium' ? '⚡' : '📋'}</div></div></td>
+    <td><div class="rating-cell" style="font-size:12.5px;">${l.rating || '—'}</div></td>
+    <td><div style="display:flex;align-items:center;gap:12px;"><div class="score-pill"><strong>${l.score || 0}</strong> /100</div><div style="font-size:14px;">${l.priority === 'high' ? 'HIGH' : l.priority === 'medium' ? 'MED' : 'LOW'}</div></div></td>
     <td><select class="badge ${bc[l.status] || 'bn'}" onchange="spUpdStatus(${l.id},this.value,this)" style="background:none;border:none;cursor:pointer;color:inherit;font-weight:700;">
-      <option value="new" ${l.status === 'new' ? 'selected' : ''}>🔵 New</option>
-      <option value="contacted" ${l.status === 'contacted' ? 'selected' : ''}>🟠 Contacted</option>
-      <option value="interested" ${l.status === 'interested' ? 'selected' : ''}>🟡 Interested</option>
-      <option value="proposal" ${l.status === 'proposal' ? 'selected' : ''}>🟣 Proposal Sent</option>
-      <option value="won" ${l.status === 'won' ? 'selected' : ''}>🟢 Won</option>
-      <option value="lost" ${l.status === 'lost' ? 'selected' : ''}>🔴 Lost</option>
+      <option value="new" ${l.status === 'new' ? 'selected' : ''}>New</option>
+      <option value="contacted" ${l.status === 'contacted' ? 'selected' : ''}>Contacted</option>
+      <option value="interested" ${l.status === 'interested' ? 'selected' : ''}>Interested</option>
+      <option value="proposal" ${l.status === 'proposal' ? 'selected' : ''}>Proposal Sent</option>
+      <option value="won" ${l.status === 'won' ? 'selected' : ''}>Won</option>
+      <option value="lost" ${l.status === 'lost' ? 'selected' : ''}>Lost</option>
     </select></td>
-    <td><div class="abts"><button class="ib view-details" onclick="openLeadPanel(${l.id})" title="Calls &amp; Notes">📋 Details</button><button class="ib" onclick="spEditLead(${l.id})" title="Edit">✏️</button></div></td>
+    <td><div class="abts"><button class="ib view-details" onclick="openLeadPanel(${l.id})" title="Calls &amp; Notes">Details</button><button class="ib" onclick="spEditLead(${l.id})" title="Edit">Edit</button></div></td>
   </tr>`).join('');
 
   }
@@ -5486,7 +6499,7 @@
       const res = await post('/auth/register', { name: fname + ' ' + lname, email, password: pass, phone, territory, color }, true);
       pendingNewSP = res.team;
       team.push(res.team);
-      toast('✅ Sales person account created!', 'success');
+      toast('Sales person account created!', 'success');
       // Clear form
       ['asp-fname', 'asp-lname', 'asp-email', 'asp-phone', 'asp-pass', 'asp-territory'].forEach(id => document.getElementById(id).value = '');
       showAssignLeadsPage(res.team);
@@ -5557,11 +6570,11 @@
         const isSel = alpSelectedIds.includes(l.id);
         const assignedTo = l.assigned_id ? team.find(t => t.id === l.assigned_id) : null;
         const dStr = fd(l.assigned_at);
-        const assInfo = assignedTo ? `<div style="font-size:10.5px;color:${assignedTo.color};margin-top:4px;background:${assignedTo.color}10;padding:3px 8px;border-radius:4px;display:inline-block;border:1px solid ${assignedTo.color}20;">📅 ${assignedTo.name} · ${dStr}</div>` : '';
+        const assInfo = assignedTo ? `<div style="font-size:10.5px;color:${assignedTo.color};margin-top:4px;background:${assignedTo.color}10;padding:3px 8px;border-radius:4px;display:inline-block;border:1px solid ${assignedTo.color}20;">${assignedTo.name} · ${dStr}</div>` : '';
         const qBtn = (!l.assigned_id && sp) ? `<button class="btn bp" style="height:28px; padding:0 12px; font-size:11px; border-radius:6px; box-shadow:0 4px 12px var(--acc)30; white-space:nowrap;" onclick="quickAssign(${l.id}, event)">Assign Now</button>` : '';
         return `<div class="lead-cb-row ${isSel ? 'sel' : ''}" id="alp-r-${l.id}" onclick="toggleCB(${l.id})"><input type="checkbox" id="alp-cb-${l.id}" ${isSel ? 'checked' : ''} onclick="event.stopPropagation();toggleCB(${l.id})"><div style="flex:1"><div style="font-weight:700;font-size:13px;">${l.school_name || '—'}</div><div style="font-size:11.5px;color:var(--tx2);">${l.address || ''} ${l.phone ? '· ' + l.phone : ''}</div>${assInfo}</div><div style="display:flex; align-items:center; gap:12px;">${qBtn}<span class="badge ${bc[l.status] || 'bn'}">${l.status}</span></div></div>`;
       }).join('')
-      : `<div style="padding:40px 24px;text-align:center;color:var(--tx3);"><div style="font-size:24px;margin-bottom:10px;opacity:0.5;">📋</div>No leads found for this sector.</div>`;
+      : `<div style="padding:40px 24px;text-align:center;color:var(--tx3);"><div style="font-size:24px;margin-bottom:10px;opacity:0.5;"></div>No leads found for this sector.</div>`;
     popAssign();
   }
 
@@ -5583,7 +6596,7 @@
     try {
       const ids = vis.map(l => l.id); await post('/leads/assign', { lead_ids: ids, team_id: sp.id });
       const now = new Date().toISOString(); leads.forEach(l => { if (ids.includes(l.id)) { l.assigned_id = sp.id; l.assigned_at = now; } });
-      toast(`✅ Assigned ${ids.length} leads to ${sp.name}!`, 'success'); renderALLeads();
+      toast(`Assigned ${ids.length} leads to ${sp.name}!`, 'success'); renderALLeads();
     } catch (e) { toast('Error: ' + e.message, 'error'); } finally { b.disabled = false; b.innerHTML = oh; }
   }
 
@@ -5596,7 +6609,7 @@
       leads.forEach(l => { 
         if (l.id === id) { l.assigned_id = pendingNewSP.id; l.assigned_at = now; } 
       });
-      toast('✅ Lead assigned successfully!', 'success');
+      toast('Lead assigned successfully!', 'success');
       renderALLeads(); // Refresh to show the assignment info
     } catch (e) { toast('Error: ' + e.message, 'error'); }
   }
@@ -5618,14 +6631,14 @@
           l.assigned_at = now;
         } 
       });
-      toast(`✅ ${alpSelectedIds.length} lead${alpSelectedIds.length > 1 ? 's' : ''} assigned to ${pendingNewSP.name}!`, 'success');
+      toast(`${alpSelectedIds.length} lead${alpSelectedIds.length > 1 ? 's' : ''} assigned to ${pendingNewSP.name}!`, 'success');
 
       alpSelectedIds = [];
       pendingNewSP = null;
       showAdminPage('team', document.getElementById('nav-team'));
       await loadAdminData();
     } catch (e) { toast('Error: ' + e.message, 'error'); }
-    btn.disabled = false; btn.textContent = '✓ Submit Assignment';
+    btn.disabled = false; btn.textContent = 'Submit assignment';
   }
 
   // ── ADMIN RENDER ──
@@ -5910,25 +6923,25 @@
       const init = m ? m.name.split(' ').map(n => n[0]).join('').slice(0, 2) : '?';
       const pStr = (l.phone && l.phone.trim() && l.phone !== 'undefined' && l.phone !== 'null') ? l.phone : '—';
       const assCell = (currentAssignment === 'assigned') ? `<td style="white-space:nowrap;"><div style="background:${m?.color}15; color:${m?.color}; border:1px solid ${m?.color}30; padding:4px 10px; border-radius:6px; font-size:11px; font-weight:700;">${m?.name || '—'}</div></td><td style="font-size:11px; color:var(--tx3);">${fd(l.assigned_at)}</td>` : '';
-      return `<tr><td><div class="sn">${l.school_name || '—'}</div><div class="sa">${l.address || ''}</div>${locationLine(l)}<div style="margin-top:6px;">${l.pitch ? `<a class="wb-link" style="cursor:pointer;white-space:nowrap;" onclick="showPitch(${l.id})">💬 View Pitch</a>` : `<a class="wb-link" style="cursor:pointer;white-space:nowrap;color:var(--tx3);" onclick="spGeneratePitch(${l.id}, this)">⚡ Generate Pitch</a>`}</div></td><td><div style="font-size:12px;color:var(--tx2);white-space:nowrap;">${pStr}</div></td><td style="white-space:nowrap;">${websiteCell(l)}</td><td><div style="color:var(--a4);font-size:12.5px;">${l.rating || '—'} ⭐</div></td><td><div style="display:flex;align-items:center;gap:12px;"><div class="score-pill"><strong>${l.score || 0}</strong> /100</div><div style="font-size:14px;">${l.priority == '🔥 high' ? '🔥' : l.priority == '⚡ medium' ? '⚡' : '📋'}</div></div></td><td><select class="badge ${bc[curStatus] || 'bn'}" onchange="updStatus(${l.id},this.value,this)" style="background:none;border:none;cursor:pointer;color:inherit;font-weight:700;">
+      return `<tr><td><div class="sn">${l.school_name || '—'}</div><div class="sa">${l.address || ''}</div>${locationLine(l)}<div style="margin-top:6px;">${l.pitch ? `<a class="wb-link" style="cursor:pointer;white-space:nowrap;" onclick="showPitch(${l.id})">View Pitch</a>` : `<a class="wb-link" style="cursor:pointer;white-space:nowrap;color:var(--tx3);" onclick="spGeneratePitch(${l.id}, this)">Generate Pitch</a>`}</div></td><td><div style="font-size:12px;color:var(--tx2);white-space:nowrap;">${pStr}</div></td><td style="white-space:nowrap;">${websiteCell(l)}</td><td><div class="rating-cell" style="font-size:12.5px;">${l.rating || '—'}</div></td><td><div style="display:flex;align-items:center;gap:12px;"><div class="score-pill"><strong>${l.score || 0}</strong> /100</div><div style="font-size:14px;">${l.priority === 'high' ? 'HIGH' : l.priority === 'medium' ? 'MED' : 'LOW'}</div></div></td><td><select class="badge ${bc[curStatus] || 'bn'}" onchange="updStatus(${l.id},this.value,this)" style="background:none;border:none;cursor:pointer;color:inherit;font-weight:700;">
 
-          <option value="new" ${curStatus === 'new' ? 'selected' : ''}>🔵 New</option>
-          <option value="contacted" ${curStatus === 'contacted' ? 'selected' : ''}>🟠 Contacted</option>
-          <option value="interested" ${curStatus === 'interested' ? 'selected' : ''}>🟡 Interested</option>
-          <option value="proposal" ${curStatus === 'proposal' ? 'selected' : ''}>🟣 Proposal Sent</option>
-          <option value="won" ${curStatus === 'won' ? 'selected' : ''}>🟢 Won</option>
-          <option value="lost" ${curStatus === 'lost' ? 'selected' : ''}>🔴 Lost</option>
-        </select></td>${assCell}<td><div class="abts"><button class="ib view-details" onclick="openLeadPanel(${l.id})" title="Calls & Notes">📋 Details</button><button class="ib" onclick="editLead(${l.id})" title="Edit">✏️</button><button class="ib del" onclick="delLead(${l.id})" title="Delete">🗑️</button></div></td></tr>`;
+          <option value="new" ${curStatus === 'new' ? 'selected' : ''}>New</option>
+          <option value="contacted" ${curStatus === 'contacted' ? 'selected' : ''}>Contacted</option>
+          <option value="interested" ${curStatus === 'interested' ? 'selected' : ''}>Interested</option>
+          <option value="proposal" ${curStatus === 'proposal' ? 'selected' : ''}>Proposal Sent</option>
+          <option value="won" ${curStatus === 'won' ? 'selected' : ''}>Won</option>
+          <option value="lost" ${curStatus === 'lost' ? 'selected' : ''}>Lost</option>
+        </select></td>${assCell}<td><div class="abts"><button class="ib view-details" onclick="openLeadPanel(${l.id})" title="Calls & Notes">Details</button><button class="ib" onclick="editLead(${l.id})" title="Edit">Edit</button><button class="ib del" onclick="delLead(${l.id})" title="Delete">Delete</button></div></td></tr>`;
     }).join('');
   }
   function rPipe() {
     const stages = [
-      { k: 'new', l: 'New', c: '#5b6af7' },
-      { k: 'contacted', l: 'Contacted', c: '#f5a623' },
-      { k: 'interested', l: 'Interested', c: '#ffeb3b' },
-      { k: 'proposal', l: 'Proposal Sent', c: '#9c27b0' },
-      { k: 'won', l: 'Won', c: '#1de9a0' },
-      { k: 'lost', l: 'Lost', c: '#f25b7e' }
+      { k: 'new', l: 'New', c: '#14568c' },
+      { k: 'contacted', l: 'Contacted', c: '#3d7ab8' },
+      { k: 'interested', l: 'Interested', c: '#b26a00' },
+      { k: 'proposal', l: 'Proposal Sent', c: '#5c5c5c' },
+      { k: 'won', l: 'Won', c: '#1a7f4b' },
+      { k: 'lost', l: 'Lost', c: '#c8102e' }
     ];
     const tot = leads.length || 1;
     const wrap = document.getElementById('pipe-wrap');
@@ -5958,26 +6971,26 @@
       const mColor = m.color || '#5b6af7';
       const mRole = m.territory || m.role || '';
       const init = mName.split(' ').map(n => n.charAt(0)).join('').toUpperCase().slice(0, 2);
-      return `<div style="position:relative; background:var(--s1);border:1.5px solid var(--bd);border-radius:var(--r);padding:18px;">
-        <button onclick="delTeam(${m.id})" style="position:absolute; top:12px; right:12px; background:none; border:none; cursor:pointer; opacity:0.3; font-size:14px;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.3" title="Delete Team Member">🗑️</button>
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
-          <div style="width:44px;height:44px;border-radius:50%;background:${mColor}18;color:${mColor};border:2px solid ${mColor}30;display:flex;align-items:center;justify-content:center;font-family:'Clash Display',sans-serif;font-weight:700;font-size:14px;">${init}</div>
-          <div style="flex:1">
-            <div style="font-weight:700;font-size:14px;text-transform:capitalize;">${mName}</div>
-            <div style="font-size:11.5px;color:var(--tx3);">${mEmail}</div>
-            <div style="font-size:11px;color:var(--tx3);">📍 ${mRole}</div>
+      return `<div class="tm-card">
+        <div class="tm-head">
+          <div class="tm-av">${init}</div>
+          <div class="tm-id">
+            <div class="tm-name">${mName}</div>
+            <div class="tm-email">${mEmail}</div>
+            <div class="tm-role">${mRole}</div>
           </div>
+          <button class="tm-del" onclick="delTeam(${m.id})" title="Delete Team Member">Remove</button>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;">
-          ${[['Leads', cnt, 'var(--acc)'], ['Qualified', q, 'var(--a3)'], ['Closed', cl, 'var(--a5)']].map(([l, v, c]) => `
-            <div style="background:var(--s2);border-radius:8px;padding:10px;text-align:center;">
-              <div style="font-family:'Clash Display',sans-serif;font-size:20px;font-weight:700;color:${c}">${v}</div>
-              <div style="font-size:10px;color:var(--tx3);margin-top:2px;">${l}</div>
+        <div class="tm-figs">
+          ${[['Leads', cnt], ['Qualified', q], ['Closed', cl]].map(([l, v]) => `
+            <div class="tm-fig">
+              <div class="tm-fig-val">${v}</div>
+              <div class="tm-fig-lbl">${l}</div>
             </div>`).join('')}
         </div>
-        <div style="display:flex;gap:8px;">
-          <button class="btn bp bsm" style="flex:1;font-size:11px;padding:10px 0;" onclick="openAssignExisting(${m.id})">📋 Assign Leads</button>
-          <button class="btn bg bsm" style="flex:1;font-size:11px;padding:10px 0;" onclick="viewTeamLeads(${m.id})">🔍 View Leads</button>
+        <div class="tm-actions">
+          <button class="btn" onclick="openAssignExisting(${m.id})">Assign leads</button>
+          <button class="btn" onclick="viewTeamLeads(${m.id})">View leads</button>
         </div>
       </div>`;
     }).join('');
@@ -6064,7 +7077,7 @@
       let url = type === 'call' ? `/leads/${leadId}/calls/${id}` : `/leads/${leadId}/notes/${id}`;
       if (type === 'reminder') url = `/reminders/${id}`;
       await del(url);
-      toast('🗑️ Activity deleted.', 'success');
+      toast('Activity deleted.', 'success');
       rActivity();
     } catch (e) { toast('Error: ' + e.message, 'error'); }
   }
@@ -6076,7 +7089,7 @@
       team = team.filter(t => t.id !== id);
       leads.forEach(l => { if (l.assigned_id === id) l.assigned_id = null; });
       rTeam();
-      toast('🗑️ Team member deleted.', 'success');
+      toast('Team member deleted.', 'success');
     } catch (e) { toast('Error: ' + e.message, 'error'); }
   }
 
@@ -6156,11 +7169,11 @@
         await patch(`/leads/${editId}`, data);
         const i = leads.findIndex(l => l.id === editId);
         if (i >= 0) leads[i] = { ...leads[i], ...data };
-        toast('✅ Lead updated!', 'success');
+        toast('Lead updated!', 'success');
       } else {
         const c = await post('/leads', data);
         leads.unshift(c);
-        toast('✅ Lead added!', 'success');
+        toast('Lead added!', 'success');
       }
       renderAll();
       closeM('lead-modal');
@@ -6183,16 +7196,16 @@
 
   // ── TEAM CRUD ──
   function openAddTeam() { ['t-name', 't-role', 't-email', 't-phone'].forEach(id => document.getElementById(id).value = ''); openM('team-modal'); }
-  async function saveTeam() { const n = document.getElementById('t-name').value.trim(), r = document.getElementById('t-role').value.trim(); if (!n || !r) { toast('Name and Role required', 'error'); return; } const data = { name: n, role: r, email: document.getElementById('t-email').value.trim(), phone: document.getElementById('t-phone').value.trim(), color: document.getElementById('t-color').value, status: document.getElementById('t-status').value }; try { const c = await post('/team', data); team.push(c); renderAll(); closeM('team-modal'); toast('✅ Team member added!', 'success'); } catch (e) { toast('Error: ' + e.message, 'error'); } }
+  async function saveTeam() { const n = document.getElementById('t-name').value.trim(), r = document.getElementById('t-role').value.trim(); if (!n || !r) { toast('Name and Role required', 'error'); return; } const data = { name: n, role: r, email: document.getElementById('t-email').value.trim(), phone: document.getElementById('t-phone').value.trim(), color: document.getElementById('t-color').value, status: document.getElementById('t-status').value }; try { const c = await post('/team', data); team.push(c); renderAll(); closeM('team-modal'); toast('Team member added!', 'success'); } catch (e) { toast('Error: ' + e.message, 'error'); } }
   function openTD(id) { const m = team.find(t => t.id === id); if (!m) return; const ml = leads.filter(l => l.assigned_id === id); const init = m.name.split(' ').map(n => n[0]).join('').slice(0, 2); const av = document.getElementById('tda'); av.textContent = init; av.style.background = m.color + '18'; av.style.color = m.color; av.style.border = `2px solid ${m.color}30`; document.getElementById('tdn').textContent = m.name; document.getElementById('tdr').textContent = m.role; document.getElementById('tdc').textContent = [m.email, m.phone].filter(Boolean).join(' · '); document.getElementById('tds1').textContent = ml.length; document.getElementById('tds2').textContent = ml.filter(l => l.status === 'new').length; document.getElementById('tds3').textContent = ml.filter(l => l.status === 'qualified').length; document.getElementById('tds4').textContent = ml.filter(l => l.status === 'closed').length; document.getElementById('td-leads').innerHTML = ml.length ? ml.map(l => `<div class="ml"><div><div style="font-weight:700">${l.school_name}</div><div style="font-size:11.5px;color:var(--tx3)">${l.address || l.phone || ''}</div></div><span class="badge b${l.status[0]}">${l.status}</span></div>`).join('') : '<div style="color:var(--tx3);font-size:13px;padding:10px 0;">No schools assigned yet.</div>'; openM('td-modal'); }
 
   // ── SCORES & PITCH ──
-  async function runScoring() { const btn = document.getElementById('score-btn'); btn.disabled = true; btn.innerHTML = '<span class="spin"></span> Scoring...'; toast('📊 Scoring pending leads...', 'success'); try { const res = await post('/trigger-score', {}); toast(`✅ Scored ${res.scored} new leads!`, 'success'); if (res.scored > 0) { leads = await get('/leads'); renderAll(); } } catch (e) { toast('⚠️ Error: ' + e.message, 'error'); } btn.disabled = false; btn.innerHTML = '📊 Score Leads'; }
+  async function runScoring() { const btn = document.getElementById('score-btn'); btn.disabled = true; btn.innerHTML = '<span class="spin"></span> Scoring...'; toast('Scoring pending leads...', 'success'); try { const res = await post('/trigger-score', {}); toast(`Scored ${res.scored} new leads!`, 'success'); if (res.scored > 0) { leads = await get('/leads'); renderAll(); } } catch (e) { toast('Error: ' + e.message, 'error'); } btn.disabled = false; btn.innerHTML = 'Score Leads'; }
   function showPitch(id) { const l = (leads.find(x => x.id === id) || spLeads.find(x => x.id === id)); if (!l || !l.pitch) return; document.getElementById('pm-txt').textContent = l.pitch; openM('pitch-modal'); }
 
   async function spGeneratePitch(leadId, btn) {
     if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spin"></span>&nbsp; Generating...'; }
-    toast('🤖 Generating AI pitch, please wait...', 'success');
+    toast('Generating AI pitch, please wait...', 'success');
     try {
       const res = await fetch(API + '/leads/' + leadId + '/score', { method: 'POST', headers: authHeaders() });
       const data = await res.json();
@@ -6202,13 +7215,13 @@
       if (inLeads) Object.assign(inLeads, data.lead);
       const inSpLeads = spLeads.find(x => x.id === leadId);
       if (inSpLeads) Object.assign(inSpLeads, data.lead);
-      toast('✅ AI Pitch generated!', 'success');
+      toast('AI Pitch generated!', 'success');
       rMyLeads();
       // Refresh pitch panel if open
       const pitchPane = document.getElementById('lp-pane-pitch');
       if (pitchPane && pitchPane.classList.contains('active')) loadPitchPanel();
     } catch (e) { toast('Error generating pitch: ' + e.message, 'error'); }
-    if (btn) { btn.disabled = false; btn.innerHTML = '⚡ Generate Pitch'; }
+    if (btn) { btn.disabled = false; btn.innerHTML = 'Generate Pitch'; }
   }
 
   // ── PIPELINE ──
@@ -6218,12 +7231,12 @@
     if (!board) return;
 
     const stages = [
-      { k: 'new', l: 'New', c: '#5b6af7' },
-      { k: 'contacted', l: 'Contacted', c: '#f5a623' },
-      { k: 'interested', l: 'Interested', c: '#ffeb3b' },
-      { k: 'proposal', l: 'Proposal Sent', c: '#9c27b0' },
-      { k: 'won', l: 'Won', c: '#1de9a0' },
-      { k: 'lost', l: 'Lost', c: '#f25b7e' }
+      { k: 'new', l: 'New', c: '#14568c' },
+      { k: 'contacted', l: 'Contacted', c: '#3d7ab8' },
+      { k: 'interested', l: 'Interested', c: '#b26a00' },
+      { k: 'proposal', l: 'Proposal Sent', c: '#5c5c5c' },
+      { k: 'won', l: 'Won', c: '#1a7f4b' },
+      { k: 'lost', l: 'Lost', c: '#c8102e' }
     ];
 
     const leadData = currentUser.role === 'admin' ? leads : spLeads;
@@ -6277,14 +7290,14 @@
               <div class="kc-tag">${(domains.find(d => d.id === l.domain) || { label: 'Lead' }).label.replace(/s$/, '')}</div>
             </div>
             <div class="kc-info">
-              <div class="kc-row"><i>📞</i> ${pStr}</div>
-              <div class="kc-row"><i>⭐</i> ${l.rating || '0.0'}</div>
+              <div class="kc-row">${pStr}</div>
+              <div class="kc-row">${l.rating || '0.0'}</div>
             </div>
             <div class="kc-foot">
               <div class="kc-btns">
-                <button class="kc-btn" onclick="openLeadPanel(${l.id})" title="Details">📋</button>
-                <button class="kc-btn" onclick="${currentUser.role === 'admin' ? 'editLead' : 'spEditLead'}(${l.id})" title="Edit">✏️</button>
-                ${currentUser.role === 'admin' ? `<button class="kc-btn" onclick="delLead(${l.id})" title="Delete" style="color:var(--a2);">🗑️</button>` : ''}
+                <button class="kc-btn" onclick="openLeadPanel(${l.id})" title="Details">Details</button>
+                <button class="kc-btn" onclick="${currentUser.role === 'admin' ? 'editLead' : 'spEditLead'}(${l.id})" title="Edit">Edit</button>
+                ${currentUser.role === 'admin' ? `<button class="kc-btn" onclick="delLead(${l.id})" title="Delete" style="color:var(--a2);">Delete</button>` : ''}
               </div>
             </div>
             ${moveBtn}
@@ -6343,10 +7356,10 @@
     document.querySelectorAll('.move-menu').forEach(m => m.classList.remove('open'));
     try {
       await updStatus(id, stage);
-      toast('✅ Moved to ' + label, 'success');
+      toast('Moved to ' + label, 'success');
       loadPipeline();
     } catch (e) {
-      toast('❌ Move failed: ' + e.message, 'error');
+      toast('Move failed: ' + e.message, 'error');
     }
   }
 
@@ -6448,7 +7461,7 @@
     if (!ptsEl || !enEl) return;
     try {
       await patch('/score-config/' + id, { points: parseInt(ptsEl.value), enabled: enEl.checked });
-      toast('✅ Rule saved!', 'success');
+      toast('Rule saved!', 'success');
     } catch (e) { toast('Error saving rule: ' + e.message, 'error'); }
   }
 
@@ -6460,9 +7473,9 @@
     if (!l) return;
     currentPanelLeadId = leadId;
     document.getElementById('lp-school-name').textContent = l.school_name || 'Unknown School';
-    const badge = { new: '🔵 New', contacted: '🟢 Contacted', qualified: '✅ Qualified', closed: '🔴 Closed' };
+    const badge = { new: 'New', contacted: 'Contacted', qualified: 'Qualified', closed: 'Closed' };
     const metaParts = [];
-    if (l.phone && l.phone !== 'undefined' && l.phone !== 'null') metaParts.push('📞 ' + l.phone);
+    if (l.phone && l.phone !== 'undefined' && l.phone !== 'null') metaParts.push(l.phone);
     if (l.rating) metaParts.push('⭐ ' + l.rating);
     metaParts.push('<span style="background:rgba(91,106,247,0.12);color:var(--acc);padding:2px 8px;border-radius:20px;font-size:10.5px;font-weight:700;">' + (badge[l.status] || l.status) + '</span>');
     document.getElementById('lp-school-meta').innerHTML = metaParts.join(' &nbsp;&middot;&nbsp; ');
@@ -6504,15 +7517,15 @@
     const container = document.getElementById('lp-pitch-content');
     if (!container) return;
     const lead = (leads.find(x => x.id === currentPanelLeadId) || spLeads.find(x => x.id === currentPanelLeadId));
-    if (!lead) { container.innerHTML = '<div class="lp-empty">⚠️ Lead data not found.</div>'; return; }
+    if (!lead) { container.innerHTML = '<div class="lp-empty">Lead data not found.</div>'; return; }
     if (lead.pitch) {
       container.innerHTML = `<div style="white-space:pre-wrap;font-family:monospace;font-size:12px;color:var(--tx2);background:var(--s2);padding:16px;border-radius:8px;line-height:1.7;">${lead.pitch}</div>`;
     } else {
       container.innerHTML = `<div class="lp-empty" style="text-align:center;padding:30px 20px;">
-        <div style="font-size:36px;margin-bottom:14px;">🤖</div>
+        <div style="font-size:36px;margin-bottom:14px;"></div>
         <div style="font-size:14px;font-weight:700;color:var(--tx);margin-bottom:8px;">No AI Pitch Generated Yet</div>
         <div style="font-size:12px;color:var(--tx3);margin-bottom:20px;">Generate an AI sales pitch for this lead based on their website analysis and gap detection.</div>
-        <button class="btn bp" id="gen-pitch-btn" onclick="spGeneratePitch(${lead.id}, this)">⚡ Generate AI Pitch</button>
+        <button class="btn bp" id="gen-pitch-btn" onclick="spGeneratePitch(${lead.id}, this)">Generate AI Pitch</button>
       </div>`;
     }
   }
@@ -6523,29 +7536,29 @@
     try {
       const calls = await fetch(API + '/leads/' + currentPanelLeadId + '/calls').then(r => r.json());
       if (!calls.length) {
-        container.innerHTML = '<div class="lp-empty"><div class="em-icon">📵</div>No calls logged yet.<br>Use the "Log Call" tab to record your first call.</div>';
+        container.innerHTML = '<div class="lp-empty">No calls logged yet.<br>Use the "Log Call" tab to record your first call.</div>';
         return;
       }
       const outcomeMap = {
-        interested: { cls: 'out-interested', label: '✅ Interested' },
-        callback: { cls: 'out-callback', label: '🔄 Call Back' },
-        not_interested: { cls: 'out-not_interested', label: '❌ Not Interested' },
-        no_answer: { cls: 'out-no_answer', label: '📵 No Answer' },
-        closed: { cls: 'out-closed', label: '🎯 Closed' },
-        voicemail: { cls: 'out-voicemail', label: '📼 Voicemail' },
+        interested: { cls: 'out-interested', label: 'Interested' },
+        callback: { cls: 'out-callback', label: 'Call Back' },
+        not_interested: { cls: 'out-not_interested', label: 'Not Interested' },
+        no_answer: { cls: 'out-no_answer', label: 'No Answer' },
+        closed: { cls: 'out-closed', label: 'Closed' },
+        voicemail: { cls: 'out-voicemail', label: 'Voicemail' },
       };
       container.innerHTML = calls.map(function (c) {
         const om = outcomeMap[c.outcome] || { cls: 'out-no_answer', label: c.outcome };
         const dt = new Date(c.called_at);
         const dtStr = dt.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-        const followup = c.next_followup ? '<div class="call-followup">📅 Follow-up: <strong>' + new Date(c.next_followup).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) + '</strong></div>' : '';
+        const followup = c.next_followup ? '<div class="call-followup">Follow-up: <strong>' + new Date(c.next_followup).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) + '</strong></div>' : '';
         const notesHtml = c.notes ? '<div class="call-notes-txt">' + c.notes + '</div>' : '';
         const calledBy = (c.called_by && c.called_by !== 'undefined' && c.called_by !== 'null') ? c.called_by : 'Unknown';
-        return '<div class="call-card"><div class="call-card-top"><span class="call-outcome-badge ' + om.cls + '">' + om.label + '</span><div style="display:flex;align-items:center;gap:8px;"><span style="font-size:10.5px;color:var(--tx3)">' + dtStr + '</span><button onclick="deleteCall(' + c.id + ')" title="Delete call log" style="width:22px;height:22px;border-radius:5px;border:1.5px solid rgba(242,91,126,0.25);background:rgba(242,91,126,0.07);color:var(--a2);cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.15s;" onmouseover="this.style.background=\'rgba(242,91,126,0.18)\'" onmouseout="this.style.background=\'rgba(242,91,126,0.07)\'">🗑</button></div></div><div class="call-meta"><span>👤 ' + calledBy + '</span>' + (c.duration ? '<span>⏱ ' + c.duration + ' min</span>' : '') + '</div>' + notesHtml + followup + '</div>';
+        return '<div class="call-card"><div class="call-card-top"><span class="call-outcome-badge ' + om.cls + '">' + om.label + '</span><div style="display:flex;align-items:center;gap:8px;"><span style="font-size:10.5px;color:var(--tx3)">' + dtStr + '</span><button onclick="deleteCall(' + c.id + ')" title="Delete call log" style="width:22px;height:22px;border-radius:5px;border:1.5px solid rgba(242,91,126,0.25);background:rgba(242,91,126,0.07);color:var(--a2);cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.15s;" onmouseover="this.style.background=\'rgba(242,91,126,0.18)\'" onmouseout="this.style.background=\'rgba(242,91,126,0.07)\'">Delete</button></div></div><div class="call-meta"><span>' + calledBy + '</span>' + (c.duration ? '<span>⏱ ' + c.duration + ' min</span>' : '') + '</div>' + notesHtml + followup + '</div>';
 
       }).join('');
     } catch (e) {
-      container.innerHTML = '<div class="lp-empty">⚠️ Failed to load call history.</div>';
+      container.innerHTML = '<div class="lp-empty">Failed to load call history.</div>';
     }
   }
 
@@ -6555,7 +7568,7 @@
     try {
       const res = await fetch(API + '/leads/' + currentPanelLeadId + '/calls/' + callId, { method: 'DELETE' });
       if (!res.ok) throw new Error('Delete failed');
-      toast('🗑️ Call log deleted.', '');
+      toast('Call log deleted.', '');
       await loadCallHistory();
     } catch (e) { toast('Error: ' + e.message, 'error'); }
   }
@@ -6593,13 +7606,13 @@
     try {
       const notes = await fetch(API + '/leads/' + currentPanelLeadId + '/notes').then(r => r.json());
       if (!notes.length) {
-        container.innerHTML = '<div class="lp-empty"><div class="em-icon">📝</div>No notes yet. Add your first note above.</div>';
+        container.innerHTML = '<div class="lp-empty">No notes yet. Add your first note above.</div>';
         return;
       }
       container.innerHTML = notes.map(function (n) {
         const dt = new Date(n.created_at);
         const dtStr = dt.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-        return '<div class="note-card"><div class="note-card-header"><span class="note-author">✍️ ' + n.added_by + '</span><span class="note-time">' + dtStr + '</span></div><div class="note-text">' + n.note + '</div></div>';
+        return '<div class="note-card"><div class="note-card-header"><span class="note-author">' + n.added_by + '</span><span class="note-time">' + dtStr + '</span></div><div class="note-text">' + n.note + '</div></div>';
       }).join('');
     } catch (e) {
       container.innerHTML = '<div class="lp-empty"><i data-lucide="alert-circle"></i> Failed to load notes.</div>';
@@ -6633,7 +7646,7 @@
     try {
       const reminders = await fetch(API + '/leads/' + currentPanelLeadId + '/reminders').then(r => r.json());
       if (!reminders.length) {
-        container.innerHTML = '<div class="lp-empty"><div class="em-icon">🔔</div>No reminders set for this lead.</div>';
+        container.innerHTML = '<div class="lp-empty">No reminders set for this lead.</div>';
         return;
       }
       container.innerHTML = reminders.map(function (r) {
@@ -6735,7 +7748,7 @@
     try {
       const rows = await get('/reminders/today', true);
       if (!rows.length) {
-        container.innerHTML = '<div class="lp-empty">☕ No pending reminders for today.</div>';
+        container.innerHTML = '<div class="lp-empty">No pending reminders for today.</div>';
         return;
       }
       container.innerHTML = rows.map(function (r) {
@@ -6752,7 +7765,7 @@
           + '</div>';
       }).join('');
     } catch (e) {
-      container.innerHTML = '<div class="lp-empty">⚠️ Failed to load reminders.</div>';
+      container.innerHTML = '<div class="lp-empty">Failed to load reminders.</div>';
     }
   }
 
@@ -6913,8 +7926,10 @@
   }
 
   // ── LANDING CONTROLS ──
-  let heroStop = createVortex(document.getElementById('hero-canvas'), { scale: 1.5 });
-  let heroStarsStop = createStars(document.getElementById('hero-stars-canvas'), 120);
+  // The landing page is typographic — no vortex, no particle field.
+  // Kept as null handles so the show/hide paths below stay valid.
+  let heroStop = null;
+  let heroStarsStop = null;
   let signupStop = null;
   let signupStarsStop = null;
 
@@ -6941,14 +7956,7 @@
     requestAnimationFrame(() => sp.style.opacity = '1');
     if (heroStop) { heroStop(); heroStop = null; }
     if (heroStarsStop) { heroStarsStop(); heroStarsStop = null; }
-    if (!signupStop) signupStop = createVortex(document.getElementById('signup-canvas'), { scale: 1.8, rays: 26 });
-    if (!signupStarsStop) signupStarsStop = createStars(document.getElementById('signup-stars-canvas'), 100);
-    
-    // Typing animation for Login
-    const loginTitle = document.getElementById('login-title');
-    if (loginTitle) {
-      runTypewriter(loginTitle, "LOGIN", 100);
-    }
+    /* sign-in panel is typographic: no canvas to start */
   }
   function closeSignup() {
     const sp = document.getElementById('login-wrap');
@@ -6957,8 +7965,8 @@
       sp.style.display = 'none'; 
       if (signupStop) { signupStop(); signupStop = null; }
       if (signupStarsStop) { signupStarsStop(); signupStarsStop = null; }
-      if (!heroStop) heroStop = createVortex(document.getElementById('hero-canvas'), { scale: 1.5 });
-      if (!heroStarsStop) heroStarsStop = createStars(document.getElementById('hero-stars-canvas'), 120);
+      /* landing is static: nothing to restart */
+
     }, 400);
   }
   // Close dropdowns on outside click
@@ -6979,16 +7987,16 @@
     await loadBrandStats();
     rLeads();
     rMyLeads();
-    toast(`✅ Detected ${detectedBigBrands.length} chain brands!`, 'success');
+    toast(`Detected ${detectedBigBrands.length} chain brands!`, 'success');
     if (btn) {
       btn.disabled = false;
-      btn.innerHTML = '🔍 Refresh Brands';
+      btn.innerHTML = 'Refresh Brands';
     }
   }
 
   async function showDetectedBrands() {
     await loadBrandStats();
-    toast(`🏢 Detected chains: ${detectedBigBrands.slice(0, 5).join(', ')} ... and ${detectedBigBrands.length - 5} more`, 'success');
+    toast(`Detected chains: ${detectedBigBrands.slice(0, 5).join(', ')} ... and ${detectedBigBrands.length - 5} more`, 'success');
   }
 </script>
 
@@ -7026,7 +8034,7 @@
   <div class="modal wide" style="max-width:800px; padding:0; overflow:hidden;" onclick="event.stopPropagation()">
     <div class="mh" style="padding:24px 28px; border-bottom:1.5px solid var(--bd); background:linear-gradient(to right, rgba(91,106,247,0.05), transparent);">
       <div id="team-leads-title" style="font-family:'Clash Display'; font-size:20px; font-weight:700;">Assigned Leads</div>
-      <button class="close-modal" onclick="closeM('team-leads-ov')" style="background:var(--s3); border:1px solid var(--bd); width:32px; height:32px; border-radius:8px;">✕</button>
+      <button class="close-modal" onclick="closeM('team-leads-ov')" style="background:var(--s3); border:1px solid var(--bd); width:32px; height:32px; border-radius:8px;">&#10005;</button>
     </div>
     <div style="max-height:65vh; overflow-y:auto; padding:0 28px 28px;">
       <table style="width:100%; border-collapse:separate; border-spacing:0 8px;">
@@ -7067,20 +8075,8 @@
     startTyping();
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
-    // Automatically target all branding elements
-    const targets = [
-      { selector: '.nav-logo', text: "EXORA LEADFORGE" },
-      { selector: '.logo', text: "EXORA LEADFORGE" },
-      { selector: '#login-title', text: "LOGIN" }
-    ];
-
-    targets.forEach(target => {
-      document.querySelectorAll(target.selector).forEach(el => {
-        runTypewriter(el, target.text, 100);
-      });
-    });
-  });
+  // The wordmarks and the sign-in heading are set in the markup and left
+  // alone — the type does the work, so nothing animates here.
 </script>
 </body>
 

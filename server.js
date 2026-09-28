@@ -345,6 +345,13 @@ app.post('/api/auth/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
     const user = result.rows[0];
+    // Access is a projection of Nomi's directory: the hourly sync stamps
+    // disabled_at on anyone Nomi no longer lists, and they lose the CRM
+    // with it. The row is kept so their past activity stays attributable.
+    if (user.disabled_at) {
+      console.log(`❌ Login failed: account disabled (${email})`);
+      return res.status(403).json({ error: 'This account is no longer active. Contact an administrator.' });
+    }
     const valid = await bcrypt.compare(password, user.password_hash);
     if (!valid) {
       console.log(`❌ Login failed: Invalid password for ${email}`);
@@ -367,57 +374,24 @@ app.get('/api/auth/me', requireAuth(), (req, res) => {
   res.json({ user: req.user });
 });
 
+// Name, email and password all live in Nomi and are overwritten by every
+// sync, so editing them here would appear to work and then silently revert.
+// The endpoint says so rather than pretending to save.
 app.put('/api/auth/update', requireAuth(), async (req, res) => {
-  const { name, email, password } = req.body;
-  if (!name || !email) return res.status(400).json({ error: 'Name and email are required' });
-  try {
-    const userId = req.user.id;
-    let query, params;
-    if (password) {
-      const hash = await bcrypt.hash(password, 10);
-      query = `UPDATE users SET name=$1, email=$2, password_hash=$3 WHERE id=$4 RETURNING id, name, email, role, team_id, territory`;
-      params = [name, email.toLowerCase().trim(), hash, userId];
-    } else {
-      query = `UPDATE users SET name=$1, email=$2 WHERE id=$3 RETURNING id, name, email, role, team_id, territory`;
-      params = [name, email.toLowerCase().trim(), userId];
-    }
-    const result = await pool.query(query, params);
-    if (!result.rows.length) return res.status(404).json({ error: 'User not found' });
-    const updatedUser = result.rows[0];
-    const token = jwt.sign(
-      { id: updatedUser.id, name: updatedUser.name, email: updatedUser.email, role: updatedUser.role, team_id: updatedUser.team_id },
-      JWT_SECRET,
-      { expiresIn: '24h' }
-    );
-    res.json({ success: true, user: updatedUser, token });
-  } catch (err) {
-    if (err.message.includes('unique')) return res.status(409).json({ error: 'Email already in use' });
-    res.status(500).json({ error: err.message });
-  }
+  res.status(405).json({
+    error: 'Your name, email and password are managed in Nomi. Change them there and they will update here within the hour.'
+  });
 });
 
+// Accounts are created in Nomi, never here.
+// The CRM holds a read-only projection of Nomi's user directory
+// (scripts/sync-nomi-users.js). Allowing a second creation path would let
+// the two drift: a user made here would have no Nomi identity, no
+// nomi_user_id, and no role Nomi could correct.
 app.post('/api/auth/register', requireAuth(['admin']), async (req, res) => {
-  const { name, email, password, phone, territory, color } = req.body;
-  if (!name || !email || !password) return res.status(400).json({ error: 'Name, email, password required' });
-  try {
-    const hash = await bcrypt.hash(password, 10);
-    const userResult = await pool.query(
-      `INSERT INTO users (name, email, password_hash, role, phone, territory) VALUES ($1,$2,$3,'salesperson',$4,$5) RETURNING *`,
-      [name, email.toLowerCase().trim(), hash, phone || '', territory || '']
-    );
-    const newUser = userResult.rows[0];
-    const teamResult = await pool.query(
-      `INSERT INTO team (name, role, email, phone, color, territory) VALUES ($1,'Sales Person',$2,$3,$4,$5) RETURNING *`,
-      [name, email.toLowerCase().trim(), phone || '', color || '#5b6af7', territory || '']
-    );
-    const teamMember = teamResult.rows[0];
-    await pool.query('UPDATE users SET team_id=$1 WHERE id=$2', [teamMember.id, newUser.id]);
-    console.log('✅ New salesperson registered:', email);
-    res.json({ success: true, user: { ...newUser, team_id: teamMember.id }, team: teamMember });
-  } catch (err) {
-    if (err.message.includes('unique')) return res.status(409).json({ error: 'Email already registered' });
-    res.status(500).json({ error: err.message });
-  }
+  res.status(405).json({
+    error: 'Accounts are managed in Nomi. Add the person in Nomi and they will appear here within the hour.'
+  });
 });
 
 // Every remaining API route requires a valid signed-in user.
@@ -551,7 +525,11 @@ app.patch('/api/domains/:name', requireAuth(['admin']), async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.post('/api/domains', requireAuth(['admin']), async (req, res) => {
+// Creating a sector is the first step of the lead-generation flow, which
+// salespeople now run themselves — so this is open to them. PATCH and
+// DELETE below stay admin-only: renaming or removing a sector affects
+// every user's data, whereas adding one is purely additive.
+app.post('/api/domains', requireAuth(['admin', 'salesperson']), async (req, res) => {
   const { name, label, icon, query, created_by, target_term, type_term } = req.body;
   try {
     const exists = await pool.query('SELECT id FROM domains WHERE name = $1', [name]);
@@ -1194,8 +1172,31 @@ app.post('/api/trigger-all', async (req, res) => {
     const domain = req.body?.domain || 'school';
     const { city, area, state, country } = req.body || {};
     const orgId = await getOrgId(req.user.id);
-    console.log(`\n🚀 FULL PIPELINE triggered for: "${query}" (domain: ${domain})`);
+    console.log(`\n🚀 FULL PIPELINE triggered for: "${query}" (domain: ${domain}) by ${req.user.email}`);
     const scrapeResults = await scrapeAndSave(query, domain, { city, area, state, country }, orgId);
+
+    // A salesperson owns what they source: the leads they just generated are
+    // assigned to them, so they appear in "My Leads" without an admin having
+    // to hand them over. Admins are left out on purpose — their generated
+    // leads stay in the unassigned pool for the existing distribution flow.
+    let autoAssigned = 0;
+    if (req.user.role !== 'admin' && scrapeResults.saved.length) {
+      const { rows: me } = await pool.query('SELECT team_id FROM users WHERE id=$1', [req.user.id]);
+      const teamId = me[0]?.team_id;
+      if (teamId) {
+        const ids = scrapeResults.saved.map((l) => l.id);
+        const { rowCount } = await pool.query(
+          `UPDATE leads SET assigned_id=$1, assigned_at=NOW()
+            WHERE id = ANY($2::int[]) AND assigned_id IS NULL`,
+          [teamId, ids]
+        );
+        autoAssigned = rowCount;
+        console.log(`👤 Auto-assigned ${autoAssigned} new lead(s) to ${req.user.email}`);
+      } else {
+        console.warn(`⚠️ ${req.user.email} has no team row — generated leads left unassigned`);
+      }
+    }
+
     const scored = await scoreAllPendingLeads();
     const { rows: allLeads } = await pool.query(
       `SELECT id, school_name, score, priority, website_status, gaps_found FROM leads WHERE search_query=$1 ORDER BY score DESC`,
@@ -1206,6 +1207,9 @@ app.post('/api/trigger-all', async (req, res) => {
       pipeline: {
         scraped: scrapeResults.saved.length, skipped: scrapeResults.skipped.length,
         rejected: scrapeResults.rejected.length, errors: scrapeResults.errors.length, scored: scored.length,
+        assigned: autoAssigned,
+        // Kept, but outside the exact neighbourhood asked for.
+        outside_area: (scrapeResults.outsideArea || []).length,
       },
       leads: allLeads, campaign_id: scrapeResults.campaign_id, run_id: scrapeResults.run_id,
     });
@@ -1263,6 +1267,13 @@ app.post('/api/trigger-n8n', requireAuth(['admin', 'salesperson']), async (req, 
 
     const rawQuery = custom_query || process.env.N8N_QUERY;
     const locationAwareQuery = combineQueryWithLocation(rawQuery, { city, area, state, country });
+
+    // n8n is an optional integration. With no webhook configured, say so
+    // plainly instead of calling fetch(undefined) and logging "Failed to
+    // parse URL from" on every single lead-generation run.
+    if (!process.env.N8N_WEBHOOK_URL) {
+      return res.json({ skipped: true, reason: 'N8N_WEBHOOK_URL is not configured' });
+    }
 
     const response = await fetch(process.env.N8N_WEBHOOK_URL, {
       method: 'POST',
@@ -1895,8 +1906,13 @@ app.get('/', (req, res) => {
 
 // ── Start server ──────────────────────────────────────────────
 const PORT = process.env.PORT || 3002;
-const server = app.listen(PORT, () => {
-  console.log(`\n🚀 LeadFlow backend running at http://localhost:${PORT}`);
+// Loopback by default: in production nginx terminates TLS and proxies to this
+// port, so binding 0.0.0.0 would also expose the whole API over plain HTTP on
+// the public interface, bypassing the certificate. Override with HOST=0.0.0.0
+// only when something outside this machine must reach the port directly.
+const HOST = process.env.HOST || '127.0.0.1';
+const server = app.listen(PORT, HOST, () => {
+  console.log(`\n🚀 LeadFlow backend running at http://${HOST}:${PORT}`);
   console.log(`🔗 n8n webhook     → POST http://localhost:${PORT}/webhook/leads`);
   console.log(`📊 Trigger score   → POST http://localhost:${PORT}/api/trigger-score`);
   console.log(`⚡ Full pipeline   → POST http://localhost:${PORT}/api/trigger-all`);

@@ -22,7 +22,7 @@ assertNotRemoteDatabase(process.env.DATABASE_URL);
 const crypto = require('crypto');
 const axios = require('axios');
 const { Pool } = require('pg');
-const { combineQueryWithLocation, normalizeLocation, locationMatches } = require('./lib/normalize');
+const { combineQueryWithLocation, normalizeLocation, locationMatches, parseLocationInput } = require('./lib/normalize');
 const { findOrCreateCompany, addLocationIfMissing } = require('./lib/companies');
 
 const DEFAULT_ORG_ID = '00000000-0000-0000-0000-000000000001';
@@ -83,7 +83,7 @@ function cleanWebsite(raw) {
 // Split out from scrapeAndSave so it can be exercised directly with mocked
 // place objects (no live Serper call) — see test/lead-scraper.integration.test.js.
 async function saveScrapedPlaces(places, { query, domain, location = {}, org_id = DEFAULT_ORG_ID, campaignId = null, runId = null, pool: dbPool = pool } = {}) {
-    const saved = [], skipped = [], errors = [], rejected = [];
+    const saved = [], skipped = [], errors = [], rejected = [], outsideArea = [];
     const normalizedLocation = normalizeLocation(location);
 
     const recordSourceError = async (place, reason) => {
@@ -105,12 +105,18 @@ async function saveScrapedPlaces(places, { query, domain, location = {}, org_id 
             continue;
         }
 
-        const { matches, reason } = locationMatches(place.address, location);
+        const { matches, reason, confidence, note } = locationMatches(place.address, location);
         if (!matches) {
             rejected.push({ name, reason });
-            console.log(`   🚫 Rejected (location mismatch): ${name} — ${reason}`);
+            console.log(`   🚫 Rejected (wrong city): ${name} — ${reason}`);
             await recordSourceError(place, `location mismatch: ${reason}`);
             continue;
+        }
+        // Right city, different neighbourhood. Kept — the search worked, and
+        // a nearby lead is still a lead — but counted so the run can say so.
+        if (confidence === 'city') {
+            outsideArea.push({ name, note });
+            console.log(`   ~ Outside exact area (kept): ${name} — ${note}`);
         }
 
         const client = await dbPool.connect();
@@ -182,13 +188,20 @@ async function saveScrapedPlaces(places, { query, domain, location = {}, org_id 
         }
     }
 
-    return { saved, skipped, errors, rejected };
+    return { saved, skipped, errors, rejected, outsideArea };
 }
 
 // ── SCRAPE & SAVE ─────────────────────────────────────────────
 async function scrapeAndSave(query = 'preschools in Bengaluru', domain = 'school', location = {}, org_id = DEFAULT_ORG_ID) {
     const apiKey = process.env.SERPER_API_KEY;
     if (!apiKey) throw new Error('SERPER_API_KEY not set in .env');
+
+    // Whatever the person typed, in whichever box, is resolved into a
+    // structured {area, city, ...} first. That fixes both halves of the job
+    // at once: the text sent to Serper reads like a real place ("gym in
+    // Vasanth Nagar, Bengaluru"), and the same structure is what results are
+    // graded against, so the two can never disagree.
+    location = parseLocationInput(location);
 
     // `query` is preserved as-is for `search_query`/provenance below; only
     // the text actually sent to Serper gets the location folded in. When
@@ -232,7 +245,7 @@ async function scrapeAndSave(query = 'preschools in Bengaluru', domain = 'school
             })]
         );
 
-        console.log(`\n📋 Scrape done: ${result.saved.length} saved, ${result.skipped.length} skipped, ${result.rejected.length} rejected (location), ${result.errors.length} errors`);
+        console.log(`\n📋 Scrape done: ${result.saved.length} saved (${(result.outsideArea || []).length} outside exact area), ${result.skipped.length} skipped, ${result.rejected.length} rejected (wrong city), ${result.errors.length} errors`);
         return { ...result, campaign_id: campaignId, run_id: runId };
     } catch (err) {
         console.error('   ❌ Scrape failed:', err.message);

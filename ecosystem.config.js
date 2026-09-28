@@ -1,18 +1,21 @@
 module.exports = {
   apps: [
     {
-      name: "leadflow-crm-backend",
+      name: "exora-crm",
       script: "server.js",
-      cwd: ".",
+      cwd: "/var/www/exora_crm",
+      instances: 1,
+      exec_mode: "fork",
       watch: false,
-      env: {
-        NODE_ENV: "production",
-        PORT: 3333
-      },
-      error_file: "./exora_crm/server_err.txt",
-      out_file: "./exora_crm/server_out.txt",
-      log_file: "./exora_crm/server_log.txt",
-      merge_logs: true
+      // No `env` block on purpose: /var/www/exora_crm/.env is the single
+      // source of truth (server.js loads it via lib/env-guard), and PM2 env
+      // values would silently win over it — dotenv never overwrites a var
+      // that is already set in the process environment.
+      max_memory_restart: "600M",
+      error_file: "./logs/error.log",
+      out_file: "./logs/out.log",
+      merge_logs: true,
+      time: true
     }
   ]
 };
