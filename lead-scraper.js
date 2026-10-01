@@ -192,9 +192,9 @@ async function saveScrapedPlaces(places, { query, domain, location = {}, org_id 
 }
 
 // ── SCRAPE & SAVE ─────────────────────────────────────────────
-async function scrapeAndSave(query = 'preschools in Bengaluru', domain = 'school', location = {}, org_id = DEFAULT_ORG_ID) {
+async function scrapeAndSave(query = 'preschools in Bengaluru', domain = 'school', location = {}, org_id = DEFAULT_ORG_ID, minLeads = null, maxLeads = 20) {
     const apiKey = process.env.SERPER_API_KEY;
-    if (!apiKey) throw new Error('SERPER_API_KEY not set in .env');
+    if (!apiKey) throw new Error('SERVER_API_KEY not set in .env');
 
     // Whatever the person typed, in whichever box, is resolved into a
     // structured {area, city, ...} first. That fixes both halves of the job
@@ -224,13 +224,31 @@ async function scrapeAndSave(query = 'preschools in Bengaluru', domain = 'school
         await pool.query(`INSERT INTO campaign_runs (id, org_id, campaign_id, status) VALUES ($1,$2,$3,'pending')`, [runId, org_id, campaignId]);
         await pool.query(`UPDATE campaign_runs SET status='running', started_at=NOW() WHERE id=$1`, [runId]);
 
-        const response = await axios.post(
-            'https://google.serper.dev/maps',
-            { q: searchText, num: 20 },
-            { headers: { 'X-API-KEY': apiKey, 'Content-Type': 'application/json' }, timeout: 20000 }
-        );
+        let places = [];
+        let page = 1;
+        const targetLeads = maxLeads || 20;
 
-        const places = response.data?.places || [];
+        while (places.length < targetLeads) {
+            const numToFetch = Math.min(100, targetLeads - places.length);
+            const response = await axios.post(
+                'https://google.serper.dev/maps',
+                { q: searchText, num: numToFetch, page: page },
+                { headers: { 'X-API-KEY': apiKey, 'Content-Type': 'application/json' }, timeout: 20000 }
+            );
+
+            const fetchedPlaces = response.data?.places || [];
+            if (fetchedPlaces.length === 0) break;
+
+            places = places.concat(fetchedPlaces);
+            page++;
+
+            if (fetchedPlaces.length < numToFetch) break;
+        }
+
+        if (minLeads && places.length < minLeads) {
+            console.warn(`Could only find ${places.length} results, which is less than the requested minimum of ${minLeads}`);
+        }
+
         console.log(`   Found ${places.length} results`);
 
         const result = await saveScrapedPlaces(places, { query, domain, location, org_id, campaignId, runId, pool });

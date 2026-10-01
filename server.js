@@ -10,6 +10,7 @@ const path = require('path');
 const { scrapeAndSave } = require('./lead-scraper');
 const { scoreAllPendingLeads, scoreLead } = require('./lead-scorer');
 const { getCollector } = require('./lib/collectors');
+const { Parser } = require('json2csv');
 const { enqueueJob } = require('./lib/jobs/queue');
 const { startWorker } = require('./lib/jobs/worker');
 const { findOrCreateCompany, addLocationIfMissing, findOrCreateContact } = require('./lib/companies');
@@ -500,6 +501,36 @@ app.get('/api/leads', async (req, res) => {
     q += ' ORDER BY school_name ASC';
     const result = await pool.query(q, params);
     res.json(result.rows);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/leads/export', async (req, res) => {
+  const { domain, segment } = req.query;
+  try {
+    let q = 'SELECT * FROM leads WHERE 1=1';
+    let params = [];
+    if (domain && domain !== 'all') {
+      params.push(domain);
+      q += ` AND domain = $${params.length}`;
+    }
+    q += ' ORDER BY school_name ASC';
+    const result = await pool.query(q, params);
+    
+    if (!result.rows.length) {
+      return res.status(404).json({ error: 'No leads found to export' });
+    }
+
+    const json2csvParser = new Parser();
+    const csv = json2csvParser.parse(result.rows);
+    
+    const dateStr = new Date().toISOString().split('T')[0];
+    const segmentStr = segment ? `${segment}.` : 'leads.';
+    const domainStr = domain && domain !== 'all' ? domain : 'all';
+    const fileName = `${segmentStr}${domainStr}.${dateStr}.csv`;
+    
+    res.header('Content-Type', 'text/csv');
+    res.attachment(fileName);
+    res.send(csv);
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
@@ -1138,10 +1169,10 @@ app.post('/api/trigger-scrape', async (req, res) => {
   const query = req.body?.query || process.env.N8N_QUERY || 'preschools in Bengaluru';
   try {
     const domain = req.body?.domain || 'school';
-    const { city, area, state, country } = req.body || {};
+    const { city, area, state, country, min_leads, max_leads } = req.body || {};
     const orgId = await getOrgId(req.user.id);
     console.log(`\n⚡ Scrape triggered for: "${query}" (domain: ${domain}${city || area ? `, location: ${area || ''}${area && city ? ', ' : ''}${city || ''}` : ''})`);
-    const results = await scrapeAndSave(query, domain, { city, area, state, country }, orgId);
+    const results = await scrapeAndSave(query, domain, { city, area, state, country }, orgId, min_leads, max_leads);
     res.json({
       success: true, query, domain,
       saved: results.saved.length, skipped: results.skipped.length, rejected: results.rejected.length, errors: results.errors.length,
@@ -1170,10 +1201,10 @@ app.post('/api/trigger-all', async (req, res) => {
   const query = req.body?.query || process.env.N8N_QUERY || 'preschools in Bengaluru';
   try {
     const domain = req.body?.domain || 'school';
-    const { city, area, state, country } = req.body || {};
+    const { city, area, state, country, min_leads, max_leads } = req.body || {};
     const orgId = await getOrgId(req.user.id);
     console.log(`\n🚀 FULL PIPELINE triggered for: "${query}" (domain: ${domain}) by ${req.user.email}`);
-    const scrapeResults = await scrapeAndSave(query, domain, { city, area, state, country }, orgId);
+    const scrapeResults = await scrapeAndSave(query, domain, { city, area, state, country }, orgId, min_leads, max_leads);
 
     // A salesperson owns what they source: the leads they just generated are
     // assigned to them, so they appear in "My Leads" without an admin having
