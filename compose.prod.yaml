@@ -1,0 +1,11 @@
+# Production-only settings for the live server.
+services:
+  crm:
+    restart: unless-stopped
+    mem_limit: 512m
+    ports:
+      - "127.0.0.1:8106:3002"   # host web router forwards crm.exora.solutions here
+    environment:
+      NOMI_DB_PATH: /nomi/nomi.db
+    volumes:
+      - /var/www/Nomi/data:/nomi:ro   # Nomi's users, read-only, for the hourly sync

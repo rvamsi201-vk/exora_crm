@@ -1,0 +1,18 @@
+# Exora CRM - how the containers fit together.
+# Laptop:  docker compose up --build            (also loads compose.override.yaml)
+# Server:  docker compose -f compose.yaml -f compose.prod.yaml up -d --build
+# Settings: .env (copy .env.example). Logs of the Nomi user sync: ./data/logs
+name: exora-crm
+
+services:
+  crm:
+    build: .
+    image: exora-crm:latest
+    env_file: .env
+    environment:
+      HOST: 0.0.0.0
+    volumes:
+      - ./data/logs:/app/logs
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }

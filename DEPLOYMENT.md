@@ -251,3 +251,10 @@ matched as one literal string against addresses reading "Vasanth Nagar,
 Bengaluru". Two failures at once: no term splitting, and the city alias only
 fired on an exact whole-field match. The same 20 results now save, 10 of them
 flagged as outside the exact area. `test/normalize.test.js` pins this.
+
+## Docker (since 2026-10-11)
+
+- Laptop: `cp .env.example .env`, then `docker compose up --build` (starts the CRM on http://localhost:3002 and a practice database on port 5433).
+- Live server: `docker compose -f compose.yaml -f compose.prod.yaml up -d --build`.
+- The hourly Nomi user sync runs inside the container from the host's crontab:
+  `docker compose -f compose.yaml -f compose.prod.yaml exec -T crm bash scripts/sync-nomi-users.sh`

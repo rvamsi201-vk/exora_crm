@@ -1,0 +1,23 @@
+# Laptop-only settings (loaded automatically by plain `docker compose up`).
+# Includes the practice database that used to live in docker-compose.yml.
+# In .env use: DATABASE_URL=postgres://exora_crm:exora_local_2024@postgres:5432/exora_crm_dev
+services:
+  crm:
+    ports:
+      - "3002:3002"   # http://localhost:3002
+    depends_on:
+      - postgres
+  postgres:
+    image: postgres:16-alpine
+    container_name: exora_crm_db
+    environment:
+      POSTGRES_DB: exora_crm_dev
+      POSTGRES_USER: exora_crm
+      POSTGRES_PASSWORD: exora_local_2024
+    ports:
+      - "5433:5432"
+    volumes:
+      - exora_pgdata:/var/lib/postgresql/data
+
+volumes:
+  exora_pgdata:
