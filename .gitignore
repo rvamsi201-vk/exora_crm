@@ -13,3 +13,7 @@ node_modules/
 
 # Temporary scripts
 tmp/
+
+# Old server output captured in the repo by mistake (2026-10-11)
+exora_crm/server_*.txt
+logs/
